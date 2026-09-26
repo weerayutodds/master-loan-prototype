@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
@@ -10,14 +11,15 @@ import { Card } from "@/components/molecules/Card";
 import { FormField } from "@/components/molecules/FormField";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import { maskIdCardNumber } from "@/lib/format";
 import { provinceOptions } from "@/lib/mock";
+import type { CustomerLead } from "@/types/customer-lead";
 import type { CollateralIdentifier, CollateralType, CustomerInfo } from "@/types/ratebook";
 
 const TOTAL_SECTIONS = 4;
-const MOCK_MASKED_ID = "1-1020-XXXXX-XX-3";
-const MOCK_NCB_GRADE = "เกรด A01";
 
 type CustomerCollateralPanelProps = {
+  initialLead?: CustomerLead | null;
   collateralType: CollateralType | null;
   tags: string[];
 };
@@ -32,20 +34,33 @@ function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
   return identifier.chassisNumber ?? "";
 }
 
-export function CustomerCollateralPanel({ collateralType, tags }: CustomerCollateralPanelProps) {
-  const [customer, setCustomer] = useState<CustomerInfo | null>(null);
+export function CustomerCollateralPanel({
+  initialLead = null,
+  collateralType,
+  tags,
+}: CustomerCollateralPanelProps) {
+  const router = useRouter();
+  const [customer, setCustomer] = useState<CustomerInfo | null>(
+    initialLead
+      ? {
+          firstName: initialLead.firstName,
+          lastName: initialLead.lastName,
+          phone: initialLead.phone,
+        }
+      : null,
+  );
   const [modalOpen, setModalOpen] = useState(false);
-  const [citizenIdVerified, setCitizenIdVerified] = useState(false);
-  const [ncbChecked, setNcbChecked] = useState(false);
   const [collateralIdentifier, setCollateralIdentifier] = useState<CollateralIdentifier | null>(
     null,
   );
   const [collateralModalOpen, setCollateralModalOpen] = useState(false);
   const [brandModel, setBrandModel] = useState("");
 
+  const idCardNumber = initialLead?.idCardNumber ?? "";
+
   const filledSectionCount = [
     customer !== null,
-    citizenIdVerified,
+    idCardNumber.trim() !== "",
     collateralIdentifier !== null,
     brandModel.trim() !== "",
   ].filter(Boolean).length;
@@ -94,28 +109,23 @@ export function CustomerCollateralPanel({ collateralType, tags }: CustomerCollat
 
       <div className="border-t border-dashed border-border" />
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-sm text-muted-foreground">เลขบัตรประชาชน</span>
-        {citizenIdVerified ? (
-          <Badge tone="success" className="px-3 py-1 text-sm font-semibold">
-            {MOCK_MASKED_ID}
+        <div className="flex items-center gap-2">
+          <Badge tone={idCardNumber ? "success" : "neutral"} className="px-3 py-1 text-sm font-semibold">
+            {idCardNumber ? maskIdCardNumber(idCardNumber) : "-"}
           </Badge>
-        ) : (
-          <Button variant="outline" size="sm" onClick={() => setCitizenIdVerified(true)}>
+          <Button variant="outline" size="sm" onClick={() => router.push("/customer-form")}>
             Dipchip
           </Button>
-        )}
+        </div>
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">NCB เกรด</span>
-        {ncbChecked ? (
-          <span className="text-sm font-medium text-foreground">{MOCK_NCB_GRADE}</span>
-        ) : (
-          <Button variant="outline" size="sm" onClick={() => setNcbChecked(true)}>
-            ตรวจ eNCB
-          </Button>
-        )}
+        <Badge tone={initialLead ? "success" : "neutral"}>
+          {initialLead ? `เกรด ${initialLead.ncbGrade}` : "-"}
+        </Badge>
       </div>
 
       <div className="border-t border-dashed border-border" />

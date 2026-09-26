@@ -2,7 +2,9 @@
 
 Source: `image_figma/CustomerForm/customer_form.png`, `customer_form_manaul_keyin.png`, `customer_form_dipchip_loading.png`, `customer_form_dipchip_success.png`
 
-Entry point: Home (`/`) → "ตรวจสอบข้อมูลลูกค้า" button → `/customer-form`.
+Entry point: Home (`/`) → "ตรวจสอบข้อมูลลูกค้า" button → `/customer-form`, or `/ratebook` → "Dipchip" button → `/customer-form` (see [ratebook.md](ratebook.md)). Both entry points land on the same page with identical behavior — no data is passed between them.
+
+On completion this flow hands off to [customer-lead-list.md](customer-lead-list.md).
 
 ## Flow
 
@@ -18,10 +20,10 @@ Entry point: Home (`/`) → "ตรวจสอบข้อมูลลูกค
 | 8 | Loading resolves | Green "อ่านข้อมูลบัตรสำเร็จ" banner appears; dropzone is replaced by a customer chip (mock name + เลขบัตรประชาชน) and an empty เบอร์โทรศัพท์ field | Mock data from `src/lib/mock.ts` (`mockCardCustomer`) — ID card doesn't carry a phone number, so it must be keyed in separately |
 | 9 | Fill เบอร์โทรศัพท์ (card tab, post-success) | "ดำเนินการต่อ" becomes enabled | |
 | 10 | Click "← หน้าหลัก" | Returns to `/` | |
-| 11 | Click "ดำเนินการต่อ" (once enabled) | **Not yet wired to a destination or persistence** | UI-state only for this phase, same precedent as "บันทึก Lead" in the ratebook flow |
+| 11 | Click "ดำเนินการต่อ" (once enabled) | Creates or updates a `customer_lead` DB row, then navigates to `/customer-lead-list?leadId=<id>` | `createCustomerLead` server action (`src/lib/actions/customer-lead.ts`): เบอร์โทรศัพท์ is the dedup key (`customer_lead.phone` is `unique` in `db/schema.sql`) — if a row with that phone already exists, it's updated in place (ชื่อ/นามสกุล/เลขบัตรประชาชน/NCB เกรด all overwritten, same `id`, no duplicate row); otherwise a new row is inserted. NCB เกรด is a fresh random pick (`A01`/`A02`/`A03`/`L05`) each time, standing in for a real eNCB check; see [customer-lead-list.md](customer-lead-list.md) |
 
 ## Out of scope for this phase (flagged, not silently built)
 - Real ID-card reader / dipchip hardware integration — the idle → loading → success sequence is simulated client-side with a timer, not connected to any device.
 - ประเภทลูกค้า only has one option ("บุคคลธรรมดา") wired; other customer types (e.g. นิติบุคคล) are not in scope.
 - The เมนู (☰) icon in the header — visual only, no menu wired.
-- What happens after "ดำเนินการต่อ" is clicked (save destination, DB write, navigation).
+- The NCB grade is a random pick, not a real eNCB API call — see [customer-lead-list.md](customer-lead-list.md).

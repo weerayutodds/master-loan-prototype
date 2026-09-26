@@ -8,7 +8,7 @@ const toneClasses: Record<NonNullable<BadgeProps["tone"]>, string> = {
   danger: "bg-badge-danger-bg text-badge-danger-fg",
   neutral: "bg-surface-muted text-muted-foreground",
   primary: "bg-primary/10 text-primary",
-  success: "bg-success text-white",
+  success: "bg-success text-primary-foreground",
 };
 
 export function Badge({ children, tone = "neutral", className = "" }: BadgeProps) {

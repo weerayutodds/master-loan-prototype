@@ -1,29 +1,15 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/atoms/Icon";
-import { CustomerCollateralPanel } from "@/components/organisms/CustomerCollateralPanel";
-import { LoanQuestionsPanel } from "@/components/organisms/LoanQuestionsPanel";
-import {
-  collateralTypeOptions,
-  loanPurposeOptions,
-  refinanceStatusOptions,
-} from "@/lib/mock";
-import type { CollateralType, LoanPurpose, RefinanceStatus } from "@/types/ratebook";
+import { RatebookForm } from "@/components/organisms/RatebookForm";
+import { getCustomerLeadById } from "@/lib/customer-lead";
 
-export default function RatebookPage() {
-  const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(null);
-  const [collateralType, setCollateralType] = useState<CollateralType | null>(null);
-  const [refinanceStatus, setRefinanceStatus] = useState<RefinanceStatus | null>(null);
+type RatebookPageProps = {
+  searchParams: Promise<{ leadId?: string }>;
+};
 
-  const tags = [
-    loanPurposeOptions.find((option) => option.value === loanPurpose)?.description,
-    collateralTypeOptions
-      .find((option) => option.value === collateralType)
-      ?.label.replace(/ /g, "-"),
-    refinanceStatusOptions.find((option) => option.value === refinanceStatus)?.description,
-  ].filter((tag): tag is string => Boolean(tag));
+export default async function RatebookPage({ searchParams }: RatebookPageProps) {
+  const { leadId } = await searchParams;
+  const initialLead = leadId ? await getCustomerLeadById(leadId) : null;
 
   return (
     <>
@@ -35,20 +21,7 @@ export default function RatebookPage() {
         <Icon name="menu" className="size-5 text-muted-foreground" />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_2fr]">
-        <CustomerCollateralPanel collateralType={collateralType} tags={tags} />
-        <LoanQuestionsPanel
-          loanPurposeOptions={loanPurposeOptions}
-          collateralTypeOptions={collateralTypeOptions}
-          refinanceStatusOptions={refinanceStatusOptions}
-          loanPurpose={loanPurpose}
-          onLoanPurposeChange={setLoanPurpose}
-          collateralType={collateralType}
-          onCollateralTypeChange={setCollateralType}
-          refinanceStatus={refinanceStatus}
-          onRefinanceStatusChange={setRefinanceStatus}
-        />
-      </div>
+      <RatebookForm initialLead={initialLead} />
     </>
   );
 }

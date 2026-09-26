@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
@@ -9,6 +10,7 @@ import { Select } from "@/components/atoms/Select";
 import { Card } from "@/components/molecules/Card";
 import { FormField } from "@/components/molecules/FormField";
 import { SegmentedControl } from "@/components/molecules/SegmentedControl";
+import { createCustomerLead } from "@/lib/actions/customer-lead";
 import { mockCardCustomer } from "@/lib/mock";
 import { isValidThaiPhone } from "@/lib/validation";
 import type {
@@ -38,6 +40,7 @@ export function CustomerVerificationPanel({
   customerTypeOptions,
   verificationMethodOptions,
 }: CustomerVerificationPanelProps) {
+  const router = useRouter();
   const [verificationMethod, setVerificationMethod] =
     useState<VerificationMethod>("card");
   const [cardStatus, setCardStatus] = useState<CardReadStatus>("idle");
@@ -50,7 +53,7 @@ export function CustomerVerificationPanel({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<CustomerFormValues>({
     mode: "onChange",
     shouldUnregister: true,
@@ -72,25 +75,27 @@ export function CustomerVerificationPanel({
     }, CARD_READ_DELAY_MS);
   }
 
-  function onSubmit(data: CustomerFormValues) {
-    const payload =
+  async function onSubmit(data: CustomerFormValues) {
+    const normalized =
       verificationMethod === "card"
-        ? {
-            verificationMethod,
-            customerType: data.customerType,
-            name: cardCustomer?.name,
-            idCardNumber: cardCustomer?.idCardNumber,
-            phone: data.cardPhone,
-          }
+        ? (() => {
+            const [firstName, ...rest] = (cardCustomer?.name ?? "").split(" ");
+            return {
+              firstName,
+              lastName: rest.join(" "),
+              phone: data.cardPhone,
+              idCardNumber: cardCustomer?.idCardNumber ?? "",
+            };
+          })()
         : {
-            verificationMethod,
-            customerType: data.customerType,
             firstName: data.firstName,
             lastName: data.lastName,
             phone: data.phone,
+            idCardNumber: "",
           };
-    // TODO: persist to DB once db/schema.sql defines a customers table.
-    console.log("customer verification submit", payload);
+
+    const lead = await createCustomerLead(normalized);
+    router.push(`/customer-lead-list?leadId=${lead.id}`);
   }
 
   const continueDisabled =
@@ -195,7 +200,12 @@ export function CustomerVerificationPanel({
           </div>
         )}
 
-        <Button type="submit" variant="primary" className="w-full" disabled={continueDisabled}>
+        <Button
+          type="submit"
+          variant="primary"
+          className="w-full"
+          disabled={continueDisabled || isSubmitting}
+        >
           ดำเนินการต่อ
         </Button>
       </form>

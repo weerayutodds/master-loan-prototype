@@ -19,7 +19,8 @@ export type IconName =
   | "user"
   | "phone"
   | "info"
-  | "close";
+  | "close"
+  | "document";
 
 type IconProps = {
   name: IconName;
@@ -179,6 +180,16 @@ const paths: Record<IconName, React.ReactNode> = {
     </>
   ),
   close: <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" strokeLinejoin="round" />,
+  document: (
+    <>
+      <path
+        d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M14 3.5V8h4M9 12.5h6M9 16h6" strokeLinecap="round" />
+    </>
+  ),
 };
 
 export function Icon({ name, className = "size-5" }: IconProps) {
