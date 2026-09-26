@@ -15,6 +15,7 @@ A prototype loan application flow — lets customers apply for and track the sta
 - / : Home — entry point for the loan application flow
 - /ratebook : ทำรายการสินเชื่อ — customer/collateral lead intake form. Business flow: [docs/business-flows/ratebook.md](docs/business-flows/ratebook.md)
 - /customer-form : ตรวจสอบข้อมูลลูกค้า — verify customer identity via simulated ID-card read or manual key-in before continuing. Business flow: [docs/business-flows/customer-form.md](docs/business-flows/customer-form.md)
+- /customer-lead-list : ข้อมูลลูกค้า — summary card for the just-verified customer plus a list of all saved leads. Business flow: [docs/business-flows/customer-lead-list.md](docs/business-flows/customer-lead-list.md)
 
 ## Folder structure
 ```

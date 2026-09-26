@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
@@ -7,16 +8,34 @@ import { Input } from "@/components/atoms/Input";
 import { Card } from "@/components/molecules/Card";
 import { FormField } from "@/components/molecules/FormField";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import { maskIdCardNumber } from "@/lib/format";
+import type { CustomerLead } from "@/types/customer-lead";
 import type { CustomerInfo } from "@/types/ratebook";
 
 const TOTAL_SECTIONS = 4;
 
-export function CustomerCollateralPanel() {
-  const [customer, setCustomer] = useState<CustomerInfo | null>(null);
+type CustomerCollateralPanelProps = {
+  initialLead?: CustomerLead | null;
+};
+
+export function CustomerCollateralPanel({
+  initialLead = null,
+}: CustomerCollateralPanelProps) {
+  const router = useRouter();
+  const [customer, setCustomer] = useState<CustomerInfo | null>(
+    initialLead
+      ? {
+          firstName: initialLead.firstName,
+          lastName: initialLead.lastName,
+          phone: initialLead.phone,
+        }
+      : null,
+  );
   const [modalOpen, setModalOpen] = useState(false);
-  const [idCardNumber, setIdCardNumber] = useState("");
   const [registrationNumber, setRegistrationNumber] = useState("");
   const [brandModel, setBrandModel] = useState("");
+
+  const idCardNumber = initialLead?.idCardNumber ?? "";
 
   const filledSectionCount = [
     customer !== null,
@@ -61,23 +80,29 @@ export function CustomerCollateralPanel() {
         ) : null}
       </div>
 
-      <FormField label="เลขบัตรประชาชน">
-        <div className="flex gap-2">
-          <Input name="idCardNumber" onChange={(e) => setIdCardNumber(e.target.value)} />
-          <Button variant="outline" size="sm" className="shrink-0">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-sm font-medium text-foreground">เลขบัตรประชาชน</span>
+        <div className="flex items-center gap-2">
+          <Badge tone={idCardNumber ? "success" : "neutral"}>
+            {idCardNumber ? maskIdCardNumber(idCardNumber) : "-"}
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={() => router.push("/customer-form")}
+          >
             Dipchip
           </Button>
         </div>
-      </FormField>
+      </div>
 
-      <FormField label="NCB เกรด">
-        <div className="flex gap-2">
-          <Input name="ncbGrade" />
-          <Button variant="outline" size="sm" className="shrink-0">
-            ตรวจ eNCB
-          </Button>
-        </div>
-      </FormField>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-sm font-medium text-foreground">NCB เกรด</span>
+        <Badge tone={initialLead ? "success" : "neutral"}>
+          {initialLead ? `เกรด ${initialLead.ncbGrade}` : "-"}
+        </Badge>
+      </div>
 
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-foreground">

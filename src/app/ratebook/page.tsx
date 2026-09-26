@@ -2,13 +2,21 @@ import Link from "next/link";
 import { Icon } from "@/components/atoms/Icon";
 import { CustomerCollateralPanel } from "@/components/organisms/CustomerCollateralPanel";
 import { LoanQuestionsPanel } from "@/components/organisms/LoanQuestionsPanel";
+import { getCustomerLeadById } from "@/lib/customer-lead";
 import {
   collateralTypeOptions,
   loanPurposeOptions,
   refinanceStatusOptions,
 } from "@/lib/mock";
 
-export default function RatebookPage() {
+type RatebookPageProps = {
+  searchParams: Promise<{ leadId?: string }>;
+};
+
+export default async function RatebookPage({ searchParams }: RatebookPageProps) {
+  const { leadId } = await searchParams;
+  const initialLead = leadId ? await getCustomerLeadById(leadId) : null;
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -20,7 +28,7 @@ export default function RatebookPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_2fr]">
-        <CustomerCollateralPanel />
+        <CustomerCollateralPanel initialLead={initialLead} />
         <LoanQuestionsPanel
           loanPurposeOptions={loanPurposeOptions}
           collateralTypeOptions={collateralTypeOptions}

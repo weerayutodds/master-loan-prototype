@@ -16,7 +16,8 @@ export type IconName =
   | "check"
   | "menu"
   | "card-reader"
-  | "user";
+  | "user"
+  | "document";
 
 type IconProps = {
   name: IconName;
@@ -160,6 +161,16 @@ const paths: Record<IconName, React.ReactNode> = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </>
+  ),
+  document: (
+    <>
+      <path
+        d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M14 3.5V8h4M9 12.5h6M9 16h6" strokeLinecap="round" />
     </>
   ),
 };
