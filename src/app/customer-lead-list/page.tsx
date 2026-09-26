@@ -80,9 +80,18 @@ export default async function CustomerLeadListPage({
             </span>
           ))}
         </div>
-        <Button variant="primary" size="sm">
-          จัดสินเชื่อ
-        </Button>
+        {focusLead ? (
+          <Link
+            href={`/ratebook?leadId=${focusLead.id}`}
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90"
+          >
+            จัดสินเชื่อ
+          </Link>
+        ) : (
+          <Button variant="primary" size="sm" disabled>
+            จัดสินเชื่อ
+          </Button>
+        )}
       </div>
 
       <div className="space-y-3">

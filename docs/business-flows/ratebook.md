@@ -2,7 +2,7 @@
 
 Source: `image_figma/MainPage.png`, `image_figma/RateBookPage.png`
 
-Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`.
+Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also reached with a lead pre-filled via `/customer-lead-list` → "ทำรายการสินเชื่อ" (a row) or "จัดสินเชื่อ" (the focused lead) → `/ratebook?leadId=<id>` (see [customer-lead-list.md](customer-lead-list.md)).
 
 ## Flow
 

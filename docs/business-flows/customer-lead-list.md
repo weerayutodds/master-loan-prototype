@@ -14,9 +14,9 @@ Entry point: `/customer-form` → "ดำเนินการต่อ" (once e
 | 4 | "รายการ Lead" tab (default active) | Lists every `customer_lead` row, newest first | Each row shows name, phone, masked เลขบัตรประชาชน, NCB เกรด badge, and a "ทำรายการสินเชื่อ" link |
 | 5 | No leads exist yet | Empty state: document icon + "ไม่มีรายการ" | Matches the empty state in the Figma reference |
 | 6 | Click "ทำรายการสินเชื่อ" on a lead row | Navigates to `/ratebook?leadId=<id>` | Reuses the ratebook sidebar's existing lead pre-fill (see [ratebook.md](ratebook.md)) |
+| 7 | Click "จัดสินเชื่อ" (only when a `leadId` is in context) | Navigates to `/ratebook?leadId=<id>` for the summary card's lead | Same destination/pre-fill as step 6, just scoped to the focused lead instead of a row; rendered as a disabled button when there's no `leadId` (nothing to send) |
 
 ## Out of scope for this phase (flagged, not silently built)
 - "รายการใบคำขอ" and "รายการสัญญาสินเชื่อ" tabs — visual only; no application/contract data model exists yet, so only "รายการ Lead" has real content.
 - "ตรวจ eNCB" button on the summary card — visual only; the NCB เกรด is already assigned automatically when the lead is created (see [customer-form.md](customer-form.md)), not triggered from here.
-- "จัดสินเชื่อ" button — visual only, no defined destination.
 - The เมนู (☰) icon in the header — visual only, no menu wired.
