@@ -11,6 +11,11 @@ import type {
   OptionCardData,
   RefinanceStatus,
 } from "@/types/ratebook";
+import type {
+  CardCustomerData,
+  CustomerType,
+  VerificationMethod,
+} from "@/types/customer-form";
 
 export const navItems: NavItem[] = [
   { href: "/", label: "หน้าแรก", icon: "home", active: true },
@@ -77,6 +82,23 @@ export const refinanceStatusOptions: OptionCardData<RefinanceStatus>[] = [
   { value: "still-paying", label: "ยังผ่อนอยู่", description: "รีไฟแนนซ์" },
   { value: "paid-off", label: "ผ่อนหมดแล้ว", description: "ไม่ใช่รีไฟแนนซ์" },
 ];
+
+export const customerTypeOptions: { value: CustomerType; label: string }[] = [
+  { value: "individual", label: "บุคคลธรรมดา" },
+];
+
+export const verificationMethodOptions: {
+  value: VerificationMethod;
+  label: string;
+}[] = [
+  { value: "card", label: "เสียบบัตรประชาชน" },
+  { value: "manual", label: "กรอกข้อมูลเอง" },
+];
+
+export const mockCardCustomer: CardCustomerData = {
+  name: "สดใส สะอาดเอี่ยม",
+  idCardNumber: "1-2345-67890-12-3",
+};
 
 export const performanceStats: PerformanceStat[] = [
   {

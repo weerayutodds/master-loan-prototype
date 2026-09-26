@@ -14,7 +14,9 @@ export type IconName =
   | "truck"
   | "map-pin"
   | "check"
-  | "menu";
+  | "menu"
+  | "card-reader"
+  | "user";
 
 type IconProps = {
   name: IconName;
@@ -143,6 +145,23 @@ const paths: Record<IconName, React.ReactNode> = {
   ),
   check: <path d="m5 12.5 4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />,
+  "card-reader": (
+    <>
+      <rect x="5" y="4.5" width="14" height="8" rx="1.5" />
+      <rect x="7.5" y="11" width="9" height="8" rx="1" />
+      <path d="M9.5 15h5" strokeLinecap="round" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path
+        d="M5 20c.7-3.6 3.6-6 7-6s6.3 2.4 7 6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
 };
 
 export function Icon({ name, className = "size-5" }: IconProps) {

@@ -11,6 +11,7 @@ export default function Home() {
         title="Master Loan Dashboard"
         subtitle="Track leads, manage applications, and check your metrics today."
         ctaLabel="ตรวจสอบข้อมูลลูกค้า"
+        ctaHref="/customer-form"
       />
       <QuickActionsSection actions={quickActions} />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

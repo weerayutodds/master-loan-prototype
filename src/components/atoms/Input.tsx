@@ -1,20 +1,22 @@
-type InputProps = {
-  name: string;
+import { forwardRef, type InputHTMLAttributes } from "react";
+
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
   type?: "text" | "tel";
-  defaultValue?: string;
-  placeholder?: string;
-  onChange?: (value: string) => void;
+  invalid?: boolean;
 };
 
-export function Input({ name, type = "text", defaultValue, placeholder, onChange }: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { type = "text", invalid = false, className = "", ...rest },
+  ref,
+) {
   return (
     <input
+      ref={ref}
       type={type}
-      name={name}
-      defaultValue={defaultValue}
-      placeholder={placeholder}
-      onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-      className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+      className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none ${
+        invalid ? "border-danger focus:border-danger" : "border-border focus:border-primary"
+      } ${className}`}
+      {...rest}
     />
   );
-}
+});

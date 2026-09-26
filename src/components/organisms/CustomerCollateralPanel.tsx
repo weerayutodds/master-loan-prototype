@@ -63,7 +63,7 @@ export function CustomerCollateralPanel() {
 
       <FormField label="เลขบัตรประชาชน">
         <div className="flex gap-2">
-          <Input name="idCardNumber" onChange={setIdCardNumber} />
+          <Input name="idCardNumber" onChange={(e) => setIdCardNumber(e.target.value)} />
           <Button variant="outline" size="sm" className="shrink-0">
             Dipchip
           </Button>
@@ -90,7 +90,7 @@ export function CustomerCollateralPanel() {
 
       <FormField label="เลขทะเบียน / เลขตัวถัง">
         <div className="flex gap-2">
-          <Input name="registrationNumber" onChange={setRegistrationNumber} />
+          <Input name="registrationNumber" onChange={(e) => setRegistrationNumber(e.target.value)} />
           <Button variant="outline" size="sm" className="shrink-0">
             เพิ่ม
           </Button>
@@ -99,7 +99,7 @@ export function CustomerCollateralPanel() {
 
       <FormField label="ยี่ห้อ / รุ่น">
         <div className="flex gap-2">
-          <Input name="brandModel" onChange={setBrandModel} />
+          <Input name="brandModel" onChange={(e) => setBrandModel(e.target.value)} />
           <Button variant="outline" size="sm" className="shrink-0">
             เพิ่ม
           </Button>
