@@ -1,0 +1,2 @@
+-- Source of truth for the database schema.
+-- Apply changes here first, then update src/lib/actions and src/types to match.
