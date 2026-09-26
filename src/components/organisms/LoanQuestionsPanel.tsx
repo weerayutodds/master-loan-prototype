@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card } from "@/components/molecules/Card";
 import { OptionCard } from "@/components/molecules/OptionCard";
 import type {
@@ -14,17 +13,25 @@ type LoanQuestionsPanelProps = {
   loanPurposeOptions: OptionCardData<LoanPurpose>[];
   collateralTypeOptions: OptionCardData<CollateralType>[];
   refinanceStatusOptions: OptionCardData<RefinanceStatus>[];
+  loanPurpose: LoanPurpose | null;
+  onLoanPurposeChange: (value: LoanPurpose) => void;
+  collateralType: CollateralType | null;
+  onCollateralTypeChange: (value: CollateralType) => void;
+  refinanceStatus: RefinanceStatus | null;
+  onRefinanceStatusChange: (value: RefinanceStatus) => void;
 };
 
 export function LoanQuestionsPanel({
   loanPurposeOptions,
   collateralTypeOptions,
   refinanceStatusOptions,
+  loanPurpose,
+  onLoanPurposeChange,
+  collateralType,
+  onCollateralTypeChange,
+  refinanceStatus,
+  onRefinanceStatusChange,
 }: LoanQuestionsPanelProps) {
-  const [loanPurpose, setLoanPurpose] = useState<LoanPurpose>("need-money");
-  const [collateralType, setCollateralType] = useState<CollateralType | null>(null);
-  const [refinanceStatus, setRefinanceStatus] = useState<RefinanceStatus | null>(null);
-
   return (
     <Card className="space-y-6">
       <div>
@@ -36,7 +43,7 @@ export function LoanQuestionsPanel({
               label={option.label}
               description={option.description}
               selected={loanPurpose === option.value}
-              onSelect={() => setLoanPurpose(option.value)}
+              onSelect={() => onLoanPurposeChange(option.value)}
             />
           ))}
         </div>
@@ -50,8 +57,9 @@ export function LoanQuestionsPanel({
               key={option.value}
               label={option.label}
               icon={option.icon}
+              image={option.image}
               selected={collateralType === option.value}
-              onSelect={() => setCollateralType(option.value)}
+              onSelect={() => onCollateralTypeChange(option.value)}
             />
           ))}
         </div>
@@ -66,7 +74,7 @@ export function LoanQuestionsPanel({
               label={option.label}
               description={option.description}
               selected={refinanceStatus === option.value}
-              onSelect={() => setRefinanceStatus(option.value)}
+              onSelect={() => onRefinanceStatusChange(option.value)}
             />
           ))}
         </div>

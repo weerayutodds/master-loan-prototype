@@ -71,11 +71,22 @@ export const loanPurposeOptions: OptionCardData<LoanPurpose>[] = [
   { value: "buy-car", label: "อยากซื้อรถ", description: "ซื้อ-ขาย ดีลเลอร์" },
 ];
 
+export const provinceOptions: { value: string; label: string }[] = [
+  { value: "bangkok", label: "กรุงเทพมหานคร" },
+  { value: "nonthaburi", label: "นนทบุรี" },
+  { value: "pathum-thani", label: "ปทุมธานี" },
+  { value: "samut-prakan", label: "สมุทรปราการ" },
+  { value: "chiang-mai", label: "เชียงใหม่" },
+  { value: "chon-buri", label: "ชลบุรี" },
+  { value: "nakhon-ratchasima", label: "นครราชสีมา" },
+  { value: "khon-kaen", label: "ขอนแก่น" },
+];
+
 export const collateralTypeOptions: OptionCardData<CollateralType>[] = [
-  { value: "motorcycle", label: "มอเตอร์ไซค์", icon: "motorcycle" },
-  { value: "car", label: "เก๋ง กระบะ ตู้", icon: "car" },
-  { value: "truck", label: "บรรทุก", icon: "truck" },
-  { value: "land", label: "ที่ดิน", icon: "map-pin" },
+  { value: "motorcycle", label: "มอเตอร์ไซค์", image: "/assets/collateral/motorcycle.png" },
+  { value: "car", label: "เก๋ง กระบะ ตู้", image: "/assets/collateral/car.png" },
+  { value: "truck", label: "บรรทุก", image: "/assets/collateral/truck.png" },
+  { value: "land", label: "ที่ดิน", image: "/assets/collateral/land.png" },
 ];
 
 export const refinanceStatusOptions: OptionCardData<RefinanceStatus>[] = [

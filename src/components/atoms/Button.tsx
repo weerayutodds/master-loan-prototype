@@ -8,13 +8,13 @@ type ButtonProps = {
   className?: string;
 };
 
+const FOCUS_RING =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2";
+
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary:
-    "bg-primary text-primary-foreground hover:opacity-90 disabled:bg-surface-muted disabled:text-muted-foreground disabled:hover:opacity-100 disabled:cursor-not-allowed",
-  ghost:
-    "bg-transparent text-foreground hover:bg-surface-muted disabled:text-muted-foreground disabled:cursor-not-allowed disabled:hover:bg-transparent",
-  outline:
-    "border border-primary bg-surface text-primary hover:bg-primary/5 disabled:border-border disabled:text-muted-foreground disabled:cursor-not-allowed disabled:hover:bg-surface",
+  primary: `bg-[linear-gradient(150.46deg,var(--primary)_10%,var(--primary-to)_78.19%)] text-primary-foreground hover:brightness-95 disabled:bg-none disabled:bg-surface-muted disabled:text-muted-foreground disabled:cursor-not-allowed ${FOCUS_RING}`,
+  ghost: `bg-transparent text-foreground hover:bg-surface-muted disabled:text-muted-foreground disabled:cursor-not-allowed disabled:hover:bg-transparent ${FOCUS_RING}`,
+  outline: `border border-primary bg-surface text-primary hover:bg-primary/5 disabled:border-border disabled:text-muted-foreground disabled:cursor-not-allowed disabled:hover:bg-surface ${FOCUS_RING}`,
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {

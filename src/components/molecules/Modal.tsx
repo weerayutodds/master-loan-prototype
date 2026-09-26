@@ -5,11 +5,30 @@ import { useEffect } from "react";
 type ModalProps = {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: React.ReactNode;
+  size?: "md" | "lg";
+  variant?: "form" | "info";
 };
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+const sizeClasses: Record<NonNullable<ModalProps["size"]>, string> = {
+  md: "max-w-md",
+  lg: "max-w-[556px]",
+};
+
+const variantClasses: Record<NonNullable<ModalProps["variant"]>, string> = {
+  form: "rounded-[20px] border-2 border-card-border shadow-primary-s",
+  info: "rounded-2xl shadow-secondary-m",
+};
+
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  size = "md",
+  variant = "form",
+}: ModalProps) {
   useEffect(() => {
     if (!open) return;
     function handleKeyDown(event: KeyboardEvent) {
@@ -27,11 +46,11 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl"
+        className={`w-full ${sizeClasses[size]} ${variantClasses[variant]} bg-surface p-6`}
         onClick={(event) => event.stopPropagation()}
       >
-        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-        <div className="mt-4">{children}</div>
+        {title ? <h2 className="text-lg font-semibold text-foreground">{title}</h2> : null}
+        <div className={title ? "mt-4" : ""}>{children}</div>
       </div>
     </div>
   );

@@ -7,17 +7,19 @@
   --surface: #ffffff;
   --surface-muted: #f4f5f8;
   --border: #e5e7eb;
+  --card-border: #ecf1f9;
   --muted-foreground: #6b7280;
 
-  --primary: #4457f5;
+  --primary: #3f74f5;
+  --primary-to: #334ed1;
   --primary-foreground: #ffffff;
 
-  --sidebar: #14183a;
+  --sidebar: #172054;
   --sidebar-foreground: #e6e8f5;
   --sidebar-muted: #9aa1c4;
-  --sidebar-active: #4457f5;
+  --sidebar-active: #3f74f5;
 
-  --success: #16a34a;
+  --success: #03aa3c;
   --danger: #e11d48;
   --badge-danger-bg: #fde2e7;
   --badge-danger-fg: #be123c;
@@ -30,10 +32,15 @@
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
+  --color-card-border: var(--card-border);
   --color-muted-foreground: var(--muted-foreground);
 
   --color-primary: var(--primary);
+  --color-primary-to: var(--primary-to);
   --color-primary-foreground: var(--primary-foreground);
+
+  --shadow-primary-s: 0px 4px 12px rgba(63, 116, 245, 0.16);
+  --shadow-secondary-m: 0px 10px 30px rgba(23, 32, 84, 0.12);
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);

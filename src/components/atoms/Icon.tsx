@@ -16,7 +16,10 @@ export type IconName =
   | "check"
   | "menu"
   | "card-reader"
-  | "user";
+  | "user"
+  | "phone"
+  | "info"
+  | "close";
 
 type IconProps = {
   name: IconName;
@@ -162,6 +165,20 @@ const paths: Record<IconName, React.ReactNode> = {
       />
     </>
   ),
+  phone: (
+    <path
+      d="M6.6 10.2c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V19c0 .6-.4 1-1 1C10.9 20 4 13.1 4 4.6c0-.6.4-1 1-1h3c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1L6.6 10.2Z"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+  info: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5.5M12 7.75v.01" strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
+  close: <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" strokeLinejoin="round" />,
 };
 
 export function Icon({ name, className = "size-5" }: IconProps) {

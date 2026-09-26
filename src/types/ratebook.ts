@@ -9,10 +9,17 @@ export type OptionCardData<T extends string> = {
   label: string;
   description?: string;
   icon?: IconName;
+  image?: string;
 };
 
 export type CustomerInfo = {
   firstName: string;
   lastName: string;
   phone: string;
+};
+
+export type CollateralIdentifier = {
+  licensePlateNumber?: string;
+  licensePlateProvince?: string;
+  chassisNumber?: string;
 };
