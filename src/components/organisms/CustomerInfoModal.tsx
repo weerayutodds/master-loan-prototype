@@ -1,10 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { FormField } from "@/components/molecules/FormField";
 import { Modal } from "@/components/molecules/Modal";
+import { isValidThaiPhone } from "@/lib/validation";
 import type { CustomerInfo } from "@/types/ratebook";
+
+const PHONE_ERROR_MESSAGE = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง";
 
 type CustomerInfoModalProps = {
   open: boolean;
@@ -14,35 +19,80 @@ type CustomerInfoModalProps = {
 };
 
 export function CustomerInfoModal({ open, initialValue, onClose, onSave }: CustomerInfoModalProps) {
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    onSave({
-      firstName: String(data.get("firstName") ?? ""),
-      lastName: String(data.get("lastName") ?? ""),
-      phone: String(data.get("phone") ?? ""),
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CustomerInfo>({
+    defaultValues: { firstName: "", lastName: "", phone: "" },
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    reset({
+      firstName: initialValue?.firstName ?? "",
+      lastName: initialValue?.lastName ?? "",
+      phone: initialValue?.phone ?? "",
     });
+  }, [open, initialValue, reset]);
+
+  function onSubmit(data: CustomerInfo) {
+    onSave(data);
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="ข้อมูลลูกค้า">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField label="ชื่อ">
-            <Input name="firstName" defaultValue={initialValue?.firstName} />
-          </FormField>
-          <FormField label="นามสกุล">
-            <Input name="lastName" defaultValue={initialValue?.lastName} />
-          </FormField>
+    <Modal open={open} onClose={onClose} size="lg">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <h2 className="text-center text-xl font-semibold text-foreground">
+          ข้อมูลลูกค้า
+        </h2>
+
+        <div className="border-t border-divider" />
+
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="ชื่อ" error={errors.firstName?.message}>
+              <Input
+                placeholder="กรอกชื่อ"
+                invalid={!!errors.firstName}
+                {...register("firstName", { required: "กรุณากรอกชื่อ" })}
+              />
+            </FormField>
+            <FormField label="นามสกุล" error={errors.lastName?.message}>
+              <Input
+                placeholder="กรอกนามสกุล"
+                invalid={!!errors.lastName}
+                {...register("lastName", { required: "กรุณากรอกนามสกุล" })}
+              />
+            </FormField>
+            <FormField label="เบอร์โทรศัพท์" error={errors.phone?.message}>
+              <Input
+                type="tel"
+                placeholder="0812345678"
+                invalid={!!errors.phone}
+                {...register("phone", {
+                  required: "กรุณากรอกเบอร์โทรศัพท์",
+                  validate: (value) => isValidThaiPhone(value) || PHONE_ERROR_MESSAGE,
+                })}
+              />
+            </FormField>
+          </div>
         </div>
-        <FormField label="เบอร์โทรศัพท์">
-          <Input name="phone" type="tel" defaultValue={initialValue?.phone} />
-        </FormField>
-        <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="ghost" onClick={onClose}>
+
+        <div className="border-t border-divider" />
+
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+            onClick={onClose}
+          >
             ยกเลิก
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" size="lg" className="flex-1">
             บันทึก
           </Button>
         </div>

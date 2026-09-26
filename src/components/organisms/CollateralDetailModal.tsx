@@ -70,7 +70,7 @@ export function CollateralDetailModal({
   return (
     <Modal open={open} onClose={onClose} size="lg">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <h2 className="text-center text-lg font-semibold text-foreground">
+        <h2 className="text-center text-xl font-semibold text-foreground">
           กรอกเลขทะเบียน / เลขตัวถัง
         </h2>
 
@@ -87,9 +87,9 @@ export function CollateralDetailModal({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-secondary-border" />
           <span className="text-sm text-muted-foreground">หรือ</span>
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-secondary-border" />
         </div>
 
         <FormField
@@ -106,13 +106,13 @@ export function CollateralDetailModal({
           <Input placeholder="กรอกข้อมูล" {...register("chassisNumber")} />
         </FormField>
 
-        <div className="border-t border-border" />
+        <div className="border-t border-divider" />
 
         <div className="flex gap-4">
-          <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
+          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             ยกเลิก
           </Button>
-          <Button type="submit" variant="primary" className="flex-1">
+          <Button type="submit" variant="primary" size="lg" className="flex-1">
             บันทึก
           </Button>
         </div>

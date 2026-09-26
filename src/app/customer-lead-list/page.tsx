@@ -23,14 +23,6 @@ export default async function CustomerLeadListPage({
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <Link href="/" className="text-sm font-medium text-primary hover:underline">
-          ← ข้อมูลลูกค้า
-        </Link>
-        <h1 className="text-xl font-semibold text-foreground">ข้อมูลลูกค้า</h1>
-        <Icon name="menu" className="size-5 text-muted-foreground" />
-      </div>
-
       <Card className="flex flex-wrap items-center justify-between gap-6">
         <div>
           <p className="text-base font-semibold text-foreground">

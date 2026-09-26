@@ -2,13 +2,17 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #414243;
 
   --surface: #ffffff;
   --surface-muted: #f4f5f8;
   --border: #e5e7eb;
   --card-border: #ecf1f9;
+  --divider: #f2f2f2;
   --muted-foreground: #6b7280;
+
+  --secondary-bg: #fafbff;
+  --secondary-border: #dddddf;
 
   --primary: #3f74f5;
   --primary-to: #334ed1;
@@ -33,7 +37,11 @@
   --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
   --color-card-border: var(--card-border);
+  --color-divider: var(--divider);
   --color-muted-foreground: var(--muted-foreground);
+
+  --color-secondary-bg: var(--secondary-bg);
+  --color-secondary-border: var(--secondary-border);
 
   --color-primary: var(--primary);
   --color-primary-to: var(--primary-to);

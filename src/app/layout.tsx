@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Thai } from "next/font/google";
-import { Sidebar } from "@/components/organisms/Sidebar";
-import { currentUser, navItems } from "@/lib/mock";
+import { AppShell } from "@/components/organisms/AppShell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,12 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <div className="flex flex-1">
-          <Sidebar navItems={navItems} user={currentUser} />
-          <main className="flex-1 space-y-6 bg-surface-muted p-8">
-            {children}
-          </main>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

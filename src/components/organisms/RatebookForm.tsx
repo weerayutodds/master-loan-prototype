@@ -30,11 +30,7 @@ export function RatebookForm({ initialLead }: RatebookFormProps) {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_2fr]">
-      <CustomerCollateralPanel
-        initialLead={initialLead}
-        collateralType={collateralType}
-        tags={tags}
-      />
+      <CustomerCollateralPanel initialLead={initialLead} tags={tags} />
       <LoanQuestionsPanel
         loanPurposeOptions={loanPurposeOptions}
         collateralTypeOptions={collateralTypeOptions}
