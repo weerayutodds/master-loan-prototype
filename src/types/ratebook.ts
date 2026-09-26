@@ -23,3 +23,16 @@ export type CollateralIdentifier = {
   licensePlateProvince?: string;
   chassisNumber?: string;
 };
+
+export type CarInfo = {
+  brand?: string;
+  model?: string;
+  year?: string;
+  condition?: string;
+  doors?: string;
+  carType?: string;
+  engineCc?: string;
+  transmission?: string;
+  bodyType?: string;
+  subModel?: string;
+};

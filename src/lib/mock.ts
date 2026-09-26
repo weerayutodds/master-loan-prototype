@@ -106,6 +106,88 @@ export const verificationMethodOptions: {
   { value: "manual", label: "กรอกข้อมูลเอง" },
 ];
 
+export const carBrandOptions: { value: string; label: string }[] = [
+  { value: "toyota", label: "Toyota" },
+  { value: "honda", label: "Honda" },
+  { value: "isuzu", label: "Isuzu" },
+  { value: "nissan", label: "Nissan" },
+  { value: "mazda", label: "Mazda" },
+  { value: "ford", label: "Ford" },
+  { value: "mitsubishi", label: "Mitsubishi" },
+  { value: "suzuki", label: "Suzuki" },
+];
+
+export const carModelOptions: { value: string; label: string }[] = [
+  { value: "vios", label: "Vios" },
+  { value: "yaris", label: "Yaris" },
+  { value: "city", label: "City" },
+  { value: "civic", label: "Civic" },
+  { value: "d-max", label: "D-Max" },
+  { value: "almera", label: "Almera" },
+  { value: "cx-5", label: "CX-5" },
+  { value: "ranger", label: "Ranger" },
+  { value: "triton", label: "Triton" },
+  { value: "swift", label: "Swift" },
+];
+
+export const carYearOptions: { value: string; label: string }[] = Array.from(
+  { length: 15 },
+  (_, index) => {
+    const year = 2024 - index;
+    return { value: String(year), label: String(year) };
+  },
+);
+
+export const carConditionOptions: { value: string; label: string }[] = [
+  { value: "excellent", label: "ดีเยี่ยม" },
+  { value: "good", label: "ดี" },
+  { value: "fair", label: "พอใช้" },
+  { value: "needs-repair", label: "ต้องซ่อมแซม" },
+];
+
+export const carDoorsOptions: { value: string; label: string }[] = [
+  { value: "2", label: "2 ประตู" },
+  { value: "4", label: "4 ประตู" },
+  { value: "5", label: "5 ประตู" },
+];
+
+export const carTypeOptions: { value: string; label: string }[] = [
+  { value: "sedan", label: "รถเก๋ง" },
+  { value: "pickup", label: "รถกระบะ" },
+  { value: "suv", label: "รถ SUV" },
+  { value: "van", label: "รถตู้" },
+  { value: "truck", label: "รถบรรทุก" },
+];
+
+export const carEngineCcOptions: { value: string; label: string }[] = [
+  { value: "1000", label: "1000 ซีซี" },
+  { value: "1200", label: "1200 ซีซี" },
+  { value: "1500", label: "1500 ซีซี" },
+  { value: "1800", label: "1800 ซีซี" },
+  { value: "2000", label: "2000 ซีซี" },
+  { value: "2500", label: "2500 ซีซี" },
+  { value: "3000", label: "3000 ซีซี" },
+];
+
+export const carTransmissionOptions: { value: string; label: string }[] = [
+  { value: "manual", label: "เกียร์ธรรมดา" },
+  { value: "auto", label: "เกียร์อัตโนมัติ" },
+];
+
+export const carBodyTypeOptions: { value: string; label: string }[] = [
+  { value: "sedan", label: "ซีดาน" },
+  { value: "pickup", label: "กระบะ" },
+  { value: "suv", label: "SUV" },
+  { value: "van", label: "รถตู้" },
+  { value: "hatchback", label: "แฮทช์แบ็ก" },
+];
+
+export const carSubModelOptions: { value: string; label: string }[] = [
+  { value: "standard", label: "Standard" },
+  { value: "sport", label: "Sport" },
+  { value: "hybrid", label: "Hybrid" },
+];
+
 export const mockCardCustomer: CardCustomerData = {
   name: "สดใส สะอาดเอี่ยม",
   idCardNumber: "1-2345-67890-12-3",

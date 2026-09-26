@@ -94,7 +94,7 @@ export function CustomerVerificationPanel({
             idCardNumber: "",
           };
 
-    const lead = await createCustomerLead(normalized);
+    const lead = await createCustomerLead({ ...normalized, verificationMethod });
     router.push(`/customer-lead-list?leadId=${lead.id}`);
   }
 

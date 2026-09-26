@@ -13,6 +13,7 @@ function mapRow(row: any): CustomerLead {
     phone: row.phone,
     idCardNumber: row.id_card_number,
     ncbGrade: row.ncb_grade,
+    verificationMethod: row.verification_method,
     createdAt: row.created_at.toISOString(),
   };
 }
@@ -23,7 +24,7 @@ export async function getCustomerLeadById(
   if (!UUID_PATTERN.test(id)) return null;
 
   const [row] = await sql`
-    select id, first_name, last_name, phone, id_card_number, ncb_grade, created_at
+    select id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method, created_at
     from customer_lead
     where id = ${id}
   `;
@@ -33,7 +34,7 @@ export async function getCustomerLeadById(
 
 export async function listCustomerLeads(): Promise<CustomerLead[]> {
   const rows = await sql`
-    select id, first_name, last_name, phone, id_card_number, ncb_grade, created_at
+    select id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method, created_at
     from customer_lead
     order by created_at desc
   `;

@@ -1,13 +1,15 @@
 import { RatebookForm } from "@/components/organisms/RatebookForm";
-import { getCustomerLeadById } from "@/lib/customer-lead";
+import { getCustomerLeadOpportunityById } from "@/lib/customer-lead-opportunity";
 
 type RatebookPageProps = {
-  searchParams: Promise<{ leadId?: string }>;
+  searchParams: Promise<{ opportunityId?: string }>;
 };
 
 export default async function RatebookPage({ searchParams }: RatebookPageProps) {
-  const { leadId } = await searchParams;
-  const initialLead = leadId ? await getCustomerLeadById(leadId) : null;
+  const { opportunityId } = await searchParams;
+  const initialOpportunity = opportunityId
+    ? await getCustomerLeadOpportunityById(opportunityId)
+    : null;
 
-  return <RatebookForm initialLead={initialLead} />;
+  return <RatebookForm initialOpportunity={initialOpportunity} />;
 }

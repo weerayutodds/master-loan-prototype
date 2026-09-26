@@ -10,16 +10,23 @@ import { ProgressRing } from "@/components/atoms/ProgressRing";
 import { Card } from "@/components/molecules/Card";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import {
+  updateOpportunityCarInfo,
+  updateOpportunityCollateralDetail,
+  updateOpportunityCustomerInfo,
+} from "@/lib/actions/customer-lead-opportunity";
 import { maskIdCardNumber } from "@/lib/format";
 import { provinceOptions } from "@/lib/mock";
-import type { CustomerLead } from "@/types/customer-lead";
-import type { CollateralIdentifier, CustomerInfo } from "@/types/ratebook";
+import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
+import type { CarInfo, CollateralIdentifier, CustomerInfo } from "@/types/ratebook";
 
 const TOTAL_SECTIONS = 4;
 
 type CustomerCollateralPanelProps = {
-  initialLead?: CustomerLead | null;
+  initialOpportunity?: CustomerLeadOpportunity | null;
+  opportunityId: string | null;
   tags: string[];
+  carInfo: CarInfo;
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -32,26 +39,38 @@ function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
   return identifier.chassisNumber ?? "";
 }
 
-export function CustomerCollateralPanel({ initialLead = null, tags }: CustomerCollateralPanelProps) {
+export function CustomerCollateralPanel({
+  initialOpportunity = null,
+  opportunityId,
+  tags,
+  carInfo,
+}: CustomerCollateralPanelProps) {
   const router = useRouter();
   const [customer, setCustomer] = useState<CustomerInfo | null>(
-    initialLead
+    initialOpportunity
       ? {
-          firstName: initialLead.firstName,
-          lastName: initialLead.lastName,
-          phone: initialLead.phone,
+          firstName: initialOpportunity.firstName,
+          lastName: initialOpportunity.lastName,
+          phone: initialOpportunity.phone,
         }
       : null,
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [collateralIdentifier, setCollateralIdentifier] = useState<CollateralIdentifier | null>(
-    null,
+    initialOpportunity &&
+      (initialOpportunity.licensePlateNumber || initialOpportunity.chassisNumber)
+      ? {
+          licensePlateNumber: initialOpportunity.licensePlateNumber ?? undefined,
+          licensePlateProvince: initialOpportunity.licensePlateProvince ?? undefined,
+          chassisNumber: initialOpportunity.chassisNumber ?? undefined,
+        }
+      : null,
   );
   const [collateralModalOpen, setCollateralModalOpen] = useState(false);
-  const [brandModel, setBrandModel] = useState("");
+  const [brandModel, setBrandModel] = useState(initialOpportunity?.brandModel ?? "");
   const [editingBrandModel, setEditingBrandModel] = useState(false);
 
-  const idCardNumber = initialLead?.idCardNumber ?? "";
+  const idCardNumber = initialOpportunity?.idCardNumber ?? "";
 
   const filledSectionCount = [
     customer !== null,
@@ -92,21 +111,26 @@ export function CustomerCollateralPanel({ initialLead = null, tags }: CustomerCo
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">เลขบัตรประชาชน</span>
-        {idCardNumber ? (
-          <Badge tone="success" className="px-3 py-1 text-sm font-semibold">
-            {maskIdCardNumber(idCardNumber)}
-          </Badge>
-        ) : (
-          <Button variant="outline" size="xs" onClick={() => router.push("/customer-form")}>
-            Dipchip
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {idCardNumber ? (
+            <Badge tone="success" className="px-3 py-1 text-sm font-semibold">
+              {maskIdCardNumber(idCardNumber)}
+            </Badge>
+          ) : null}
+          {initialOpportunity?.verificationMethod !== "card" ? (
+            <Button variant="outline" size="xs" onClick={() => router.push("/customer-form")}>
+              Dipchip
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">NCB เกรด</span>
-        {initialLead ? (
-          <span className="text-sm font-medium text-foreground">เกรด {initialLead.ncbGrade}</span>
+        {initialOpportunity?.ncbGrade ? (
+          <span className="text-sm font-medium text-foreground">
+            เกรด {initialOpportunity.ncbGrade}
+          </span>
         ) : (
           <Button variant="outline" size="xs" onClick={() => router.push("/customer-form")}>
             ตรวจ eNCB
@@ -177,7 +201,17 @@ export function CustomerCollateralPanel({ initialLead = null, tags }: CustomerCo
 
       <div className="border-t border-border" />
 
-      <Button variant="primary" className="w-full" disabled={!customer}>
+      <Button
+        variant="primary"
+        className="w-full"
+        disabled={!customer}
+        onClick={() => {
+          if (!opportunityId) return;
+          if (customer) void updateOpportunityCustomerInfo(opportunityId, customer);
+          void updateOpportunityCollateralDetail(opportunityId, { collateralIdentifier, brandModel });
+          void updateOpportunityCarInfo(opportunityId, carInfo);
+        }}
+      >
         บันทึก Lead
       </Button>
 

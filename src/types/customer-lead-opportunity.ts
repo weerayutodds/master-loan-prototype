@@ -1,0 +1,33 @@
+import type { VerificationMethod } from "@/types/customer-form";
+import type { NcbGrade } from "@/types/customer-lead";
+import type { CollateralType, LoanPurpose, RefinanceStatus } from "@/types/ratebook";
+
+export type CustomerLeadOpportunity = {
+  id: string;
+  leadId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  idCardNumber: string;
+  ncbGrade: NcbGrade | null;
+  verificationMethod: VerificationMethod;
+  loanPurpose: LoanPurpose | null;
+  collateralType: CollateralType | null;
+  refinanceStatus: RefinanceStatus | null;
+  licensePlateNumber: string | null;
+  licensePlateProvince: string | null;
+  chassisNumber: string | null;
+  brandModel: string | null;
+  carBrand: string | null;
+  carModel: string | null;
+  carYear: string | null;
+  carCondition: string | null;
+  carDoors: string | null;
+  carType: string | null;
+  carEngineCc: string | null;
+  carTransmission: string | null;
+  carBodyType: string | null;
+  carSubModel: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
