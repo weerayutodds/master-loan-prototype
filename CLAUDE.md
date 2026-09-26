@@ -13,6 +13,7 @@ A prototype loan application flow — lets customers apply for and track the sta
 
 ## Pages
 - / : Home — entry point for the loan application flow
+- /ratebook : ทำรายการสินเชื่อ — customer/collateral lead intake form. Business flow: [docs/business-flows/ratebook.md](docs/business-flows/ratebook.md)
 
 ## Folder structure
 ```
@@ -54,3 +55,4 @@ CLAUDE.md
 ## Workflow
 - Work one phase at a time. Stop and summarize changes after each task.
 - If the Figma design is unclear, ask instead of guessing.
+- For every new page/feature built from a Figma reference, also create or update a business flow doc under `docs/business-flows/<feature>.md` describing the click-by-click flow (trigger → result). Link it from the page's entry in the `## Pages` list above.
