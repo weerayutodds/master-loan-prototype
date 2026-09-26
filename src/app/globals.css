@@ -14,6 +14,8 @@
   --secondary-bg: #fafbff;
   --secondary-border: #dddddf;
 
+  --toast-bg: rgba(30, 30, 31, 0.8);
+
   --primary: #3f74f5;
   --primary-to: #334ed1;
   --primary-foreground: #ffffff;
@@ -27,6 +29,21 @@
   --danger: #e11d48;
   --badge-danger-bg: #fde2e7;
   --badge-danger-fg: #be123c;
+
+  --accent-lime: #cfff78;
+  --pale-blue: #dbe7fe;
+  --hero-to: #1f33ae;
+  --hero-accent: #1e3fd7;
+  --price-label: #616166;
+  --unit-label: #828387;
+  --radio-border: #c3c3c6;
+
+  --tag-red: #f85754;
+  --tag-purple: #874fff;
+  --tag-amber: #ffb41c;
+  --tag-pink: #f849c1;
+  --catalog-card-bg: #eff5ff;
+  --icon-warning: #dd6402;
 }
 
 @theme inline {
@@ -43,12 +60,16 @@
   --color-secondary-bg: var(--secondary-bg);
   --color-secondary-border: var(--secondary-border);
 
+  --color-toast: var(--toast-bg);
+
   --color-primary: var(--primary);
   --color-primary-to: var(--primary-to);
   --color-primary-foreground: var(--primary-foreground);
 
   --shadow-primary-s: 0px 4px 12px rgba(63, 116, 245, 0.16);
+  --shadow-primary-xs: 0px 2px 8px rgba(63, 116, 245, 0.08);
   --shadow-secondary-m: 0px 10px 30px rgba(23, 32, 84, 0.12);
+  --shadow-secondary-xs: 0px 4px 12px rgba(23, 32, 84, 0.08);
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -60,6 +81,21 @@
   --color-badge-danger-bg: var(--badge-danger-bg);
   --color-badge-danger-fg: var(--badge-danger-fg);
 
+  --color-accent-lime: var(--accent-lime);
+  --color-pale-blue: var(--pale-blue);
+  --color-hero-to: var(--hero-to);
+  --color-hero-accent: var(--hero-accent);
+  --color-price-label: var(--price-label);
+  --color-unit-label: var(--unit-label);
+  --color-radio-border: var(--radio-border);
+
+  --color-tag-red: var(--tag-red);
+  --color-tag-purple: var(--tag-purple);
+  --color-tag-amber: var(--tag-amber);
+  --color-tag-pink: var(--tag-pink);
+  --color-catalog-card-bg: var(--catalog-card-bg);
+  --color-icon-warning: var(--icon-warning);
+
   --font-sans: "Geist", "Noto Sans Thai", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
@@ -68,4 +104,42 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.product-guide-hero {
+  background: linear-gradient(167.66deg, var(--sidebar) 41.72%, var(--hero-to) 116.38%);
+}
+
+.product-guide-card-title-1 {
+  background: linear-gradient(266.34deg, var(--pale-blue) -10.06%, var(--primary-to) 62.01%);
+}
+
+.product-guide-card-title-2 {
+  background: linear-gradient(266.34deg, var(--hero-accent) -10.06%, var(--primary) 91.79%);
+}
+
+.product-guide-card-title-3 {
+  background: linear-gradient(
+    270.67deg,
+    var(--primary) 13.76%,
+    var(--hero-accent) 60.83%,
+    var(--primary) 96.37%
+  );
+}
+
+.product-guide-ltv-box {
+  background: linear-gradient(180deg, rgba(63, 116, 245, 0.18) 41.99%, rgba(51, 78, 209, 0.18) 85.28%);
+}
+
+.product-guide-disclaimer-box {
+  background: linear-gradient(180deg, rgba(63, 116, 245, 0.08) 41.99%, rgba(51, 78, 209, 0.08) 85.28%);
+}
+
+.loan-cal-bar {
+  background: linear-gradient(195.77deg, var(--primary-to) 9.73%, var(--sidebar) 121.75%);
+  box-shadow: 0px 0px 11px 2px rgba(23, 32, 84, 0.24);
+}
+
+.loan-cal-result-box {
+  background: linear-gradient(360deg, #ffffff 7.14%, var(--pale-blue) 100%);
 }

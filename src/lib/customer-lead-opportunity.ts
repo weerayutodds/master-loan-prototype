@@ -57,7 +57,11 @@ export async function getCustomerLeadOpportunityById(
   return row ? mapRow(row) : null;
 }
 
-export async function listCustomerLeadOpportunities(): Promise<CustomerLeadOpportunity[]> {
+export async function listCustomerLeadOpportunitiesByLeadId(
+  leadId: string,
+): Promise<CustomerLeadOpportunity[]> {
+  if (!UUID_PATTERN.test(leadId)) return [];
+
   const rows = await sql`
     select
       id, lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
@@ -67,6 +71,7 @@ export async function listCustomerLeadOpportunities(): Promise<CustomerLeadOppor
       car_transmission, car_body_type, car_sub_model,
       created_at, updated_at
     from customer_lead_opportunity
+    where lead_id = ${leadId}
     order by created_at desc
   `;
 

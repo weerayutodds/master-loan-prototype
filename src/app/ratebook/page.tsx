@@ -11,5 +11,9 @@ export default async function RatebookPage({ searchParams }: RatebookPageProps) 
     ? await getCustomerLeadOpportunityById(opportunityId)
     : null;
 
+      if (opportunityId) {
+    console.log("[ratebook] opened saved loan request", { opportunityId, initialOpportunity });
+  }
+
   return <RatebookForm initialOpportunity={initialOpportunity} />;
 }

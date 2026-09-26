@@ -16,6 +16,9 @@ import type {
   CustomerType,
   VerificationMethod,
 } from "@/types/customer-form";
+import type { ProductGuideData } from "@/types/product-guide";
+import type { ProductCatalogData } from "@/types/product-catalog";
+import type { FollowUpEntry } from "@/types/lead-content";
 
 export const navItems: NavItem[] = [
   { href: "/", label: "หน้าแรก", icon: "home", active: true },
@@ -217,5 +220,126 @@ export const performanceStats: PerformanceStat[] = [
     value: "142",
     changeLabel: "8.7%",
     trend: "up",
+  },
+];
+
+export const productGuideMock: ProductGuideData = {
+  appraisalPrice: 570000,
+  approvedRange: { min: 421000, max: 912000 },
+  approvedLtvBadges: ["70% LTV", "160% LTV"],
+  plans: [
+    {
+      title: "อนุมัติง่าย LTV ต่ำ",
+      maxLtvLabel: "ไม่เกิน 70% LTV",
+      maxAmount: 421000,
+      bullets: [
+        "NCB A01-A03 ได้สูงสุด 70%LTV",
+        "วันครอบครอง 60-210 วัน ขึ้นอยู่กับเกรด NCB",
+      ],
+    },
+    {
+      title: "วงเงินสูง ความเสี่ยงปกติ",
+      maxLtvLabel: "ไม่เกิน 130% LTV",
+      maxAmount: 741000,
+      bullets: ["เงื่อนไขขึ้นอยู่กับ NCB grade, LTV และวันครอบครอง"],
+    },
+    {
+      title: "วงเงินสูง ดอกเบี้ยต่ำ ความเสี่ยงต่ำ",
+      maxLtvLabel: "ไม่เกิน 160% LTV",
+      maxAmount: 912000,
+      bullets: ["NCB A01-A02", "เอกสารแสดงรายได้", "งานนอกอำนาจ"],
+    },
+  ],
+};
+
+export const productCatalogMock: ProductCatalogData = {
+  filterChips: ["รถเก๋ง กระบะ 4 ประตู", "จำนำทะเบียน", "ไม่มีไฟแนนซ์", "บัตรติดลบ"],
+  gradeFilterLabel: "ทุกเกรด",
+  items: [
+    {
+      id: "no-transfer-low-risk",
+      title: "ผลิตภัณฑ์ไม่โอนเล่ม ความเสี่ยงต่ำ",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "นอกอำนาจ", tone: "red" },
+        { label: "ใช้เอกสารรายได้", tone: "purple" },
+      ],
+      ltvLabel: "92% LTV",
+      approvedAmount: "524,400",
+      ncbGradeLabel: "A01, A02",
+      ncbGradeTone: "blue",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      interestRateLabel: "(0.60% ต่อเดือน)",
+      interestReductionLabel: "ลดต้นลดดอก 13% ต่อปี",
+      primaryActionLabel: "ตรวจ eNCB",
+      primaryActionVariant: "outline",
+    },
+    {
+      id: "high-limit-normal-risk",
+      title: "โครงการวงเงินสูง ความเสี่ยงปกติ เก่ง กระบะ",
+      tags: [{ label: "รับทุกเกรด", tone: "purple" }],
+      ltvLabel: "80% - 130% LTV",
+      approvedAmount: "456,000 - 741,000",
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      interestRateLabel: "(0.60% - 0.84% ต่อเดือน)",
+      interestReductionLabel: "ลดต้นลดดอก 20% - 24% ต่อปี",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "easy-approval-low-ltv",
+      title: "โครงการอนุมัติง่าย LTV ต่ำ เก่ง กระบะ",
+      tags: [
+        { label: "อนุมัติไว", tone: "amber" },
+        { label: "70% LTV", tone: "pink" },
+      ],
+      ltvLabel: "70% LTV",
+      approvedAmount: "399,000",
+      ncbGradeLabel: "A01 - A03",
+      ncbGradeTone: "blue",
+      bookStatusLabel: "ไม่มีเล่ม",
+      interestRateLabel: "(0.94% - 1.13% ต่อเดือน)",
+      interestReductionLabel: "ลดต้นลดดอก 20% - 24% ต่อปี",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+  ],
+};
+
+export const insuranceCompanyOptions: { value: string; label: string }[] = [
+  { value: "viriyah", label: "วิริยะประกันภัย" },
+  { value: "thipya", label: "ทิพยประกันภัย" },
+  { value: "bkk-insurance", label: "กรุงเทพประกันภัย" },
+];
+
+export const followUpTimelineMock: FollowUpEntry[] = [
+  {
+    id: "1",
+    timestamp: "28/04/2569 12:24",
+    actor: "บันทึกโดย สมหมาย รักงาน (80012345)",
+    statusBadge: "ติดตามแล้ว",
+    note: "บันทึกผลการติดตาม • วันนัดหมาย 28/04/2569 12:00 น.\nไม่สะดวกคุย ให้ติดตามกลับตอนเที่ยง / แจ้งวงเงินแต่ของระยะเวลาตัดสินใจ 2-3 วัน ให้ติดตามกลับมาอีกที",
+  },
+  {
+    id: "2",
+    timestamp: "25/04/2569 12:00",
+    actor: "บันทึกโดย สมหมาย รักงาน (80012345)",
+    statusBadge: "ติดตามแล้ว",
+    highlight: "TOYOTA • COLLOLA ALTIS • 2018(2555) • 1กก4567 • XDEEE4455977RD45",
+  },
+  {
+    id: "3",
+    timestamp: "23/04/2569 14:21",
+    actor: "โดย อรอุมา โกสินทร์ (80010123)",
+    actionBadge: "ส่งต่องาน",
+    note: "หมายเหตุ\nลูกค้าสะดวกไปสาขาพระนครศรีอยุธยา ประมาณช่วงเที่ยง",
+  },
+  {
+    id: "4",
+    timestamp: "21/04/2569 16:04",
+    actor: "โดย กรรณิการ์ ส่งจิต (CF108645)",
+    actionBadge: "สร้าง Lead",
   },
 ];

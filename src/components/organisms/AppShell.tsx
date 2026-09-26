@@ -21,7 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col">
         {pageTitle ? <TopHeader title={pageTitle} /> : null}
         <main
-          className={`flex-1 space-y-6 bg-surface-muted py-8 ${pageTitle ? "px-20" : "px-8"}`}
+          className={`flex-1 space-y-6 py-8 ${pageTitle ? "bg-surface px-20" : "bg-surface-muted px-8"}`}
         >
           {children}
         </main>

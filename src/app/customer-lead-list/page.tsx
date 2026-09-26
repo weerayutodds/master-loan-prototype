@@ -5,7 +5,7 @@ import { Icon } from "@/components/atoms/Icon";
 import { Card } from "@/components/molecules/Card";
 import { createOpportunityAndRedirect } from "@/lib/actions/customer-lead-opportunity";
 import { getCustomerLeadById } from "@/lib/customer-lead";
-import { listCustomerLeadOpportunities } from "@/lib/customer-lead-opportunity";
+import { listCustomerLeadOpportunitiesByLeadId } from "@/lib/customer-lead-opportunity";
 import { formatThaiPhone, maskIdCardNumber } from "@/lib/format";
 import { collateralTypeOptions, loanPurposeOptions } from "@/lib/mock";
 
@@ -21,7 +21,7 @@ export default async function CustomerLeadListPage({
   const { leadId } = await searchParams;
   const [focusLead, opportunities] = await Promise.all([
     leadId ? getCustomerLeadById(leadId) : Promise.resolve(null),
-    listCustomerLeadOpportunities(),
+    leadId ? listCustomerLeadOpportunitiesByLeadId(leadId) : Promise.resolve([]),
   ]);
 
   return (
@@ -137,14 +137,12 @@ export default async function CustomerLeadListPage({
                   <Badge tone={opportunity.ncbGrade ? "success" : "neutral"}>
                     {opportunity.ncbGrade ? `เกรด ${opportunity.ncbGrade}` : "-"}
                   </Badge>
-                  <form action={createOpportunityAndRedirect.bind(null, opportunity.leadId)}>
-                    <button
-                      type="submit"
-                      className="inline-flex items-center justify-center rounded-lg border border-primary bg-surface px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/5"
-                    >
-                      ทำรายการสินเชื่อ
-                    </button>
-                  </form>
+                  <Link
+                    href={`/ratebook?opportunityId=${opportunity.id}`}
+                    className="inline-flex items-center justify-center rounded-lg border border-primary bg-surface px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/5"
+                  >
+                    ทำรายการสินเชื่อ
+                  </Link>
                 </Card>
               );
             })}

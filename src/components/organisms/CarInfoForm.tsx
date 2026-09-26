@@ -3,7 +3,6 @@
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Select } from "@/components/atoms/Select";
-import { Card } from "@/components/molecules/Card";
 import { FormField } from "@/components/molecules/FormField";
 import { updateOpportunityCarInfo } from "@/lib/actions/customer-lead-opportunity";
 import {
@@ -48,9 +47,15 @@ type CarInfoFormProps = {
   opportunityId: string | null;
   carInfo: CarInfo;
   onCarInfoChange: (carInfo: CarInfo) => void;
+  onViewAppraisal: () => void;
 };
 
-export function CarInfoForm({ opportunityId, carInfo, onCarInfoChange }: CarInfoFormProps) {
+export function CarInfoForm({
+  opportunityId,
+  carInfo,
+  onCarInfoChange,
+  onViewAppraisal,
+}: CarInfoFormProps) {
   function update<K extends keyof CarInfo>(key: K, value: string) {
     onCarInfoChange({ ...carInfo, [key]: value });
   }
@@ -60,14 +65,14 @@ export function CarInfoForm({ opportunityId, carInfo, onCarInfoChange }: CarInfo
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-foreground">กรอกข้อมูลรถ</p>
+        <p className="text-base font-semibold text-foreground">กรอกข้อมูลรถ</p>
         <Button variant="outline" size="sm" className="gap-1.5">
           <Icon name="scan" className="size-4" />
           สแกนเล่มทะเบียน
         </Button>
       </div>
 
-      <Card className="space-y-4">
+      <div className="space-y-4 rounded-xl border-2 border-card-border bg-surface p-5 shadow-primary-s">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label="ยี่ห้อรถ">
             <Select
@@ -155,12 +160,13 @@ export function CarInfoForm({ opportunityId, carInfo, onCarInfoChange }: CarInfo
             disabled={!isComplete}
             onClick={() => {
               if (opportunityId) void updateOpportunityCarInfo(opportunityId, carInfo);
+              onViewAppraisal();
             }}
           >
             ดูราคาประเมิน
           </Button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
