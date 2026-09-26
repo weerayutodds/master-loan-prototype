@@ -20,7 +20,8 @@ export type IconName =
   | "phone"
   | "info"
   | "close"
-  | "document";
+  | "document"
+  | "scan";
 
 type IconProps = {
   name: IconName;
@@ -188,6 +189,16 @@ const paths: Record<IconName, React.ReactNode> = {
         strokeLinejoin="round"
       />
       <path d="M14 3.5V8h4M9 12.5h6M9 16h6" strokeLinecap="round" />
+    </>
+  ),
+  scan: (
+    <>
+      <path
+        d="M4 8V6a2 2 0 0 1 2-2h2M4 16v2a2 2 0 0 0 2 2h2M20 8V6a2 2 0 0 0-2-2h-2M20 16v2a2 2 0 0 1-2 2h-2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M4 12h16" strokeLinecap="round" />
     </>
   ),
 };

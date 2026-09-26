@@ -3,8 +3,11 @@ import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Card } from "@/components/molecules/Card";
-import { getCustomerLeadById, listCustomerLeads } from "@/lib/customer-lead";
+import { createOpportunityAndRedirect } from "@/lib/actions/customer-lead-opportunity";
+import { getCustomerLeadById } from "@/lib/customer-lead";
+import { listCustomerLeadOpportunities } from "@/lib/customer-lead-opportunity";
 import { formatThaiPhone, maskIdCardNumber } from "@/lib/format";
+import { collateralTypeOptions, loanPurposeOptions } from "@/lib/mock";
 
 const LEAD_LIST_TABS = ["รายการ Lead", "รายการใบคำขอ", "รายการสัญญาสินเชื่อ"];
 
@@ -16,9 +19,9 @@ export default async function CustomerLeadListPage({
   searchParams,
 }: CustomerLeadListPageProps) {
   const { leadId } = await searchParams;
-  const [focusLead, leads] = await Promise.all([
+  const [focusLead, opportunities] = await Promise.all([
     leadId ? getCustomerLeadById(leadId) : Promise.resolve(null),
-    listCustomerLeads(),
+    listCustomerLeadOpportunities(),
   ]);
 
   return (
@@ -81,12 +84,14 @@ export default async function CustomerLeadListPage({
           ))}
         </div>
         {focusLead ? (
-          <Link
-            href={`/ratebook?leadId=${focusLead.id}`}
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90"
-          >
-            จัดสินเชื่อ
-          </Link>
+          <form action={createOpportunityAndRedirect.bind(null, focusLead.id)}>
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90"
+            >
+              จัดสินเชื่อ
+            </button>
+          </form>
         ) : (
           <Button variant="primary" size="sm" disabled>
             จัดสินเชื่อ
@@ -97,41 +102,60 @@ export default async function CustomerLeadListPage({
       <div className="space-y-3">
         <h2 className="text-sm font-medium text-foreground">รายการ Lead</h2>
 
-        {leads.length === 0 ? (
+        {opportunities.length === 0 ? (
           <Card className="flex flex-col items-center gap-3 py-16 text-center">
             <Icon name="document" className="size-12 text-muted-foreground" />
             <p className="text-sm font-medium text-foreground">ไม่มีรายการ</p>
           </Card>
         ) : (
           <div className="space-y-3">
-            {leads.map((lead) => (
-              <Card
-                key={lead.id}
-                className="flex flex-wrap items-center justify-between gap-4"
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {lead.firstName} {lead.lastName}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatThaiPhone(lead.phone)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">เลขบัตรประชาชน</p>
-                  <p className="text-sm text-foreground">
-                    {lead.idCardNumber ? maskIdCardNumber(lead.idCardNumber) : "-"}
-                  </p>
-                </div>
-                <Badge tone="success">เกรด {lead.ncbGrade}</Badge>
-                <Link
-                  href={`/ratebook?leadId=${lead.id}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-primary bg-surface px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/5"
+            {opportunities.map((opportunity) => {
+              const loanPurposeLabel = loanPurposeOptions.find(
+                (option) => option.value === opportunity.loanPurpose,
+              )?.label;
+              const collateralTypeLabel = collateralTypeOptions.find(
+                (option) => option.value === opportunity.collateralType,
+              )?.label;
+
+              return (
+                <Card
+                  key={opportunity.id}
+                  className="flex flex-wrap items-center justify-between gap-4"
                 >
-                  ทำรายการสินเชื่อ
-                </Link>
-              </Card>
-            ))}
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {opportunity.firstName} {opportunity.lastName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatThaiPhone(opportunity.phone)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">ประเภทสินเชื่อ</p>
+                    <p className="text-sm text-foreground">
+                      {loanPurposeLabel ?? "-"} · {collateralTypeLabel ?? "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">วันที่ทำรายการ</p>
+                    <p className="text-sm text-foreground">
+                      {new Date(opportunity.createdAt).toLocaleDateString("th-TH")}
+                    </p>
+                  </div>
+                  <Badge tone={opportunity.ncbGrade ? "success" : "neutral"}>
+                    {opportunity.ncbGrade ? `เกรด ${opportunity.ncbGrade}` : "-"}
+                  </Badge>
+                  <form action={createOpportunityAndRedirect.bind(null, opportunity.leadId)}>
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center rounded-lg border border-primary bg-surface px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/5"
+                    >
+                      ทำรายการสินเชื่อ
+                    </button>
+                  </form>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

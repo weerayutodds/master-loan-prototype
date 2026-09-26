@@ -11,17 +11,24 @@ import { Card } from "@/components/molecules/Card";
 import { FormField } from "@/components/molecules/FormField";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import {
+  updateOpportunityCarInfo,
+  updateOpportunityCollateralDetail,
+  updateOpportunityCustomerInfo,
+} from "@/lib/actions/customer-lead-opportunity";
 import { maskIdCardNumber } from "@/lib/format";
 import { provinceOptions } from "@/lib/mock";
-import type { CustomerLead } from "@/types/customer-lead";
-import type { CollateralIdentifier, CollateralType, CustomerInfo } from "@/types/ratebook";
+import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
+import type { CarInfo, CollateralIdentifier, CollateralType, CustomerInfo } from "@/types/ratebook";
 
 const TOTAL_SECTIONS = 4;
 
 type CustomerCollateralPanelProps = {
-  initialLead?: CustomerLead | null;
+  initialOpportunity?: CustomerLeadOpportunity | null;
+  opportunityId: string | null;
   collateralType: CollateralType | null;
   tags: string[];
+  carInfo: CarInfo;
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -35,28 +42,37 @@ function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
 }
 
 export function CustomerCollateralPanel({
-  initialLead = null,
+  initialOpportunity = null,
+  opportunityId,
   collateralType,
   tags,
+  carInfo,
 }: CustomerCollateralPanelProps) {
   const router = useRouter();
   const [customer, setCustomer] = useState<CustomerInfo | null>(
-    initialLead
+    initialOpportunity
       ? {
-          firstName: initialLead.firstName,
-          lastName: initialLead.lastName,
-          phone: initialLead.phone,
+          firstName: initialOpportunity.firstName,
+          lastName: initialOpportunity.lastName,
+          phone: initialOpportunity.phone,
         }
       : null,
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [collateralIdentifier, setCollateralIdentifier] = useState<CollateralIdentifier | null>(
-    null,
+    initialOpportunity &&
+      (initialOpportunity.licensePlateNumber || initialOpportunity.chassisNumber)
+      ? {
+          licensePlateNumber: initialOpportunity.licensePlateNumber ?? undefined,
+          licensePlateProvince: initialOpportunity.licensePlateProvince ?? undefined,
+          chassisNumber: initialOpportunity.chassisNumber ?? undefined,
+        }
+      : null,
   );
   const [collateralModalOpen, setCollateralModalOpen] = useState(false);
-  const [brandModel, setBrandModel] = useState("");
+  const [brandModel, setBrandModel] = useState(initialOpportunity?.brandModel ?? "");
 
-  const idCardNumber = initialLead?.idCardNumber ?? "";
+  const idCardNumber = initialOpportunity?.idCardNumber ?? "";
 
   const filledSectionCount = [
     customer !== null,
@@ -64,29 +80,6 @@ export function CustomerCollateralPanel({
     collateralIdentifier !== null,
     brandModel.trim() !== "",
   ].filter(Boolean).length;
-
-  if (!customer) {
-    return (
-      <Card className="space-y-4 border-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-foreground">ข้อมูลลูกค้า</span>
-          <Button variant="outline" size="sm" onClick={() => setModalOpen(true)}>
-            เพิ่ม/แก้ไข
-          </Button>
-        </div>
-        <p className="text-sm text-muted-foreground">ยังไม่มีข้อมูลลูกค้า</p>
-
-        <CustomerInfoModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSave={(info) => {
-            setCustomer(info);
-            setModalOpen(false);
-          }}
-        />
-      </Card>
-    );
-  }
 
   return (
     <Card className="space-y-4 border-2">
@@ -97,11 +90,11 @@ export function CustomerCollateralPanel({
       >
         <div>
           <p className="text-base font-medium text-foreground">
-            {customer.firstName} {customer.lastName}
+            {customer ? `${customer.firstName} ${customer.lastName}` : "-"}
           </p>
           <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
             <Icon name="phone" className="size-4" />
-            {customer.phone}
+            {customer ? customer.phone : "-"}
           </div>
         </div>
         <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
@@ -115,16 +108,18 @@ export function CustomerCollateralPanel({
           <Badge tone={idCardNumber ? "success" : "neutral"} className="px-3 py-1 text-sm font-semibold">
             {idCardNumber ? maskIdCardNumber(idCardNumber) : "-"}
           </Badge>
-          <Button variant="outline" size="sm" onClick={() => router.push("/customer-form")}>
-            Dipchip
-          </Button>
+          {initialOpportunity?.verificationMethod !== "card" ? (
+            <Button variant="outline" size="sm" onClick={() => router.push("/customer-form")}>
+              Dipchip
+            </Button>
+          ) : null}
         </div>
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">NCB เกรด</span>
-        <Badge tone={initialLead ? "success" : "neutral"}>
-          {initialLead ? `เกรด ${initialLead.ncbGrade}` : "-"}
+        <Badge tone={initialOpportunity?.ncbGrade ? "success" : "neutral"}>
+          {initialOpportunity?.ncbGrade ? `เกรด ${initialOpportunity.ncbGrade}` : "-"}
         </Badge>
       </div>
 
@@ -156,7 +151,11 @@ export function CustomerCollateralPanel({
       {collateralType ? (
         <FormField label="ยี่ห้อ / รุ่น">
           <div className="flex gap-2">
-            <Input name="brandModel" onChange={(e) => setBrandModel(e.target.value)} />
+            <Input
+              name="brandModel"
+              defaultValue={brandModel}
+              onChange={(e) => setBrandModel(e.target.value)}
+            />
             <Button variant="outline" size="sm" className="shrink-0">
               เพิ่ม
             </Button>
@@ -180,13 +179,22 @@ export function CustomerCollateralPanel({
 
       <div className="border-t border-border" />
 
-      <Button variant="primary" className="w-full">
+      <Button
+        variant="primary"
+        className="w-full"
+        onClick={() => {
+          if (!opportunityId) return;
+          if (customer) void updateOpportunityCustomerInfo(opportunityId, customer);
+          void updateOpportunityCollateralDetail(opportunityId, { collateralIdentifier, brandModel });
+          void updateOpportunityCarInfo(opportunityId, carInfo);
+        }}
+      >
         บันทึก Lead
       </Button>
 
       <CustomerInfoModal
         open={modalOpen}
-        initialValue={customer}
+        initialValue={customer ?? undefined}
         onClose={() => setModalOpen(false)}
         onSave={(info) => {
           setCustomer(info);

@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { Icon } from "@/components/atoms/Icon";
 import { RatebookForm } from "@/components/organisms/RatebookForm";
-import { getCustomerLeadById } from "@/lib/customer-lead";
+import { getCustomerLeadOpportunityById } from "@/lib/customer-lead-opportunity";
 
 type RatebookPageProps = {
-  searchParams: Promise<{ leadId?: string }>;
+  searchParams: Promise<{ opportunityId?: string }>;
 };
 
 export default async function RatebookPage({ searchParams }: RatebookPageProps) {
-  const { leadId } = await searchParams;
-  const initialLead = leadId ? await getCustomerLeadById(leadId) : null;
+  const { opportunityId } = await searchParams;
+  const initialOpportunity = opportunityId
+    ? await getCustomerLeadOpportunityById(opportunityId)
+    : null;
 
   return (
     <>
@@ -21,7 +23,7 @@ export default async function RatebookPage({ searchParams }: RatebookPageProps) 
         <Icon name="menu" className="size-5 text-muted-foreground" />
       </div>
 
-      <RatebookForm initialLead={initialLead} />
+      <RatebookForm initialOpportunity={initialOpportunity} />
     </>
   );
 }
