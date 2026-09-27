@@ -32,6 +32,19 @@ const REQUIRED_FIELDS: (keyof CarInfo)[] = [
   "carType",
 ];
 
+const FIELD_LABELS: Record<keyof CarInfo, string> = {
+  brand: "ยี่ห้อรถ",
+  model: "รุ่นรถ",
+  year: "รุ่นปี ค.ศ.",
+  condition: "สภาพรถ",
+  doors: "จำนวนประตู",
+  carType: "ประเภทรถ",
+  engineCc: "ขนาดเครื่องยนต์",
+  transmission: "ระบบเกียร์",
+  bodyType: "ประเภทตัวถัง",
+  subModel: "รุ่นย่อย",
+};
+
 function InfoLabel({ children }: { children: React.ReactNode }) {
   return (
     <span className="flex items-center gap-1">
@@ -73,6 +86,9 @@ export function CarInfoForm({
     ? REQUIRED_FIELDS.filter((field) => field !== "doors")
     : REQUIRED_FIELDS;
   const isComplete = requiredFields.every((field) => Boolean(carInfo[field]));
+  const missingFieldLabels = requiredFields
+    .filter((field) => !carInfo[field])
+    .map((field) => FIELD_LABELS[field]);
 
   const vehicleCollateralType = toVehicleCollateralType(collateralType);
   const brandOptions = getVehicleBrands(collateralType);
@@ -177,7 +193,12 @@ export function CarInfoForm({
 
         <div className="border-t border-border" />
 
-        <div className="flex justify-end">
+        <div className="flex items-center justify-end gap-3">
+          {!isComplete && missingFieldLabels.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              กรุณากรอก: {missingFieldLabels.join(", ")}
+            </p>
+          )}
           <Button
             variant="primary"
             disabled={!isComplete}
