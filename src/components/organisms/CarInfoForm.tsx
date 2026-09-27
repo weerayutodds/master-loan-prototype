@@ -21,7 +21,7 @@ import type { CarInfo } from "@/types/ratebook";
 
 const PLACEHOLDER = { value: "", label: "เลือกข้อมูล" };
 
-// engineCc is optional ("ไม่บังคับ" in the field label); every other field is required.
+// engineCc, transmission, bodyType, and subModel are optional; only the first two rows are required.
 const REQUIRED_FIELDS: (keyof CarInfo)[] = [
   "brand",
   "model",
@@ -29,9 +29,6 @@ const REQUIRED_FIELDS: (keyof CarInfo)[] = [
   "condition",
   "doors",
   "carType",
-  "transmission",
-  "bodyType",
-  "subModel",
 ];
 
 function InfoLabel({ children }: { children: React.ReactNode }) {
@@ -122,28 +119,28 @@ export function CarInfoForm({
         </div>
 
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <FormField label="ขนาดเครื่องยนต์ ไม่บังคับ">
+          <FormField label="ขนาดเครื่องยนต์ (ไม่บังคับ)">
             <Select
               options={[PLACEHOLDER, ...carEngineCcOptions]}
               value={carInfo.engineCc ?? ""}
               onChange={(e) => update("engineCc", e.target.value)}
             />
           </FormField>
-          <FormField label="ระบบเกียร์">
+          <FormField label="ระบบเกียร์ (ไม่บังคับ)">
             <Select
               options={[PLACEHOLDER, ...carTransmissionOptions]}
               value={carInfo.transmission ?? ""}
               onChange={(e) => update("transmission", e.target.value)}
             />
           </FormField>
-          <FormField label="ประเภทตัวถัง">
+          <FormField label="ประเภทตัวถัง (ไม่บังคับ)">
             <Select
               options={[PLACEHOLDER, ...carBodyTypeOptions]}
               value={carInfo.bodyType ?? ""}
               onChange={(e) => update("bodyType", e.target.value)}
             />
           </FormField>
-          <FormField label="รุ่นย่อย">
+          <FormField label="รุ่นย่อย (ไม่บังคับ)">
             <Select
               options={[PLACEHOLDER, ...carSubModelOptions]}
               value={carInfo.subModel ?? ""}

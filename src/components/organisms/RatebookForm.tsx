@@ -208,10 +208,9 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
                 data={productCatalogMock}
                 onSelectConfirmed={handleSelectedProductConfirmed}
               />
+              <LoanCalBar productCatalog={productCatalogMock} />
             </>
           )}
-
-          <LoanCalBar productCatalog={productCatalogMock} />
         </div>
       )}
     </div>
