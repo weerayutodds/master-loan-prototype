@@ -1,13 +1,13 @@
 type LeadProgressChecklistItem = {
-  label: string;
-  filled: boolean;
-};
+  label: string
+  filled: boolean
+}
 
 type LeadProgressTooltipProps = {
-  filledCount: number;
-  total: number;
-  items: LeadProgressChecklistItem[];
-};
+  filledCount: number
+  total: number
+  items: LeadProgressChecklistItem[]
+}
 
 export function LeadProgressTooltip({
   filledCount,
@@ -15,8 +15,13 @@ export function LeadProgressTooltip({
   items,
 }: LeadProgressTooltipProps) {
   return (
-    <div className="invisible absolute top-1/2 left-full z-20 ml-3 w-41 -translate-y-1/2 rounded-lg bg-toast px-2 py-2 opacity-0 backdrop-blur-[2px] transition-opacity duration-150 group-hover/progress:visible group-hover/progress:opacity-100">
-      <span className="absolute top-3 -left-1 size-2 rotate-45 bg-toast" />
+    <div className="invisible absolute top-1/2 left-full z-20 ml-3 w-41 -translate-y-3.5 rounded-lg bg-toast px-2 py-2 opacity-0 backdrop-blur-[2px] transition-opacity duration-150 group-hover/progress:visible group-hover/progress:opacity-100">
+      {/* 
+        Fixed Triangle Arrow 
+        Uses transparent top/bottom borders and a colored right border
+      */}
+      <span className="absolute top-3 -left-1.5 h-0 w-0 border-y-[6px] border-y-transparent border-r-[6px] border-r-toast" />
+
       <p className="text-xs leading-[160%] tracking-[0.01em] text-white">
         ข้อมูลการจอง Lead {filledCount}/{total}
       </p>
@@ -45,5 +50,5 @@ export function LeadProgressTooltip({
         ))}
       </ul>
     </div>
-  );
+  )
 }

@@ -10,6 +10,13 @@ export function maskIdCardNumber(idCardNumber: string): string {
     .join("-");
 }
 
+export function formatPhoneInput(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  return [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 10)]
+    .filter(Boolean)
+    .join("-");
+}
+
 export function formatThaiPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 10) {

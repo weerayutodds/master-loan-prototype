@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type Resolver } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
@@ -11,6 +13,7 @@ import { Card } from "@/components/molecules/Card";
 import { FormField } from "@/components/molecules/FormField";
 import { SegmentedControl } from "@/components/molecules/SegmentedControl";
 import { createCustomerLead } from "@/lib/actions/customer-lead";
+import { formatPhoneInput } from "@/lib/format";
 import { mockCardCustomer } from "@/lib/mock";
 import { isValidThaiPhone } from "@/lib/validation";
 import type {
@@ -21,7 +24,18 @@ import type {
 } from "@/types/customer-form";
 
 const CARD_READ_DELAY_MS = 1500;
-const PHONE_ERROR_MESSAGE = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง";
+
+const phoneSchema = z
+  .string()
+  .min(1, "กรุณากรอกเบอร์มือถือ")
+  .refine((value) => isValidThaiPhone(value), "รูปแบบเบอร์มือถือไม่ถูกต้อง");
+
+const cardSchema = z.object({ cardPhone: phoneSchema });
+const manualSchema = z.object({
+  firstName: z.string().min(1, "กรุณากรอกชื่อ"),
+  lastName: z.string().min(1, "กรุณากรอกนามสกุล"),
+  phone: phoneSchema,
+});
 
 type CustomerVerificationPanelProps = {
   customerTypeOptions: { value: CustomerType; label: string }[];
@@ -53,11 +67,14 @@ export function CustomerVerificationPanel({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm<CustomerFormValues>({
     mode: "onChange",
     shouldUnregister: true,
     defaultValues: { customerType: "individual" },
+    resolver: zodResolver(
+      verificationMethod === "card" ? cardSchema : manualSchema,
+    ) as unknown as Resolver<CustomerFormValues>,
   });
 
   useEffect(() => {
@@ -99,7 +116,7 @@ export function CustomerVerificationPanel({
   }
 
   const continueDisabled =
-    verificationMethod === "card" ? cardStatus !== "success" || !isValid : !isValid;
+    verificationMethod === "card" ? cardStatus !== "success" : false;
 
   return (
     <Card className="mx-auto max-w-md">
@@ -140,12 +157,17 @@ export function CustomerVerificationPanel({
                   <p className="text-sm text-foreground">{cardCustomer.idCardNumber}</p>
                 </div>
               </div>
-              <FormField label="เบอร์โทรศัพท์" error={errors.cardPhone?.message}>
+              <FormField label="เบอร์มือถือ" error={errors.cardPhone?.message}>
                 <Input
                   type="tel"
+                  inputMode="numeric"
+                  maxLength={12}
+                  placeholder="081-123-5678"
                   invalid={!!errors.cardPhone}
                   {...register("cardPhone", {
-                    validate: (value) => isValidThaiPhone(value ?? "") || PHONE_ERROR_MESSAGE,
+                    onChange: (e) => {
+                      e.target.value = formatPhoneInput(e.target.value);
+                    },
                   })}
                 />
               </FormField>
@@ -178,22 +200,29 @@ export function CustomerVerificationPanel({
           <div key="manual" className="space-y-4">
             <FormField label="ชื่อ" error={errors.firstName?.message}>
               <Input
+                placeholder="กรอกชื่อ"
                 invalid={!!errors.firstName}
-                {...register("firstName", { required: "กรุณากรอกชื่อ" })}
+                {...register("firstName")}
               />
             </FormField>
             <FormField label="นามสกุล" error={errors.lastName?.message}>
               <Input
+                placeholder="กรอกนามสกุล"
                 invalid={!!errors.lastName}
-                {...register("lastName", { required: "กรุณากรอกนามสกุล" })}
+                {...register("lastName")}
               />
             </FormField>
-            <FormField label="เบอร์โทรศัพท์" error={errors.phone?.message}>
+            <FormField label="เบอร์มือถือ" error={errors.phone?.message}>
               <Input
                 type="tel"
+                inputMode="numeric"
+                maxLength={12}
+                placeholder="081-123-5678"
                 invalid={!!errors.phone}
                 {...register("phone", {
-                  validate: (value) => isValidThaiPhone(value ?? "") || PHONE_ERROR_MESSAGE,
+                  onChange: (e) => {
+                    e.target.value = formatPhoneInput(e.target.value);
+                  },
                 })}
               />
             </FormField>

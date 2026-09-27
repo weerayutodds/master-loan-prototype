@@ -1,44 +1,49 @@
-"use client";
+"use client"
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/atoms/Button";
-import { Input } from "@/components/atoms/Input";
-import { FormField } from "@/components/molecules/FormField";
-import { Modal } from "@/components/molecules/Modal";
-import { isValidThaiPhone } from "@/lib/validation";
-import type { CustomerInfo } from "@/types/ratebook";
+import {useEffect} from "react"
+import {useForm} from "react-hook-form"
+import {Button} from "@/components/atoms/Button"
+import {Input} from "@/components/atoms/Input"
+import {FormField} from "@/components/molecules/FormField"
+import {Modal} from "@/components/molecules/Modal"
+import {isValidThaiPhone} from "@/lib/validation"
+import type {CustomerInfo} from "@/types/ratebook"
 
-const PHONE_ERROR_MESSAGE = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง";
+const PHONE_ERROR_MESSAGE = "รูปแบบเบอร์มือถือไม่ถูกต้อง"
 
 type CustomerInfoModalProps = {
-  open: boolean;
-  initialValue?: CustomerInfo;
-  onClose: () => void;
-  onSave: (info: CustomerInfo) => void;
-};
+  open: boolean
+  initialValue?: CustomerInfo
+  onClose: () => void
+  onSave: (info: CustomerInfo) => void
+}
 
-export function CustomerInfoModal({ open, initialValue, onClose, onSave }: CustomerInfoModalProps) {
+export function CustomerInfoModal({
+  open,
+  initialValue,
+  onClose,
+  onSave,
+}: CustomerInfoModalProps) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: {errors},
   } = useForm<CustomerInfo>({
-    defaultValues: { firstName: "", lastName: "", phone: "" },
-  });
+    defaultValues: {firstName: "", lastName: "", phone: ""},
+  })
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return
     reset({
       firstName: initialValue?.firstName ?? "",
       lastName: initialValue?.lastName ?? "",
       phone: initialValue?.phone ?? "",
-    });
-  }, [open, initialValue, reset]);
+    })
+  }, [open, initialValue, reset])
 
   function onSubmit(data: CustomerInfo) {
-    onSave(data);
+    onSave(data)
   }
 
   return (
@@ -56,24 +61,25 @@ export function CustomerInfoModal({ open, initialValue, onClose, onSave }: Custo
               <Input
                 placeholder="กรอกชื่อ"
                 invalid={!!errors.firstName}
-                {...register("firstName", { required: "กรุณากรอกชื่อ" })}
+                {...register("firstName", {required: "กรุณากรอกชื่อ"})}
               />
             </FormField>
             <FormField label="นามสกุล" error={errors.lastName?.message}>
               <Input
                 placeholder="กรอกนามสกุล"
                 invalid={!!errors.lastName}
-                {...register("lastName", { required: "กรุณากรอกนามสกุล" })}
+                {...register("lastName", {required: "กรุณากรอกนามสกุล"})}
               />
             </FormField>
-            <FormField label="เบอร์โทรศัพท์" error={errors.phone?.message}>
+            <FormField label="เบอร์มือถือ" error={errors.phone?.message}>
               <Input
                 type="tel"
                 placeholder="0812345678"
                 invalid={!!errors.phone}
                 {...register("phone", {
-                  required: "กรุณากรอกเบอร์โทรศัพท์",
-                  validate: (value) => isValidThaiPhone(value) || PHONE_ERROR_MESSAGE,
+                  required: "กรุณากรอกเบอร์มือถือ",
+                  validate: (value) =>
+                    isValidThaiPhone(value) || PHONE_ERROR_MESSAGE,
                 })}
               />
             </FormField>
@@ -98,5 +104,5 @@ export function CustomerInfoModal({ open, initialValue, onClose, onSave }: Custo
         </div>
       </form>
     </Modal>
-  );
+  )
 }

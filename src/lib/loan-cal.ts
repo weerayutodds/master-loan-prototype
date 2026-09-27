@@ -1,3 +1,12 @@
+export function calculateLtvPercent(amount: number, appraisalPrice: number): number {
+  if (appraisalPrice <= 0) return 0;
+  return Math.round((amount / appraisalPrice) * 100);
+}
+
+export function calculateAmountFromLtv(ltvPercent: number, appraisalPrice: number): number {
+  return Math.round(appraisalPrice * (ltvPercent / 100));
+}
+
 export function calculateMonthlyPayment(
   principal: number,
   annualRatePercent: number,
