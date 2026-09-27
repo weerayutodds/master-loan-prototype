@@ -20,6 +20,7 @@ function mapRow(row: any): CustomerLeadOpportunity {
     loanPurpose: row.loan_purpose,
     collateralType: row.collateral_type,
     refinanceStatus: row.refinance_status,
+    existingFinanceCompany: row.existing_finance_company,
     licensePlateNumber: row.license_plate_number,
     licensePlateProvince: row.license_plate_province,
     chassisNumber: row.chassis_number,
@@ -59,7 +60,7 @@ export async function getCustomerLeadOpportunityById(
     select
       id, lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
       gender, birth_date,
-      loan_purpose, collateral_type, refinance_status,
+      loan_purpose, collateral_type, refinance_status, existing_finance_company,
       license_plate_number, license_plate_province, chassis_number, brand_model,
       car_brand, car_model, car_year, car_condition, car_doors, car_type, car_engine_cc,
       car_transmission, car_body_type, car_sub_model, selected_product_id,
@@ -83,7 +84,7 @@ export async function listCustomerLeadOpportunitiesByLeadId(
     select
       id, lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
       gender, birth_date,
-      loan_purpose, collateral_type, refinance_status,
+      loan_purpose, collateral_type, refinance_status, existing_finance_company,
       license_plate_number, license_plate_province, chassis_number, brand_model,
       car_brand, car_model, car_year, car_condition, car_doors, car_type, car_engine_cc,
       car_transmission, car_body_type, car_sub_model, selected_product_id,

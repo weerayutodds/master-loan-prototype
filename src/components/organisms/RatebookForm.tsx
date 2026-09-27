@@ -14,6 +14,7 @@ import {
 } from "@/lib/actions/customer-lead-opportunity";
 import {
   collateralTypeOptions,
+  existingFinanceOptions,
   findProductCatalogItemById,
   getProductCatalogData,
   getProductGuideData,
@@ -61,6 +62,9 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
     useState<RefinanceStatus | null>(
       initialOpportunity?.refinanceStatus ?? null,
     );
+  const [existingFinance, setExistingFinance] = useState<string | null>(
+    initialOpportunity?.existingFinanceCompany ?? null,
+  );
   const [carInfo, setCarInfo] = useState<CarInfo>(
     initialOpportunity
       ? {
@@ -137,14 +141,25 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
     nextLoanPurpose: LoanPurpose | null,
     nextCollateralType: CollateralType | null,
     nextRefinanceStatus: RefinanceStatus | null,
+    nextExistingFinance: string | null,
   ) {
-    if (nextLoanPurpose && nextCollateralType && nextRefinanceStatus) {
+    // A รีไฟแนนซ์ can't move on until we know which ไฟแนนซ์ currently holds the car.
+    const financeAnswered =
+      nextRefinanceStatus === "still-paying" ? Boolean(nextExistingFinance) : true;
+    if (
+      nextLoanPurpose &&
+      nextCollateralType &&
+      nextRefinanceStatus &&
+      financeAnswered
+    ) {
       setShowCarInfo(true);
       if (opportunityId) {
         void updateOpportunityLoanQuestions(opportunityId, {
           loanPurpose: nextLoanPurpose,
           collateralType: nextCollateralType,
           refinanceStatus: nextRefinanceStatus,
+          existingFinanceCompany:
+            nextRefinanceStatus === "still-paying" ? nextExistingFinance : null,
         });
       }
     }
@@ -162,19 +177,47 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
 
   function handleLoanPurposeChange(value: LoanPurpose) {
     setLoanPurpose(value);
-    commitLoanQuestionsIfComplete(value, collateralType, refinanceStatus);
+    commitLoanQuestionsIfComplete(
+      value,
+      collateralType,
+      refinanceStatus,
+      existingFinance,
+    );
   }
 
   function handleCollateralTypeChange(value: CollateralType) {
     setCollateralType(value);
     // A different หลักประกัน swaps the whole vehicle catalog, so any shown appraisal is void.
     setShowProductGuide(false);
-    commitLoanQuestionsIfComplete(loanPurpose, value, refinanceStatus);
+    commitLoanQuestionsIfComplete(
+      loanPurpose,
+      value,
+      refinanceStatus,
+      existingFinance,
+    );
   }
 
   function handleRefinanceStatusChange(value: RefinanceStatus) {
     setRefinanceStatus(value);
-    commitLoanQuestionsIfComplete(loanPurpose, collateralType, value);
+    // "ผ่อนหมดแล้ว" means there is no existing ไฟแนนซ์ to carry over.
+    const nextExistingFinance = value === "still-paying" ? existingFinance : null;
+    setExistingFinance(nextExistingFinance);
+    commitLoanQuestionsIfComplete(
+      loanPurpose,
+      collateralType,
+      value,
+      nextExistingFinance,
+    );
+  }
+
+  function handleExistingFinanceChange(value: string) {
+    setExistingFinance(value);
+    commitLoanQuestionsIfComplete(
+      loanPurpose,
+      collateralType,
+      refinanceStatus,
+      value,
+    );
   }
 
   // The product guide is only ever revealed by "ดูราคาประเมิน", so editing the car
@@ -192,6 +235,9 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
       ?.label.replace(/ /g, "-"),
     refinanceStatusOptions.find((option) => option.value === refinanceStatus)
       ?.description,
+    // ไฟแนนซ์เดิม — only ever set while refinanceStatus is "still-paying"
+    existingFinanceOptions.find((option) => option.value === existingFinance)
+      ?.label,
   ].filter((tag): tag is string => Boolean(tag));
 
   return (
@@ -246,6 +292,9 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
               onCollateralTypeChange={handleCollateralTypeChange}
               refinanceStatus={refinanceStatus}
               onRefinanceStatusChange={handleRefinanceStatusChange}
+              existingFinanceOptions={existingFinanceOptions}
+              existingFinance={existingFinance}
+              onExistingFinanceChange={handleExistingFinanceChange}
             />
           )}
 

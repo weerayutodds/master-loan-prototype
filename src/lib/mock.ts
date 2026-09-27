@@ -112,6 +112,63 @@ export const refinanceStatusOptions: OptionCardData<RefinanceStatus>[] = [
   {value: "paid-off", label: "ผ่อนหมดแล้ว", description: "ไม่ใช่รีไฟแนนซ์"},
 ]
 
+// ไฟแนนซ์เดิมที่รับรีไฟแนนซ์ — จาก image_figma/RateBook/car-precreen-refinance.png
+// หมายเหตุจาก Figma (ยังไม่แสดงใน UI):
+// 1. ไฟแนนซ์ลำดับที่ 20–23 จัดได้เฉพาะช่องทาง Agent ที่ Refer ให้กับสาขาในจังหวัด ร้อยเอ็ด มุกดาหาร และกาฬสินธุ์ เท่านั้น
+// 2. ขั้นตอนการทำงานและเงื่อนไขการพิจารณาสินเชื่อ อ้างอิงตาม Policy ของสินเชื่อรีไฟแนนซ์ แบบไม่โอนเล่มในปัจจุบันที่กำหนด
+export const existingFinanceOptions: {value: string; label: string}[] = [
+  {value: "tisco", label: "ธนาคาร ทิสโก้ จำกัด (มหาชน)"},
+  {value: "thanachart", label: "ธนาคาร ธนชาต จำกัด (มหาชน)"},
+  {value: "scb", label: "ธนาคาร ไทยพาณิชย์ จำกัด (มหาชน)"},
+  {value: "tripetch-isuzu-leasing", label: "บริษัท ตรีเพชรอีซูซุลิสซิ่ง จำกัด"},
+  {value: "kasikorn-leasing", label: "บริษัท ลิสซิ่งกสิกรไทย จำกัด"},
+  {value: "kiatnakin", label: "ธนาคาร เกียรตินาคิน จำกัด (มหาชน)"},
+  {
+    value: "asia-sermkij-leasing",
+    label: "บริษัท เอเซียเสริมกิจลีสซิ่ง จำกัด (มหาชน)",
+  },
+  {value: "icbc-thai-leasing", label: "บริษัท ลิสซิ่งไอซีบีซี (ไทย) จำกัด"},
+  {
+    value: "krungthai-business-leasing",
+    label: "บริษัท กรุงไทยธุรกิจลีสซิ่ง จำกัด",
+  },
+  {value: "toyota-leasing", label: "บริษัท โตโยต้า ลิสซิ่ง (ประเทศไทย) จำกัด"},
+  {value: "cimb-thai-auto", label: "บริษัท ซีไอเอ็มบี ไทย ออโต้ จำกัด"},
+  {
+    value: "ayudhya-capital-auto-lease",
+    label: "บริษัท อยุธยา แคปปิตอล ออโต้ ลิส จำกัด (มหาชน)",
+  },
+  {value: "krungsri", label: "ธนาคาร กรุงศรีอยุธยา จำกัด (มหาชน)"},
+  {value: "nissan-leasing", label: "บริษัท นิสสัน ลิสซิ่ง (ประเทศไทย) จำกัด"},
+  {value: "honda-leasing", label: "บริษัท ฮอนด้า ลิสซิ่ง (ประเทศไทย) จำกัด"},
+  {value: "highway", label: "บริษัท ไฮเวย์ จำกัด"},
+  {value: "center-auto-lease", label: "บริษัท เซ็นเตอร์ ออโต้ ลิส จำกัด"},
+  {
+    value: "mercedes-benz-leasing",
+    label: "บริษัท เมอร์เซเดส-เบนซ์ ลิสซิ่ง (ประเทศไทย) จำกัด",
+  },
+  {
+    value: "bmw-leasing",
+    label: "บริษัท บีเอ็มดับเบิลยู ลิสซิ่ง (ประเทศไทย) จำกัด",
+  },
+  {value: "somjai-2559", label: "บริษัท สมใจ 2559 จำกัด*"},
+  {value: "chairak-yanyon", label: "บริษัท ชัยรักษ์ ยานยนต์ จำกัด*"},
+  {value: "chairak-motor", label: "บริษัท ชัยรักษ์ มอเตอร์ จำกัด*"},
+  {value: "cak-marketing", label: "บริษัท ซีเอเค มาร์เก็ตติ้ง จำกัด*"},
+  {value: "hem-leasing", label: "เฮมลิสซิ่ง"},
+  {value: "nim-leasing", label: "นิ่ม ลิสซิ่ง (นิ่ม ซี่ เส็ง)"},
+  {value: "chukiat-leasing", label: "ชูเกียรติลิสซิ่ง"},
+  {value: "chukiat-autotech-1995", label: "ชูเกียรติออโต้เทค (1995) จำกัด"},
+  {value: "chukiat-leasing-krabi", label: "ชูเกียรติลิสซิ่ง กระบี่ จำกัด"},
+  {value: "chukiat-motor-1996", label: "ชูเกียรติมอเตอร์ (1996) จำกัด"},
+  {value: "ratchthani-leasing", label: "บริษัท ราชธานีลิสซิ่ง จำกัด (มหาชน)"},
+  {
+    value: "ngern-hai-jai",
+    label: "บริษัท เงินให้ใจ จำกัด (เริ่มตั้งแต่ 3 กันยายน 2569 เป็นต้นไป)",
+  },
+  {value: "other", label: "อื่นๆ"},
+]
+
 export const customerTypeOptions: {value: CustomerType; label: string}[] = [
   {value: "individual", label: "บุคคลธรรมดา"},
 ]

@@ -16,6 +16,7 @@ export type CustomerLeadOpportunity = {
   loanPurpose: LoanPurpose | null;
   collateralType: CollateralType | null;
   refinanceStatus: RefinanceStatus | null;
+  existingFinanceCompany: string | null;
   licensePlateNumber: string | null;
   licensePlateProvince: string | null;
   chassisNumber: string | null;

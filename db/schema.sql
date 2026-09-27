@@ -36,6 +36,9 @@ create table customer_lead_opportunity (
   loan_purpose text check (loan_purpose in ('need-money', 'buy-car')),
   collateral_type text check (collateral_type in ('motorcycle', 'car', 'truck', 'land')),
   refinance_status text check (refinance_status in ('still-paying', 'paid-off')),
+  -- only set when refinance_status = 'still-paying'; free text because the
+  -- approved finance list lives in mock data and changes over time.
+  existing_finance_company text,
 
   license_plate_number text,
   license_plate_province text,

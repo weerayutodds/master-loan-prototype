@@ -22,6 +22,7 @@ function mapRow(row: any): CustomerLeadOpportunity {
     loanPurpose: row.loan_purpose,
     collateralType: row.collateral_type,
     refinanceStatus: row.refinance_status,
+    existingFinanceCompany: row.existing_finance_company,
     licensePlateNumber: row.license_plate_number,
     licensePlateProvince: row.license_plate_province,
     chassisNumber: row.chassis_number,
@@ -87,6 +88,7 @@ export async function updateOpportunityLoanQuestions(
     loanPurpose: LoanPurpose;
     collateralType: CollateralType;
     refinanceStatus: RefinanceStatus;
+    existingFinanceCompany: string | null;
   },
 ): Promise<CustomerLeadOpportunity> {
   const [row] = await sql`
@@ -95,6 +97,7 @@ export async function updateOpportunityLoanQuestions(
       loan_purpose = ${input.loanPurpose},
       collateral_type = ${input.collateralType},
       refinance_status = ${input.refinanceStatus},
+      existing_finance_company = ${input.existingFinanceCompany},
       updated_at = now()
     where id = ${opportunityId}
     returning *

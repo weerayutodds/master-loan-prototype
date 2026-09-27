@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/molecules/Card";
 import { OptionCard } from "@/components/molecules/OptionCard";
+import { SearchableSelect } from "@/components/molecules/SearchableSelect";
 import type {
   CollateralType,
   LoanPurpose,
@@ -19,6 +20,9 @@ type LoanQuestionsPanelProps = {
   onCollateralTypeChange: (value: CollateralType) => void;
   refinanceStatus: RefinanceStatus | null;
   onRefinanceStatusChange: (value: RefinanceStatus) => void;
+  existingFinanceOptions: { value: string; label: string }[];
+  existingFinance: string | null;
+  onExistingFinanceChange: (value: string) => void;
 };
 
 export function LoanQuestionsPanel({
@@ -31,6 +35,9 @@ export function LoanQuestionsPanel({
   onCollateralTypeChange,
   refinanceStatus,
   onRefinanceStatusChange,
+  existingFinanceOptions,
+  existingFinance,
+  onExistingFinanceChange,
 }: LoanQuestionsPanelProps) {
   return (
     <Card className="space-y-6">
@@ -78,6 +85,22 @@ export function LoanQuestionsPanel({
             />
           ))}
         </div>
+
+        {refinanceStatus === "still-paying" ? (
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <SearchableSelect
+              options={existingFinanceOptions}
+              value={existingFinance}
+              onChange={onExistingFinanceChange}
+              placeholder="เลือกไฟแนนซ์เดิม"
+              emptyMessage="ไม่พบไฟแนนซ์ที่ค้นหา"
+              className="sm:w-[60%]"
+            />
+            <p className="text-sm text-muted-foreground">
+              รับเฉพาะไฟแนนซ์ที่มีในรายการเท่านั้น
+            </p>
+          </div>
+        ) : null}
       </div>
     </Card>
   );
