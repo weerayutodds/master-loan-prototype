@@ -23,7 +23,11 @@ export type IconName =
   | "close"
   | "document"
   | "scan"
-  | "edit";
+  | "edit"
+  | "star"
+  | "chevron-up"
+  | "chevron-down"
+  | "calendar";
 
 type IconProps = {
   name: IconName;
@@ -216,6 +220,25 @@ const paths: Record<IconName, React.ReactNode> = {
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  ),
+  star: (
+    <path
+      d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 15.98l-4.94 2.73.94-5.5-4-3.9 5.53-.8L12 3.5Z"
+      fill="currentColor"
+      stroke="none"
+    />
+  ),
+  "chevron-up": (
+    <path d="M6 15l6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
+  ),
+  "chevron-down": (
+    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+  ),
+  calendar: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15" rx="2" />
+      <path d="M3.5 9.5h17M8 3v4M16 3v4" strokeLinecap="round" />
+    </>
   ),
 };
 

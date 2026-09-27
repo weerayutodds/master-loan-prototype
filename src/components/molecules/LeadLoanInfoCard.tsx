@@ -3,13 +3,12 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Card } from "@/components/molecules/Card";
 import { Select } from "@/components/atoms/Select";
-import { calculateMonthlyPayment } from "@/lib/loan-cal";
+import { PPI_ANNUAL_PREMIUM, calculateMonthlyPayment } from "@/lib/loan-cal";
 import type { ProductCatalogItem } from "@/types/product-catalog";
 import type { LoanInfo } from "@/types/ratebook";
 import { useMemo } from "react";
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84];
-const PPI_ANNUAL_PREMIUM = 8073;
 const MIN_REQUESTED_AMOUNT = 20000;
 
 function parseAmounts(value: string): number[] {

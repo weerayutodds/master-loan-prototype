@@ -9,6 +9,7 @@ import { LeadProgressTooltip } from "@/components/molecules/LeadProgressTooltip"
 import { Toast } from "@/components/molecules/Toast";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import { GenderAgePopover } from "@/components/organisms/GenderAgePopover";
 import {
   updateOpportunityCarInfo,
   updateOpportunityCarInsurance,
@@ -16,12 +17,13 @@ import {
   updateOpportunityCustomerInfo,
   updateOpportunityLoanInfo,
 } from "@/lib/actions/customer-lead-opportunity";
-import { maskIdCardNumber } from "@/lib/format";
+import { calculateAge, maskIdCardNumber } from "@/lib/format";
 import {
   getVehicleBrandLabel,
   getVehicleModelLabel,
   provinceOptions,
 } from "@/lib/mock";
+import type { Gender } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
@@ -32,7 +34,7 @@ import type {
   LoanInfo,
 } from "@/types/ratebook";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TOTAL_SECTIONS = 4;
 
@@ -47,6 +49,8 @@ type CustomerCollateralPanelProps = {
   hasSelectedProduct?: boolean;
   loanInfo?: LoanInfo;
   carInsuranceInfo?: CarInsuranceInfo;
+  customer: CustomerInfo | null;
+  onCustomerChange: (value: CustomerInfo) => void;
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -96,18 +100,13 @@ export function CustomerCollateralPanel({
   hasSelectedProduct = false,
   loanInfo,
   carInsuranceInfo,
+  customer,
+  onCustomerChange,
 }: CustomerCollateralPanelProps) {
   const router = useRouter();
-  const [customer, setCustomer] = useState<CustomerInfo | null>(
-    initialOpportunity
-      ? {
-          firstName: initialOpportunity.firstName,
-          lastName: initialOpportunity.lastName,
-          phone: initialOpportunity.phone,
-        }
-      : null,
-  );
   const [modalOpen, setModalOpen] = useState(false);
+  const [genderAgeOpen, setGenderAgeOpen] = useState(false);
+  const genderAgeRef = useRef<HTMLDivElement>(null);
   const [collateralIdentifier, setCollateralIdentifier] =
     useState<CollateralIdentifier | null>(
       initialOpportunity &&
@@ -130,6 +129,27 @@ export function CustomerCollateralPanel({
   const [savedToastOpen, setSavedToastOpen] = useState(false);
 
   const idCardNumber = initialOpportunity?.idCardNumber ?? "";
+
+  useEffect(() => {
+    if (!genderAgeOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (!genderAgeRef.current?.contains(event.target as Node)) {
+        setGenderAgeOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [genderAgeOpen]);
+
+  async function handleSaveGenderAge(value: { gender: Gender; birthDate: string }) {
+    if (!customer) return;
+    const nextCustomer: CustomerInfo = { ...customer, ...value };
+    onCustomerChange(nextCustomer);
+    setGenderAgeOpen(false);
+    if (opportunityId) {
+      await updateOpportunityCustomerInfo(opportunityId, nextCustomer);
+    }
+  }
 
   async function handleSaveLead() {
     if (!opportunityId) return;
@@ -174,20 +194,38 @@ export function CustomerCollateralPanel({
   return (
     <Card className="space-y-4 border-2">
       {customer ? (
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="flex w-full items-start justify-between text-left"
-        >
-          <div>
-            <p className="text-base font-medium text-foreground">
-              {customer.firstName} {customer.lastName}
-            </p>
+        <div className="flex w-full items-start justify-between">
+          <div className="text-left">
+            <button type="button" onClick={() => setModalOpen(true)}>
+              <p className="text-base font-medium text-foreground">
+                {customer.firstName} {customer.lastName}
+              </p>
+            </button>
             <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
               <Icon name="phone" className="size-4" />
               {customer.phone}
-              <span>| 36 ปี</span>
-              <Icon name="info" className="size-4 text-primary-to" />
+              <div ref={genderAgeRef} className="relative">
+                {customer.birthDate ? (
+                  <button
+                    type="button"
+                    onClick={() => setGenderAgeOpen((value) => !value)}
+                    className="flex items-center gap-1.5"
+                  >
+                    <span>{`| ${calculateAge(customer.birthDate)} ปี`}</span>
+                    <Icon name="info" className="size-4 text-primary-to" />
+                  </button>
+                ) : null}
+                {genderAgeOpen ? (
+                  <div className="absolute left-0 top-full z-50 mt-3">
+                    <GenderAgePopover
+                      initialGender={customer.gender ?? null}
+                      initialBirthDate={customer.birthDate ?? null}
+                      onSave={handleSaveGenderAge}
+                      onCancel={() => setGenderAgeOpen(false)}
+                    />
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
           <div className="group/progress relative shrink-0">
@@ -198,7 +236,7 @@ export function CustomerCollateralPanel({
               items={progressItems}
             />
           </div>
-        </button>
+        </div>
       ) : (
         <div className="flex items-center justify-between">
           <span className="text-sm text-foreground">ข้อมูลลูกค้า</span>
@@ -356,7 +394,7 @@ export function CustomerCollateralPanel({
         initialValue={customer ?? undefined}
         onClose={() => setModalOpen(false)}
         onSave={(info) => {
-          setCustomer(info);
+          onCustomerChange({ ...customer, ...info });
           setModalOpen(false);
         }}
       />

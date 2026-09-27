@@ -15,6 +15,8 @@ function mapRow(row: any): CustomerLeadOpportunity {
     idCardNumber: row.id_card_number,
     ncbGrade: row.ncb_grade,
     verificationMethod: row.verification_method,
+    gender: row.gender,
+    birthDate: row.birth_date ? row.birth_date.toISOString().slice(0, 10) : null,
     loanPurpose: row.loan_purpose,
     collateralType: row.collateral_type,
     refinanceStatus: row.refinance_status,
@@ -56,6 +58,7 @@ export async function getCustomerLeadOpportunityById(
   const [row] = await sql`
     select
       id, lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
+      gender, birth_date,
       loan_purpose, collateral_type, refinance_status,
       license_plate_number, license_plate_province, chassis_number, brand_model,
       car_brand, car_model, car_year, car_condition, car_doors, car_type, car_engine_cc,
@@ -79,6 +82,7 @@ export async function listCustomerLeadOpportunitiesByLeadId(
   const rows = await sql`
     select
       id, lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
+      gender, birth_date,
       loan_purpose, collateral_type, refinance_status,
       license_plate_number, license_plate_province, chassis_number, brand_model,
       car_brand, car_model, car_year, car_condition, car_doors, car_type, car_engine_cc,

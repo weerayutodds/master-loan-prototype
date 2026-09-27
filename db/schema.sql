@@ -11,6 +11,8 @@ create table customer_lead (
   id_card_number text not null,
   ncb_grade text,
   verification_method text not null default 'manual' check (verification_method in ('card', 'manual')),
+  gender text check (gender in ('male', 'female')),
+  birth_date date,
   created_at timestamptz not null default now()
 );
 
@@ -28,6 +30,8 @@ create table customer_lead_opportunity (
   id_card_number text not null,
   ncb_grade text,
   verification_method text not null check (verification_method in ('card', 'manual')),
+  gender text check (gender in ('male', 'female')),
+  birth_date date,
 
   loan_purpose text check (loan_purpose in ('need-money', 'buy-car')),
   collateral_type text check (collateral_type in ('motorcycle', 'car', 'truck', 'land')),

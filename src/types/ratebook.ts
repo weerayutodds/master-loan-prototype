@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/atoms/Icon";
+import type { Gender } from "@/types/customer-lead";
 
 export type LoanPurpose = "need-money" | "buy-car";
 export type CollateralType = "motorcycle" | "car" | "truck" | "land";
@@ -33,6 +34,8 @@ export type CustomerInfo = {
   firstName: string;
   lastName: string;
   phone: string;
+  gender?: Gender;
+  birthDate?: string;
 };
 
 export type CollateralIdentifier = {

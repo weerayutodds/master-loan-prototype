@@ -2,13 +2,29 @@
 
 import {Icon} from "@/components/atoms/Icon"
 import {Select} from "@/components/atoms/Select"
+import {LoanCalDetailPopover} from "@/components/molecules/LoanCalDetailPopover"
+import {GenderAgePopover} from "@/components/organisms/GenderAgePopover"
+import {updateOpportunityCustomerInfo} from "@/lib/actions/customer-lead-opportunity"
+import {calculateAge} from "@/lib/format"
 import {
   calculateAmountFromLtv,
+  calculateFlatRateEquivalent,
+  calculateLoanCalSummary,
   calculateLtvPercent,
-  calculateMonthlyPayment,
 } from "@/lib/loan-cal"
+import {GENDER_LABELS} from "@/lib/mock"
+import type {Gender} from "@/types/customer-lead"
+import type {CustomerInfo} from "@/types/ratebook"
 import type {ProductCatalogData} from "@/types/product-catalog"
-import {useMemo, useState} from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
+
+type CalculatedInputs = {
+  requestedAmount: number
+  interestRatePercent: number
+  installmentTerm: number
+  isTLC: boolean
+  hasPpi: boolean
+}
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84]
 
@@ -34,12 +50,12 @@ function ToggleChip({
       className={`flex h-9 shrink-0 items-center gap-2 rounded-md border px-2 text-sm whitespace-nowrap bg-white ${
         checked
           ? "border-primary text-foreground"
-          : "border-gray-300 text-gray-500" // Adjusted for visibility on white bg
+          : "border-gray-300 text-gray-500"
       }`}
     >
       <span
         className={`flex size-5 shrink-0 items-center justify-center rounded ${
-          checked ? "bg-primary-to" : "border border-gray-300" // Shows the outline when not checked
+          checked ? "bg-primary-to" : "border border-gray-300"
         }`}
       >
         {checked ? <Icon name="check" className="size-3.5 text-white" /> : null}
@@ -52,9 +68,18 @@ function ToggleChip({
 type LoanCalBarProps = {
   productCatalog: ProductCatalogData
   appraisalPrice: number
+  customer: CustomerInfo | null
+  opportunityId: string | null
+  onCustomerChange: (value: CustomerInfo) => void
 }
 
-export function LoanCalBar({productCatalog, appraisalPrice}: LoanCalBarProps) {
+export function LoanCalBar({
+  productCatalog,
+  appraisalPrice,
+  customer,
+  opportunityId,
+  onCustomerChange,
+}: LoanCalBarProps) {
   const bookStatusOptions = useMemo(
     () =>
       Array.from(
@@ -68,27 +93,117 @@ export function LoanCalBar({productCatalog, appraisalPrice}: LoanCalBarProps) {
   )
   const [requestedAmount, setRequestedAmount] = useState(0)
   const [requestedLtvPercent, setRequestedLtvPercent] = useState(0)
-  const [isBlacklisted, setIsBlacklisted] = useState(
+  const [isTLC, setIsTLC] = useState(
     productCatalog.filterChips.includes("บัตรติดล้อ"),
   )
   const [installmentTerm, setInstallmentTerm] = useState(60)
   const [hasPpi, setHasPpi] = useState(false)
   const [interestRatePercent, setInterestRatePercent] = useState(24)
-  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null)
+  const [calculated, setCalculated] = useState<CalculatedInputs | null>(null)
+  const [showDetail, setShowDetail] = useState(false)
+  const [genderAgeOpen, setGenderAgeOpen] = useState(false)
+  const [genderAgePosition, setGenderAgePosition] = useState<{
+    left: number
+    bottom: number
+  } | null>(null)
+  const [genderAgeIntent, setGenderAgeIntent] = useState<"label" | "ppi">("label")
+  const containerRef = useRef<HTMLDivElement>(null)
+  const genderAgeAnchorRef = useRef<HTMLDivElement>(null)
+  const genderAgePopoverRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (isTLC) setInstallmentTerm(60)
+  }, [isTLC])
+
+  useEffect(() => {
+    if (!showDetail) return
+    function handleClickOutside(event: MouseEvent) {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setShowDetail(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showDetail])
+
+  useEffect(() => {
+    if (!genderAgeOpen) return
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node
+      if (
+        !genderAgeAnchorRef.current?.contains(target) &&
+        !genderAgePopoverRef.current?.contains(target)
+      ) {
+        setGenderAgeOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [genderAgeOpen])
+
+  function openGenderAgePopover(intent: "label" | "ppi") {
+    const rect = genderAgeAnchorRef.current?.getBoundingClientRect()
+    if (rect) {
+      setGenderAgePosition({left: rect.left, bottom: window.innerHeight - rect.top + 12})
+    }
+    setGenderAgeIntent(intent)
+    setGenderAgeOpen(true)
+  }
+
+  function handleTogglePpi(nextChecked: boolean) {
+    if (nextChecked && !(customer?.gender && customer?.birthDate)) {
+      openGenderAgePopover("ppi")
+      return
+    }
+    setHasPpi(nextChecked)
+  }
+
+  const summary = useMemo(
+    () => (calculated ? calculateLoanCalSummary(calculated) : null),
+    [calculated],
+  )
+  const flatRatePercent = useMemo(
+    () =>
+      calculated
+        ? calculateFlatRateEquivalent(
+            calculated.interestRatePercent,
+            calculated.installmentTerm,
+          )
+        : 0,
+    [calculated],
+  )
 
   function handleCalculate() {
-    const payment = calculateMonthlyPayment(
-      requestedAmount,
-      interestRatePercent,
-      installmentTerm,
-    )
-    setMonthlyPayment(hasPpi ? payment + 500 : payment)
+    setCalculated({requestedAmount, interestRatePercent, installmentTerm, isTLC, hasPpi})
+  }
+
+  async function handleSaveGenderAge(value: {gender: Gender; birthDate: string}) {
+    const nextCustomer: CustomerInfo = {
+      firstName: customer?.firstName ?? "",
+      lastName: customer?.lastName ?? "",
+      phone: customer?.phone ?? "",
+      ...value,
+    }
+    onCustomerChange(nextCustomer)
+    setGenderAgeOpen(false)
+    if (genderAgeIntent === "ppi") setHasPpi(true)
+    if (opportunityId) {
+      await updateOpportunityCustomerInfo(opportunityId, nextCustomer)
+    }
   }
 
   return (
     <div className="fixed inset-x-4 bottom-4 z-40 flex justify-center">
-      <div className="loan-cal-bar flex w-full max-w-6xl items-end justify-between gap-6 overflow-x-auto rounded-xl px-4 py-2.5">
-        <div className="flex items-end gap-2">
+      {/* 
+        FIX 1: Removed `overflow-x-auto` from this main wrapper. 
+        This stops the browser from clipping the detail popup.
+      */}
+      <div className="loan-cal-bar flex w-full max-w-6xl items-end justify-between gap-6 rounded-xl px-4 py-2.5">
+        {/* 
+          FIX 2: Added `flex-1 min-w-0 overflow-x-auto pb-2` here. 
+          Now only the inputs scroll on small screens, preventing the popup from being trapped.
+        */}
+        <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1 scrollbar-hide">
           <div className="w-fit shrink-0">
             <FieldLabel>เล่มทะเบียน</FieldLabel>
             <Select
@@ -146,11 +261,7 @@ export function LoanCalBar({productCatalog, appraisalPrice}: LoanCalBarProps) {
 
           <div className="h-9 w-px shrink-0 bg-primary/60" />
 
-          <ToggleChip
-            label="บัตรติดล้อ"
-            checked={isBlacklisted}
-            onChange={setIsBlacklisted}
-          />
+          <ToggleChip label="บัตรติดล้อ" checked={isTLC} onChange={setIsTLC} />
 
           <div className="w-fit shrink-0">
             <FieldLabel>งวดผ่อน</FieldLabel>
@@ -159,18 +270,48 @@ export function LoanCalBar({productCatalog, appraisalPrice}: LoanCalBarProps) {
                 label: `${term} งวด`,
                 value: String(term),
               }))}
+              disabled={isTLC}
               value={String(installmentTerm)}
               onChange={(e) => setInstallmentTerm(Number(e.target.value))}
               className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
             />
           </div>
-          <div className="w-20 shrink-0">
-            <span className="mb-2 shrink-0 self-center text-xs text-pale-blue">
-              เพศ ชาย | 36 ปี
-            </span>
+          <div ref={genderAgeAnchorRef} className="w-20 shrink-0">
+            {customer?.gender && customer?.birthDate ? (
+              <button
+                type="button"
+                onClick={() =>
+                  genderAgeOpen
+                    ? setGenderAgeOpen(false)
+                    : openGenderAgePopover("label")
+                }
+                className="mb-2 block shrink-0 self-center text-xs text-pale-blue"
+              >
+                {`เพศ ${GENDER_LABELS[customer.gender]} | ${calculateAge(customer.birthDate)} ปี`}
+              </button>
+            ) : null}
 
-            <ToggleChip label="PPI" checked={hasPpi} onChange={setHasPpi} />
+            <ToggleChip label="PPI" checked={hasPpi} onChange={handleTogglePpi} />
           </div>
+
+          {genderAgeOpen && genderAgePosition ? (
+            <div
+              ref={genderAgePopoverRef}
+              style={{
+                position: "fixed",
+                left: genderAgePosition.left,
+                bottom: genderAgePosition.bottom,
+              }}
+              className="z-1000"
+            >
+              <GenderAgePopover
+                initialGender={customer?.gender ?? null}
+                initialBirthDate={customer?.birthDate ?? null}
+                onSave={handleSaveGenderAge}
+                onCancel={() => setGenderAgeOpen(false)}
+              />
+            </div>
+          ) : null}
           <div className="w-28 shrink-0">
             <FieldLabel>อัตราดอกเบี้ยลดต้นลดดอก</FieldLabel>
             <div className="flex h-9 items-center gap-1 rounded-md border border-secondary-border bg-surface px-2">
@@ -205,16 +346,47 @@ export function LoanCalBar({productCatalog, appraisalPrice}: LoanCalBarProps) {
           </button>
         </div>
 
-        <div className="loan-cal-result-box flex shrink-0 flex-col justify-center rounded-md border border-primary-to px-3 py-1.5">
-          <span className="text-[10px] font-medium text-foreground">
-            ยอดผ่อนต่อเดือน
-          </span>
+        <div
+          ref={containerRef}
+          className="loan-cal-result-box relative flex shrink-0 flex-col justify-center gap-1 rounded-md border border-primary-to px-3 py-1.5"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-medium text-foreground">
+              ยอดผ่อนต่อเดือน
+            </span>
+            {summary !== null && summary.totalPayment > 0 ? (
+              <button
+                type="button"
+                onClick={() => setShowDetail((value) => !value)}
+                aria-label="แสดงรายละเอียดยอดจัดสินเชื่อ"
+                className="flex size-4 shrink-0 items-center justify-center rounded border border-secondary-border bg-secondary-bg"
+              >
+                <Icon
+                  name={showDetail ? "chevron-down" : "chevron-up"}
+                  className="size-3 text-foreground"
+                />
+              </button>
+            ) : null}
+          </div>
           <p className="text-xl font-semibold text-primary-to">
-            {monthlyPayment !== null
-              ? monthlyPayment.toLocaleString("th-TH")
-              : 0}{" "}
+            {summary !== null ? summary.totalPayment.toLocaleString("th-TH") : 0}
+            &nbsp;
             <span className="text-xs font-normal text-price-label">บาท</span>
           </p>
+
+          {showDetail && summary !== null && calculated !== null ? (
+            <div className="absolute bottom-full right-0 z-1000 mb-2">
+              <LoanCalDetailPopover
+                requestedAmount={calculated.requestedAmount}
+                interestRatePercent={calculated.interestRatePercent}
+                flatRatePercent={flatRatePercent}
+                installmentTerm={calculated.installmentTerm}
+                isTLC={calculated.isTLC}
+                hasPpi={calculated.hasPpi}
+                onClose={() => setShowDetail(false)}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

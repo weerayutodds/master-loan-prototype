@@ -1,6 +1,7 @@
 import type { VerificationMethod } from "@/types/customer-form";
 
 export type NcbGrade = "A01" | "A02" | "A03" | "L05";
+export type Gender = "male" | "female";
 
 export type CustomerLead = {
   id: string;
@@ -10,5 +11,7 @@ export type CustomerLead = {
   idCardNumber: string;
   ncbGrade: NcbGrade | null;
   verificationMethod: VerificationMethod;
+  gender: Gender | null;
+  birthDate: string | null;
   createdAt: string;
 };

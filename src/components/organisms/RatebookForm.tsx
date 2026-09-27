@@ -24,6 +24,7 @@ import type {
   CarInfo,
   CarInsuranceInfo,
   CollateralType,
+  CustomerInfo,
   LoanInfo,
   LoanPurpose,
   RefinanceStatus,
@@ -38,6 +39,17 @@ type RatebookFormProps = {
 export function RatebookForm({initialOpportunity}: RatebookFormProps) {
   const opportunityId = initialOpportunity?.id ?? null
 
+  const [customer, setCustomer] = useState<CustomerInfo | null>(
+    initialOpportunity
+      ? {
+          firstName: initialOpportunity.firstName,
+          lastName: initialOpportunity.lastName,
+          phone: initialOpportunity.phone,
+          gender: initialOpportunity.gender ?? undefined,
+          birthDate: initialOpportunity.birthDate ?? undefined,
+        }
+      : null,
+  )
   const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(
     initialOpportunity?.loanPurpose ?? null,
   )
@@ -171,6 +183,8 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
         hasSelectedProduct={selectedProduct !== null}
         loanInfo={loanInfo}
         carInsuranceInfo={carInsuranceInfo}
+        customer={customer}
+        onCustomerChange={setCustomer}
       />
       {selectedProduct && initialOpportunity ? (
         <LeadContent
@@ -216,6 +230,9 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
               <LoanCalBar
                 productCatalog={productCatalogMock}
                 appraisalPrice={productGuideMock.appraisalPrice}
+                customer={customer}
+                opportunityId={opportunityId}
+                onCustomerChange={setCustomer}
               />
             </>
           )}

@@ -102,6 +102,8 @@ export function CustomerVerificationPanel({
               lastName: rest.join(" "),
               phone: data.cardPhone,
               idCardNumber: cardCustomer?.idCardNumber ?? "",
+              gender: cardCustomer?.gender ?? null,
+              birthDate: cardCustomer?.birthDate ?? null,
             };
           })()
         : {
@@ -109,6 +111,8 @@ export function CustomerVerificationPanel({
             lastName: data.lastName,
             phone: data.phone,
             idCardNumber: "",
+            gender: null,
+            birthDate: null,
           };
 
     const lead = await createCustomerLead({ ...normalized, verificationMethod });

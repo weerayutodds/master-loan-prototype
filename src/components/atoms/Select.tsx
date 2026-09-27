@@ -1,8 +1,8 @@
-import { forwardRef, type SelectHTMLAttributes } from "react";
+import {forwardRef, type SelectHTMLAttributes} from "react"
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
-  options: { label: string; value: string }[];
-};
+  options: {label: string; value: string}[]
+}
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { options, className = "", ...rest },
@@ -26,5 +26,5 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         </option>
       ))}
     </select>
-  );
-});
+  )
+})

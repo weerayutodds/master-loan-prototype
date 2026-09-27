@@ -17,6 +17,8 @@ function mapRow(row: any): CustomerLeadOpportunity {
     idCardNumber: row.id_card_number,
     ncbGrade: row.ncb_grade,
     verificationMethod: row.verification_method,
+    gender: row.gender,
+    birthDate: row.birth_date ? row.birth_date.toISOString().slice(0, 10) : null,
     loanPurpose: row.loan_purpose,
     collateralType: row.collateral_type,
     refinanceStatus: row.refinance_status,
@@ -60,11 +62,13 @@ export async function createCustomerLeadOpportunity(
 
   const [row] = await sql`
     insert into customer_lead_opportunity (
-      lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method
+      lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
+      gender, birth_date
     )
     values (
       ${lead.id}, ${lead.firstName}, ${lead.lastName}, ${lead.phone},
-      ${lead.idCardNumber}, ${lead.ncbGrade}, ${lead.verificationMethod}
+      ${lead.idCardNumber}, ${lead.ncbGrade}, ${lead.verificationMethod},
+      ${lead.gender}, ${lead.birthDate}
     )
     returning *
   `;
@@ -109,6 +113,8 @@ export async function updateOpportunityCustomerInfo(
       first_name = ${input.firstName},
       last_name = ${input.lastName},
       phone = ${input.phone},
+      gender = ${input.gender ?? null},
+      birth_date = ${input.birthDate ?? null},
       updated_at = now()
     where id = ${opportunityId}
     returning *

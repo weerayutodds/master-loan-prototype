@@ -23,6 +23,7 @@ import type {
 import type {ProductGuideData} from "@/types/product-guide"
 import type {ProductCatalogData} from "@/types/product-catalog"
 import type {FollowUpEntry} from "@/types/lead-content"
+import type {Gender} from "@/types/customer-lead"
 
 export const navItems: NavItem[] = [
   {href: "/", label: "หน้าแรก", icon: "home", active: true},
@@ -545,6 +546,18 @@ export const carTransmissionOptions: {value: string; label: string}[] = [
 export const mockCardCustomer: CardCustomerData = {
   name: "สดใส สะอาดเอี่ยม",
   idCardNumber: "1-2345-67890-12-3",
+  gender: "male",
+  birthDate: "1990-05-20",
+}
+
+export const genderOptions: {value: Gender; label: string}[] = [
+  {value: "male", label: "ชาย"},
+  {value: "female", label: "หญิง"},
+]
+
+export const GENDER_LABELS: Record<Gender, string> = {
+  male: "ชาย",
+  female: "หญิง",
 }
 
 export const performanceStats: PerformanceStat[] = [

@@ -7,6 +7,15 @@ export function calculateAmountFromLtv(ltvPercent: number, appraisalPrice: numbe
   return Math.round(appraisalPrice * (ltvPercent / 100));
 }
 
+export function calculateFlatRateEquivalent(
+  reducingAnnualRatePercent: number,
+  months: number,
+): number {
+  if (months <= 0) return 0;
+  const flatAnnualRatePercent = (reducingAnnualRatePercent * (months + 1)) / (2 * months);
+  return Math.round((flatAnnualRatePercent / 12) * 100) / 100;
+}
+
 export function calculateMonthlyPayment(
   principal: number,
   annualRatePercent: number,
@@ -19,4 +28,67 @@ export function calculateMonthlyPayment(
       ? principal / months
       : (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
   return Math.round(payment);
+}
+
+export const PPI_ANNUAL_PREMIUM = 8073;
+
+export type LoanCalSummary = {
+  financedAmount: number;
+  ppiTotal: number;
+  ppiMonthly: number;
+  basePayment: number;
+  totalPayment: number;
+};
+
+/**
+ * บัตรติดล้อ (TLC) bills PPI as a flat monthly add-on to the installment.
+ * Without it, PPI is instead financed into the principal up front.
+ */
+export function calculateLoanCalSummary({
+  requestedAmount,
+  interestRatePercent,
+  installmentTerm,
+  isTLC,
+  hasPpi,
+}: {
+  requestedAmount: number;
+  interestRatePercent: number;
+  installmentTerm: number;
+  isTLC: boolean;
+  hasPpi: boolean;
+}): LoanCalSummary {
+  if (requestedAmount <= 0) {
+    return {financedAmount: 0, ppiTotal: 0, ppiMonthly: 0, basePayment: 0, totalPayment: 0};
+  }
+
+  if (isTLC) {
+    const basePayment = calculateMonthlyPayment(
+      requestedAmount,
+      interestRatePercent,
+      installmentTerm,
+    );
+    const ppiMonthly = hasPpi ? Math.round(PPI_ANNUAL_PREMIUM / 12) : 0;
+    return {
+      financedAmount: requestedAmount,
+      ppiTotal: 0,
+      ppiMonthly,
+      basePayment,
+      totalPayment: basePayment + ppiMonthly,
+    };
+  }
+
+  const ppiTotal = hasPpi ? Math.round((PPI_ANNUAL_PREMIUM * installmentTerm) / 12) : 0;
+  const financedAmount = requestedAmount + ppiTotal;
+  const basePayment = calculateMonthlyPayment(
+    financedAmount,
+    interestRatePercent,
+    installmentTerm,
+  );
+  return {
+    financedAmount,
+    ppiTotal,
+    ppiMonthly: 0,
+    basePayment,
+    totalPayment: basePayment,
+  };
 }

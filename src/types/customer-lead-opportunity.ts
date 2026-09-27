@@ -1,5 +1,5 @@
 import type { VerificationMethod } from "@/types/customer-form";
-import type { NcbGrade } from "@/types/customer-lead";
+import type { Gender, NcbGrade } from "@/types/customer-lead";
 import type { CollateralType, LoanPurpose, RefinanceStatus } from "@/types/ratebook";
 
 export type CustomerLeadOpportunity = {
@@ -11,6 +11,8 @@ export type CustomerLeadOpportunity = {
   idCardNumber: string;
   ncbGrade: NcbGrade | null;
   verificationMethod: VerificationMethod;
+  gender: Gender | null;
+  birthDate: string | null;
   loanPurpose: LoanPurpose | null;
   collateralType: CollateralType | null;
   refinanceStatus: RefinanceStatus | null;
