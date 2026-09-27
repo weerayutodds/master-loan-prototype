@@ -52,11 +52,15 @@ type CustomerCollateralPanelProps = {
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
-  if (identifier.licensePlateNumber && identifier.licensePlateProvince) {
+  if (
+    identifier.licensePlateNumber &&
+    identifier.licensePlateProvince &&
+    identifier.chassisNumber
+  ) {
     const province = provinceOptions.find(
       (option) => option.value === identifier.licensePlateProvince,
     );
-    return `${identifier.licensePlateNumber} · ${province?.label ?? ""}`;
+    return `${identifier.licensePlateNumber} ${province?.label ?? ""} · ${identifier.chassisNumber ?? ""}`;
   }
   return identifier.chassisNumber ?? "";
 }
