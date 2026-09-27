@@ -15,7 +15,10 @@ import {
 } from "@/lib/loan-cal"
 import {GENDER_LABELS} from "@/lib/mock"
 import type {Gender} from "@/types/customer-lead"
-import type {ProductCatalogData} from "@/types/product-catalog"
+import type {
+  ProductCatalogData,
+  ProductCatalogFilter,
+} from "@/types/product-catalog"
 import type {CustomerInfo} from "@/types/ratebook"
 import {useEffect, useMemo, useRef, useState} from "react"
 
@@ -79,6 +82,7 @@ type LoanCalBarProps = {
   customer: CustomerInfo | null
   opportunityId: string | null
   onCustomerChange: (value: CustomerInfo) => void
+  onFilterChange: (filter: ProductCatalogFilter) => void
 }
 
 export function LoanCalBar({
@@ -87,6 +91,7 @@ export function LoanCalBar({
   customer,
   opportunityId,
   onCustomerChange,
+  onFilterChange,
 }: LoanCalBarProps) {
   const bookStatusOptions = useMemo(
     () =>
@@ -121,9 +126,19 @@ export function LoanCalBar({
 
   const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS
 
+  function commitFilter(overrides: Partial<ProductCatalogFilter> = {}) {
+    onFilterChange({
+      bookStatus,
+      requestedAmount,
+      requestedLtvPercent,
+      ...overrides,
+    })
+  }
+
   function handleBookStatusChange(value: string) {
     setBookStatus(value)
     if (value === TRANSFER_BOOK_STATUS) setIsTLC(false)
+    commitFilter({bookStatus: value})
   }
 
   function handleFlatRateChange(raw: string) {
@@ -269,6 +284,7 @@ export function LoanCalBar({
                       calculateLtvPercent(amount, appraisalPrice),
                     )
                   }}
+                  onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"
                 />
                 <span className="text-xs text-muted-foreground">บาท</span>
@@ -287,6 +303,7 @@ export function LoanCalBar({
                       calculateAmountFromLtv(ltvPercent, appraisalPrice),
                     )
                   }}
+                  onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"
                 />
                 <span className="text-xs text-muted-foreground">%LTV</span>

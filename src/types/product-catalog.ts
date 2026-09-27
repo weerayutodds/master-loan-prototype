@@ -25,3 +25,10 @@ export type ProductCatalogData = {
   gradeFilterLabel: string;
   items: ProductCatalogItem[];
 };
+
+/** A 0 amount/LTV means that condition is not applied. */
+export type ProductCatalogFilter = {
+  bookStatus: string;
+  requestedAmount: number;
+  requestedLtvPercent: number;
+};

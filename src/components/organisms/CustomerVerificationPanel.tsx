@@ -115,12 +115,16 @@ export function CustomerVerificationPanel({
             birthDate: null,
           };
 
-    const lead = await createCustomerLead({ ...normalized, verificationMethod });
+    const lead = await createCustomerLead({
+      ...normalized,
+      verificationMethod,
+    });
     router.push(`/customer-lead-list?leadId=${lead.id}`);
   }
 
+  const hasErrors = Object.keys(errors).length > 0;
   const continueDisabled =
-    verificationMethod === "card" ? cardStatus !== "success" : false;
+    hasErrors || (verificationMethod === "card" && cardStatus !== "success");
 
   return (
     <Card className="mx-auto max-w-md">
@@ -157,8 +161,12 @@ export function CustomerVerificationPanel({
                   <Icon name="user" className="size-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-primary">{cardCustomer.name}</p>
-                  <p className="text-sm text-foreground">{cardCustomer.idCardNumber}</p>
+                  <p className="text-sm font-semibold text-primary">
+                    {cardCustomer.name}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {cardCustomer.idCardNumber}
+                  </p>
                 </div>
               </div>
               <FormField label="เบอร์มือถือ" error={errors.cardPhone?.message}>
@@ -184,7 +192,10 @@ export function CustomerVerificationPanel({
               disabled={cardStatus === "loading"}
               className="relative flex w-full flex-col items-center gap-3 rounded-xl border border-dashed border-border p-6 text-center disabled:cursor-not-allowed"
             >
-              <Icon name="card-reader" className="size-10 text-muted-foreground" />
+              <Icon
+                name="card-reader"
+                className="size-10 text-muted-foreground"
+              />
               <p className="flex items-center gap-1.5 text-sm text-foreground">
                 เครื่องเสียบบัตร :
                 <Icon name="check" className="size-4 text-success" />
@@ -195,7 +206,9 @@ export function CustomerVerificationPanel({
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-foreground/80 p-6 text-center text-primary-foreground">
                   <span className="size-8 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
                   <p className="text-sm font-medium">กำลังอ่านข้อมูลบัตร...</p>
-                  <p className="text-xs">อย่าเพิ่งดึงบัตรออก จนกว่าจะเสร็จสิ้น</p>
+                  <p className="text-xs">
+                    อย่าเพิ่งดึงบัตรออก จนกว่าจะเสร็จสิ้น
+                  </p>
                 </div>
               ) : null}
             </button>
@@ -221,7 +234,7 @@ export function CustomerVerificationPanel({
                 type="tel"
                 inputMode="numeric"
                 maxLength={12}
-                placeholder="081-123-5678"
+                placeholder="กรอกเบอร์มือถือ"
                 invalid={!!errors.phone}
                 {...register("phone", {
                   onChange: (e) => {

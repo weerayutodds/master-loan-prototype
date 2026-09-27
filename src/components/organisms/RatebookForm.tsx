@@ -31,7 +31,10 @@ import type {
   LoanPurpose,
   RefinanceStatus,
 } from "@/types/ratebook";
-import type { ProductCatalogItem } from "@/types/product-catalog";
+import type {
+  ProductCatalogFilter,
+  ProductCatalogItem,
+} from "@/types/product-catalog";
 import { useState } from "react";
 
 type RatebookFormProps = {
@@ -124,6 +127,8 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
     appraisalPrice: productGuideData.appraisalPrice,
   };
   const productCatalogData = getProductCatalogData(productCatalogContext);
+  const [productFilter, setProductFilter] =
+    useState<ProductCatalogFilter | null>(null);
 
   // Runs once, against the first render's persisted car info — so a saved product
   // rehydrates from the same catalog the customer picked it out of.
@@ -279,7 +284,11 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
               carInfo={carInfo}
               collateralType={collateralType}
               onCarInfoChange={handleCarInfoChange}
-              onViewAppraisal={() => setShowProductGuide(true)}
+              onViewAppraisal={() => {
+                // LoanCalBar remounts with empty inputs, so start unfiltered too.
+                setProductFilter(null);
+                setShowProductGuide(true);
+              }}
             />
           ) : (
             <LoanQuestionsPanel
@@ -303,6 +312,7 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
               <ProductGuide data={productGuideData} />
               <ProductCatalog
                 data={productCatalogData}
+                filter={productFilter}
                 onSelectConfirmed={handleSelectedProductConfirmed}
               />
               <LoanCalBar
@@ -311,6 +321,7 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
                 customer={customer}
                 opportunityId={opportunityId}
                 onCustomerChange={setCustomer}
+                onFilterChange={setProductFilter}
               />
             </>
           )}

@@ -3,17 +3,50 @@
 import { Icon } from "@/components/atoms/Icon";
 import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
-import type { ProductCatalogData, ProductCatalogItem } from "@/types/product-catalog";
+import type {
+  ProductCatalogData,
+  ProductCatalogFilter,
+  ProductCatalogItem,
+} from "@/types/product-catalog";
 import { useState } from "react";
 
 type ProductCatalogProps = {
   data: ProductCatalogData;
+  filter: ProductCatalogFilter | null;
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
 
-export function ProductCatalog({ data, onSelectConfirmed }: ProductCatalogProps) {
+/** Lowest number in a label like "80% - 130% LTV" or "456,000 - 741,000". */
+function parseMinValue(label: string): number {
+  const values = (label.match(/\d[\d,]*(\.\d+)?/g) ?? []).map((value) =>
+    Number(value.replace(/,/g, "")),
+  );
+  return values.length ? Math.min(...values) : 0;
+}
+
+function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): boolean {
+  if (filter.bookStatus && item.bookStatusLabel !== filter.bookStatus) return false;
+  if (filter.requestedAmount > 0 && parseMinValue(item.approvedAmount) < filter.requestedAmount) {
+    return false;
+  }
+  if (filter.requestedLtvPercent > 0 && parseMinValue(item.ltvLabel) < filter.requestedLtvPercent) {
+    return false;
+  }
+  return true;
+}
+
+export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatalogProps) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const selectedItem = data.items.find((item) => item.id === selectedItemId) ?? null;
+
+  const matchedItems = filter ? data.items.filter((item) => matchesFilter(item, filter)) : data.items;
+  const otherItems = filter ? data.items.filter((item) => !matchesFilter(item, filter)) : [];
+
+  function renderCards(items: ProductCatalogItem[]) {
+    return items.map((item) => (
+      <ProductCatalogCard key={item.id} item={item} onSelect={() => setSelectedItemId(item.id)} />
+    ));
+  }
 
   return (
     <div className="space-y-4">
@@ -36,20 +69,27 @@ export function ProductCatalog({ data, onSelectConfirmed }: ProductCatalogProps)
       </div>
 
       <div className="space-y-4">
-        {data.items.length === 0 ? (
+        {matchedItems.length === 0 ? (
           <p className="rounded-xl border-2 border-card-border bg-surface p-5 text-center text-sm text-muted-foreground shadow-primary-s">
-            ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้
+            {data.items.length === 0
+              ? "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้"
+              : "ไม่พบผลิตภัณฑ์ที่ตรงตามเงื่อนไข"}
           </p>
         ) : (
-          data.items.map((item) => (
-            <ProductCatalogCard
-              key={item.id}
-              item={item}
-              onSelect={() => setSelectedItemId(item.id)}
-            />
-          ))
+          renderCards(matchedItems)
         )}
       </div>
+
+      {otherItems.length > 0 ? (
+        <>
+          <div className="flex items-center gap-4 pt-2">
+            <div className="h-px flex-1 bg-divider" />
+            <h3 className="text-sm font-semibold text-muted-foreground">ผลิตภัณฑ์อื่นที่น่าสนใจ</h3>
+            <div className="h-px flex-1 bg-divider" />
+          </div>
+          <div className="space-y-4">{renderCards(otherItems)}</div>
+        </>
+      ) : null}
 
       <SelectProductConfirmModal
         open={selectedItemId !== null}
