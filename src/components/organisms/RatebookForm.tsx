@@ -1,25 +1,26 @@
-"use client"
+"use client";
 
-import {usePageTitleOverride} from "@/components/organisms/AppShell"
-import {CarInfoForm} from "@/components/organisms/CarInfoForm"
-import {CustomerCollateralPanel} from "@/components/organisms/CustomerCollateralPanel"
-import {LeadContent} from "@/components/organisms/LeadContent"
-import {LoanCalBar} from "@/components/organisms/LoanCalBar"
-import {LoanQuestionsPanel} from "@/components/organisms/LoanQuestionsPanel"
-import {ProductCatalog} from "@/components/organisms/ProductCatalog"
-import {ProductGuide} from "@/components/organisms/ProductGuide"
+import { usePageTitleOverride } from "@/components/organisms/AppShell";
+import { CarInfoForm } from "@/components/organisms/CarInfoForm";
+import { CustomerCollateralPanel } from "@/components/organisms/CustomerCollateralPanel";
+import { LeadContent } from "@/components/organisms/LeadContent";
+import { LoanCalBar } from "@/components/organisms/LoanCalBar";
+import { LoanQuestionsPanel } from "@/components/organisms/LoanQuestionsPanel";
+import { ProductCatalog } from "@/components/organisms/ProductCatalog";
+import { ProductGuide } from "@/components/organisms/ProductGuide";
 import {
   updateOpportunityLoanQuestions,
   updateOpportunitySelectedProduct,
-} from "@/lib/actions/customer-lead-opportunity"
+} from "@/lib/actions/customer-lead-opportunity";
 import {
   collateralTypeOptions,
+  findProductCatalogItemById,
+  getProductCatalogData,
+  getProductGuideData,
   loanPurposeOptions,
-  productCatalogMock,
-  productGuideMock,
   refinanceStatusOptions,
-} from "@/lib/mock"
-import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
+} from "@/lib/mock";
+import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
   CarInsuranceInfo,
@@ -28,16 +29,16 @@ import type {
   LoanInfo,
   LoanPurpose,
   RefinanceStatus,
-} from "@/types/ratebook"
-import type {ProductCatalogItem} from "@/types/product-catalog"
-import {useState} from "react"
+} from "@/types/ratebook";
+import type { ProductCatalogItem } from "@/types/product-catalog";
+import { useState } from "react";
 
 type RatebookFormProps = {
-  initialOpportunity: CustomerLeadOpportunity | null
-}
+  initialOpportunity: CustomerLeadOpportunity | null;
+};
 
-export function RatebookForm({initialOpportunity}: RatebookFormProps) {
-  const opportunityId = initialOpportunity?.id ?? null
+export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
+  const opportunityId = initialOpportunity?.id ?? null;
 
   const [customer, setCustomer] = useState<CustomerInfo | null>(
     initialOpportunity
@@ -49,17 +50,17 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
           birthDate: initialOpportunity.birthDate ?? undefined,
         }
       : null,
-  )
+  );
   const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(
     initialOpportunity?.loanPurpose ?? null,
-  )
+  );
   const [collateralType, setCollateralType] = useState<CollateralType | null>(
     initialOpportunity?.collateralType ?? null,
-  )
+  );
   const [refinanceStatus, setRefinanceStatus] =
     useState<RefinanceStatus | null>(
       initialOpportunity?.refinanceStatus ?? null,
-    )
+    );
   const [carInfo, setCarInfo] = useState<CarInfo>(
     initialOpportunity
       ? {
@@ -75,7 +76,7 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
           subModel: initialOpportunity.carSubModel ?? undefined,
         }
       : {},
-  )
+  );
   const [loanInfo, setLoanInfo] = useState<LoanInfo>(
     initialOpportunity
       ? {
@@ -91,30 +92,46 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
               : undefined,
         }
       : {},
-  )
+  );
   const [carInsuranceInfo, setCarInsuranceInfo] = useState<CarInsuranceInfo>(
     initialOpportunity
       ? {
           possessionDate: initialOpportunity.possessionDate ?? undefined,
-          carInsuranceExpiry: initialOpportunity.carInsuranceExpiry ?? undefined,
-          carInsuranceCompany: initialOpportunity.carInsuranceCompany ?? undefined,
+          carInsuranceExpiry:
+            initialOpportunity.carInsuranceExpiry ?? undefined,
+          carInsuranceCompany:
+            initialOpportunity.carInsuranceCompany ?? undefined,
           compulsoryExpiry: initialOpportunity.compulsoryExpiry ?? undefined,
           compulsoryBundledWithCarInsurance:
             initialOpportunity.compulsoryBundledWithCarInsurance,
           compulsoryCompany: initialOpportunity.compulsoryCompany ?? undefined,
         }
       : {},
-  )
-  const hasSavedProduct = Boolean(initialOpportunity?.selectedProductId)
-  const [showCarInfo, setShowCarInfo] = useState(hasSavedProduct)
-  const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct)
-  const [selectedProduct, setSelectedProduct] = useState<ProductCatalogItem | null>(
-    initialOpportunity?.selectedProductId
-      ? productCatalogMock.items.find(
-          (item) => item.id === initialOpportunity.selectedProductId,
-        ) ?? null
-      : null,
-  )
+  );
+  const hasSavedProduct = Boolean(initialOpportunity?.selectedProductId);
+  const [showCarInfo, setShowCarInfo] = useState(hasSavedProduct);
+  const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct);
+  const productGuideData = getProductGuideData(carInfo, collateralType);
+  const productCatalogContext = {
+    carInfo,
+    collateralType,
+    loanPurpose,
+    refinanceStatus,
+    appraisalPrice: productGuideData.appraisalPrice,
+  };
+  const productCatalogData = getProductCatalogData(productCatalogContext);
+
+  // Runs once, against the first render's persisted car info — so a saved product
+  // rehydrates from the same catalog the customer picked it out of.
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductCatalogItem | null>(
+      initialOpportunity?.selectedProductId
+        ? findProductCatalogItemById(
+            initialOpportunity.selectedProductId,
+            productCatalogContext,
+          )
+        : null,
+    );
 
   function commitLoanQuestionsIfComplete(
     nextLoanPurpose: LoanPurpose | null,
@@ -122,40 +139,49 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
     nextRefinanceStatus: RefinanceStatus | null,
   ) {
     if (nextLoanPurpose && nextCollateralType && nextRefinanceStatus) {
-      setShowCarInfo(true)
+      setShowCarInfo(true);
       if (opportunityId) {
         void updateOpportunityLoanQuestions(opportunityId, {
           loanPurpose: nextLoanPurpose,
           collateralType: nextCollateralType,
           refinanceStatus: nextRefinanceStatus,
-        })
+        });
       }
     }
   }
 
-  usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
+  usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null);
 
   function handleSelectedProductConfirmed(item: ProductCatalogItem) {
-    setSelectedProduct(item)
-    window.scrollTo({top: 0, behavior: "instant"})
+    setSelectedProduct(item);
+    window.scrollTo({ top: 0, behavior: "instant" });
     if (opportunityId) {
-      void updateOpportunitySelectedProduct(opportunityId, item.id)
+      void updateOpportunitySelectedProduct(opportunityId, item.id);
     }
   }
 
   function handleLoanPurposeChange(value: LoanPurpose) {
-    setLoanPurpose(value)
-    commitLoanQuestionsIfComplete(value, collateralType, refinanceStatus)
+    setLoanPurpose(value);
+    commitLoanQuestionsIfComplete(value, collateralType, refinanceStatus);
   }
 
   function handleCollateralTypeChange(value: CollateralType) {
-    setCollateralType(value)
-    commitLoanQuestionsIfComplete(loanPurpose, value, refinanceStatus)
+    setCollateralType(value);
+    // A different หลักประกัน swaps the whole vehicle catalog, so any shown appraisal is void.
+    setShowProductGuide(false);
+    commitLoanQuestionsIfComplete(loanPurpose, value, refinanceStatus);
   }
 
   function handleRefinanceStatusChange(value: RefinanceStatus) {
-    setRefinanceStatus(value)
-    commitLoanQuestionsIfComplete(loanPurpose, collateralType, value)
+    setRefinanceStatus(value);
+    commitLoanQuestionsIfComplete(loanPurpose, collateralType, value);
+  }
+
+  // The product guide is only ever revealed by "ดูราคาประเมิน", so editing the car
+  // info takes it away again — it can never show numbers for a car that changed since.
+  function handleCarInfoChange(nextCarInfo: CarInfo) {
+    setCarInfo(nextCarInfo);
+    setShowProductGuide(false);
   }
 
   const tags = [
@@ -166,7 +192,7 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
       ?.label.replace(/ /g, "-"),
     refinanceStatusOptions.find((option) => option.value === refinanceStatus)
       ?.description,
-  ].filter((tag): tag is string => Boolean(tag))
+  ].filter((tag): tag is string => Boolean(tag));
 
   return (
     <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_2fr]">
@@ -178,7 +204,10 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
         collateralType={collateralType}
         showCarInfo={showCarInfo}
         setShowCarInfo={(value: boolean) => {
-          setShowCarInfo(value)
+          setShowCarInfo(value);
+          // Reopening the collateral questions is an intent to edit — drop the
+          // appraisal shown against the old answers, same as any car-info edit.
+          if (!value) setShowProductGuide(false);
         }}
         hasSelectedProduct={selectedProduct !== null}
         loanInfo={loanInfo}
@@ -203,7 +232,7 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
               opportunityId={opportunityId}
               carInfo={carInfo}
               collateralType={collateralType}
-              onCarInfoChange={setCarInfo}
+              onCarInfoChange={handleCarInfoChange}
               onViewAppraisal={() => setShowProductGuide(true)}
             />
           ) : (
@@ -222,14 +251,14 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
 
           {showProductGuide && (
             <>
-              <ProductGuide data={productGuideMock} />
+              <ProductGuide data={productGuideData} />
               <ProductCatalog
-                data={productCatalogMock}
+                data={productCatalogData}
                 onSelectConfirmed={handleSelectedProductConfirmed}
               />
               <LoanCalBar
-                productCatalog={productCatalogMock}
-                appraisalPrice={productGuideMock.appraisalPrice}
+                productCatalog={productCatalogData}
+                appraisalPrice={productGuideData.appraisalPrice}
                 customer={customer}
                 opportunityId={opportunityId}
                 onCustomerChange={setCustomer}
@@ -239,5 +268,5 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

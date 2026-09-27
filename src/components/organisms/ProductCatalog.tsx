@@ -36,13 +36,19 @@ export function ProductCatalog({ data, onSelectConfirmed }: ProductCatalogProps)
       </div>
 
       <div className="space-y-4">
-        {data.items.map((item) => (
-          <ProductCatalogCard
-            key={item.id}
-            item={item}
-            onSelect={() => setSelectedItemId(item.id)}
-          />
-        ))}
+        {data.items.length === 0 ? (
+          <p className="rounded-xl border-2 border-card-border bg-surface p-5 text-center text-sm text-muted-foreground shadow-primary-s">
+            ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้
+          </p>
+        ) : (
+          data.items.map((item) => (
+            <ProductCatalogCard
+              key={item.id}
+              item={item}
+              onSelect={() => setSelectedItemId(item.id)}
+            />
+          ))
+        )}
       </div>
 
       <SelectProductConfirmModal

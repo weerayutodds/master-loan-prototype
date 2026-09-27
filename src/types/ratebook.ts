@@ -15,6 +15,7 @@ export type VehicleModelOption = {
   value: string;
   label: string;
   subModels: VehicleSubModelOption[];
+  basePrice: number;
 };
 export type VehicleBrandOption = {
   value: string;
