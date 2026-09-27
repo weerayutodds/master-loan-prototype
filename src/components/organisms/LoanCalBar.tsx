@@ -11,6 +11,7 @@ import {
   calculateFlatRateEquivalent,
   calculateLoanCalSummary,
   calculateLtvPercent,
+  type InterestRateType,
 } from "@/lib/loan-cal"
 import {GENDER_LABELS} from "@/lib/mock"
 import type {Gender} from "@/types/customer-lead"
@@ -21,12 +22,16 @@ import {useEffect, useMemo, useRef, useState} from "react"
 type CalculatedInputs = {
   requestedAmount: number
   interestRatePercent: number
+  rateType: InterestRateType
   installmentTerm: number
   isTLC: boolean
   hasPpi: boolean
 }
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84]
+const TRANSFER_BOOK_STATUS = "โอนเล่ม"
+const MAX_REDUCING_RATE_PERCENT = 24
+const MAX_FLAT_RATE_PERCENT = 2
 
 function FieldLabel({children}: {children: React.ReactNode}) {
   return (
@@ -37,17 +42,20 @@ function FieldLabel({children}: {children: React.ReactNode}) {
 function ToggleChip({
   label,
   checked,
+  disabled = false,
   onChange,
 }: {
   label: string
   checked: boolean
+  disabled?: boolean
   onChange: (value: boolean) => void
 }) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`flex h-9 shrink-0 items-center gap-2 rounded-md border px-2 text-sm whitespace-nowrap bg-white ${
+      className={`flex h-9 shrink-0 items-center gap-2 rounded-md border px-2 text-sm whitespace-nowrap bg-white disabled:cursor-not-allowed disabled:opacity-50 ${
         checked
           ? "border-primary text-foreground"
           : "border-gray-300 text-gray-500"
@@ -99,6 +107,7 @@ export function LoanCalBar({
   const [installmentTerm, setInstallmentTerm] = useState(60)
   const [hasPpi, setHasPpi] = useState(false)
   const [interestRatePercent, setInterestRatePercent] = useState(24)
+  const [flatRateInput, setFlatRateInput] = useState("1")
   const [calculated, setCalculated] = useState<CalculatedInputs | null>(null)
   const [showDetail, setShowDetail] = useState(false)
   const [genderAgeOpen, setGenderAgeOpen] = useState(false)
@@ -110,9 +119,24 @@ export function LoanCalBar({
   const genderAgeAnchorRef = useRef<HTMLDivElement>(null)
   const genderAgePopoverRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (isTLC) setInstallmentTerm(60)
-  }, [isTLC])
+  const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS
+
+  function handleBookStatusChange(value: string) {
+    setBookStatus(value)
+    if (value === TRANSFER_BOOK_STATUS) setIsTLC(false)
+  }
+
+  function handleFlatRateChange(raw: string) {
+    const value = raw.replace(/[^\d.]/g, "")
+    if (!/^\d*\.?\d{0,2}$/.test(value)) return
+    if (Number(value) > MAX_FLAT_RATE_PERCENT) return
+    setFlatRateInput(value)
+  }
+
+  function handleToggleTLC(nextChecked: boolean) {
+    setIsTLC(nextChecked)
+    if (nextChecked) setInstallmentTerm(60)
+  }
 
   useEffect(() => {
     if (!showDetail) return
@@ -163,23 +187,24 @@ export function LoanCalBar({
     () => (calculated ? calculateLoanCalSummary(calculated) : null),
     [calculated],
   )
-  const flatRatePercent = useMemo(
-    () =>
-      calculated
-        ? calculateFlatRateEquivalent(
-            calculated.interestRatePercent,
-            calculated.installmentTerm,
-          )
-        : 0,
-    [calculated],
-  )
+  const flatRatePercent = useMemo(() => {
+    if (!calculated) return 0
+    if (calculated.rateType === "flat") return calculated.interestRatePercent
+    return calculateFlatRateEquivalent(
+      calculated.interestRatePercent,
+      calculated.installmentTerm,
+    )
+  }, [calculated])
 
   function handleCalculate() {
     setCalculated({
       requestedAmount,
-      interestRatePercent,
+      interestRatePercent: isTransferBook
+        ? Number(flatRateInput) || 0
+        : interestRatePercent,
+      rateType: isTransferBook ? "flat" : "reducing",
       installmentTerm,
-      isTLC,
+      isTLC: isTransferBook ? false : isTLC,
       hasPpi,
     })
   }
@@ -219,7 +244,7 @@ export function LoanCalBar({
             <Select
               options={bookStatusOptions}
               value={bookStatus}
-              onChange={(e) => setBookStatus(e.target.value)}
+              onChange={(e) => handleBookStatusChange(e.target.value)}
               className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
             />
           </div>
@@ -271,7 +296,12 @@ export function LoanCalBar({
 
           <div className="h-9 w-px shrink-0 bg-primary/60" />
 
-          <ToggleChip label="บัตรติดล้อ" checked={isTLC} onChange={setIsTLC} />
+          <ToggleChip
+            label="บัตรติดล้อ"
+            checked={isTLC}
+            disabled={isTransferBook}
+            onChange={handleToggleTLC}
+          />
 
           <div className="w-fit shrink-0">
             <FieldLabel>งวดผ่อน</FieldLabel>
@@ -319,24 +349,39 @@ export function LoanCalBar({
             </div>
           ) : null}
           <div className="w-28 shrink-0">
-            <FieldLabel>อัตราดอกเบี้ยลดต้นลดดอก</FieldLabel>
+            <FieldLabel>
+              {isTransferBook
+                ? "อัตราดอกเบี้ยคงที่"
+                : "อัตราดอกเบี้ยลดต้นลดดอก"}
+            </FieldLabel>
             <div className="flex h-9 items-center gap-1 rounded-md border border-secondary-border bg-surface px-2">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={interestRatePercent}
-                onChange={(e) =>
-                  setInterestRatePercent(
-                    Math.min(
-                      24,
-                      Number(e.target.value.replace(/\D/g, "")) || 0,
-                    ),
-                  )
-                }
-                className="w-full text-sm text-foreground outline-none"
-              />
+              {isTransferBook ? (
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={flatRateInput}
+                  placeholder="0"
+                  onChange={(e) => handleFlatRateChange(e.target.value)}
+                  className="w-full text-sm text-foreground outline-none"
+                />
+              ) : (
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={interestRatePercent}
+                  onChange={(e) =>
+                    setInterestRatePercent(
+                      Math.min(
+                        MAX_REDUCING_RATE_PERCENT,
+                        Number(e.target.value.replace(/\D/g, "")) || 0,
+                      ),
+                    )
+                  }
+                  className="w-full text-sm text-foreground outline-none"
+                />
+              )}
               <span className="text-xs  text-muted-foreground shrink-0">
-                % ต่อปี
+                {isTransferBook ? "% ต่อเดือน" : "% ต่อปี"}
               </span>
             </div>
           </div>
@@ -387,6 +432,7 @@ export function LoanCalBar({
               <LoanCalDetailPopover
                 requestedAmount={calculated.requestedAmount}
                 interestRatePercent={calculated.interestRatePercent}
+                rateType={calculated.rateType}
                 flatRatePercent={flatRatePercent}
                 installmentTerm={calculated.installmentTerm}
                 isTLC={calculated.isTLC}

@@ -1,7 +1,11 @@
 "use client"
 
 import {Icon} from "@/components/atoms/Icon"
-import {PPI_ANNUAL_PREMIUM, calculateLoanCalSummary} from "@/lib/loan-cal"
+import {
+  PPI_ANNUAL_PREMIUM,
+  calculateLoanCalSummary,
+  type InterestRateType,
+} from "@/lib/loan-cal"
 
 function DetailRow({label, value}: {label: string; value: string}) {
   return (
@@ -15,6 +19,7 @@ function DetailRow({label, value}: {label: string; value: string}) {
 type LoanCalDetailPopoverProps = {
   requestedAmount: number
   interestRatePercent: number
+  rateType: InterestRateType
   flatRatePercent: number
   installmentTerm: number
   isTLC: boolean
@@ -25,6 +30,7 @@ type LoanCalDetailPopoverProps = {
 export function LoanCalDetailPopover({
   requestedAmount,
   interestRatePercent,
+  rateType,
   flatRatePercent,
   installmentTerm,
   isTLC,
@@ -34,6 +40,7 @@ export function LoanCalDetailPopover({
   const summary = calculateLoanCalSummary({
     requestedAmount,
     interestRatePercent,
+    rateType,
     installmentTerm,
     isTLC,
     hasPpi,
@@ -65,14 +72,23 @@ export function LoanCalDetailPopover({
             : `${requestedAmount.toLocaleString("th-TH")} บาท`
         }
       />
-      <DetailRow
-        label={`${rateLabelPrefix}ลดต้นลดดอก`}
-        value={`${interestRatePercent} % ต่อปี`}
-      />
-      <DetailRow
-        label={`${rateLabelPrefix}คงที่เทียบเคียง`}
-        value={`${flatRatePercent} % ต่อเดือน`}
-      />
+      {rateType === "flat" ? (
+        <DetailRow
+          label="อัตราดอกเบี้ยคงที่"
+          value={`${flatRatePercent} % ต่อเดือน`}
+        />
+      ) : (
+        <>
+          <DetailRow
+            label={`${rateLabelPrefix}ลดต้นลดดอก`}
+            value={`${interestRatePercent} % ต่อปี`}
+          />
+          <DetailRow
+            label={`${rateLabelPrefix}คงที่เทียบเคียง`}
+            value={`${flatRatePercent} % ต่อเดือน`}
+          />
+        </>
+      )}
       <DetailRow label="งวดผ่อน" value={`${installmentTerm} งวด`} />
 
       {isTLC && hasPpi ? (

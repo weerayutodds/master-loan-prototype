@@ -30,6 +30,22 @@ export function calculateMonthlyPayment(
   return Math.round(payment);
 }
 
+export function calculateFlatMonthlyPayment(
+  principal: number,
+  monthlyFlatRatePercent: number,
+  months: number,
+): number {
+  if (months <= 0) return 0;
+  const totalInterest = principal * (monthlyFlatRatePercent / 100) * months;
+  return Math.round((principal + totalInterest) / months);
+}
+
+/**
+ * "reducing" = ลดต้นลดดอก, rate in % ต่อปี.
+ * "flat" = คงที่ (โอนเล่ม), rate in % ต่อเดือน.
+ */
+export type InterestRateType = "reducing" | "flat";
+
 export const PPI_ANNUAL_PREMIUM = 8073;
 
 export type LoanCalSummary = {
@@ -47,12 +63,14 @@ export type LoanCalSummary = {
 export function calculateLoanCalSummary({
   requestedAmount,
   interestRatePercent,
+  rateType,
   installmentTerm,
   isTLC,
   hasPpi,
 }: {
   requestedAmount: number;
   interestRatePercent: number;
+  rateType: InterestRateType;
   installmentTerm: number;
   isTLC: boolean;
   hasPpi: boolean;
@@ -61,8 +79,10 @@ export function calculateLoanCalSummary({
     return {financedAmount: 0, ppiTotal: 0, ppiMonthly: 0, basePayment: 0, totalPayment: 0};
   }
 
+  const monthlyPayment = rateType === "flat" ? calculateFlatMonthlyPayment : calculateMonthlyPayment;
+
   if (isTLC) {
-    const basePayment = calculateMonthlyPayment(
+    const basePayment = monthlyPayment(
       requestedAmount,
       interestRatePercent,
       installmentTerm,
@@ -79,7 +99,7 @@ export function calculateLoanCalSummary({
 
   const ppiTotal = hasPpi ? Math.round((PPI_ANNUAL_PREMIUM * installmentTerm) / 12) : 0;
   const financedAmount = requestedAmount + ppiTotal;
-  const basePayment = calculateMonthlyPayment(
+  const basePayment = monthlyPayment(
     financedAmount,
     interestRatePercent,
     installmentTerm,
