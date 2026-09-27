@@ -5,7 +5,8 @@ import { Card } from "@/components/molecules/Card";
 import { Select } from "@/components/atoms/Select";
 import { calculateMonthlyPayment } from "@/lib/loan-cal";
 import type { ProductCatalogItem } from "@/types/product-catalog";
-import { useMemo, useState } from "react";
+import type { LoanInfo } from "@/types/ratebook";
+import { useMemo } from "react";
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84];
 const PPI_ANNUAL_PREMIUM = 8073;
@@ -65,9 +66,11 @@ function RadioPair({
 
 type LeadLoanInfoCardProps = {
   product: ProductCatalogItem;
+  value: LoanInfo;
+  onChange: (value: LoanInfo) => void;
 };
 
-export function LeadLoanInfoCard({ product }: LeadLoanInfoCardProps) {
+export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardProps) {
   const approvedAmounts = useMemo(() => parseAmounts(product.approvedAmount), [product]);
   const maxApprovedAmount = approvedAmounts[approvedAmounts.length - 1] ?? 0;
   const monthlyRatePercent = useMemo(
@@ -75,10 +78,10 @@ export function LeadLoanInfoCard({ product }: LeadLoanInfoCardProps) {
     [product],
   );
 
-  const [requestedAmount, setRequestedAmount] = useState(maxApprovedAmount);
-  const [wantsWheelCard, setWantsWheelCard] = useState("yes");
-  const [hasPpi, setHasPpi] = useState("yes");
-  const [installmentTerm, setInstallmentTerm] = useState(60);
+  const requestedAmount = value.requestedAmount ?? maxApprovedAmount;
+  const wantsWheelCard = value.wantsWheelCard ?? "yes";
+  const hasPpi = value.hasPpi ?? "yes";
+  const installmentTerm = value.installmentTerm ?? 60;
 
   const monthlyPayment = calculateMonthlyPayment(
     requestedAmount,
@@ -125,7 +128,10 @@ export function LeadLoanInfoCard({ product }: LeadLoanInfoCardProps) {
               inputMode="numeric"
               value={requestedAmount.toLocaleString("th-TH")}
               onChange={(e) =>
-                setRequestedAmount(Number(e.target.value.replace(/\D/g, "")) || 0)
+                onChange({
+                  ...value,
+                  requestedAmount: Number(e.target.value.replace(/\D/g, "")) || 0,
+                })
               }
               className="w-full text-right text-sm text-foreground outline-none"
             />
@@ -141,7 +147,9 @@ export function LeadLoanInfoCard({ product }: LeadLoanInfoCardProps) {
           <span className="text-muted-foreground">ต้องการรับบัตรติดล้อหรือไม่?</span>
           <RadioPair
             value={wantsWheelCard}
-            onChange={setWantsWheelCard}
+            onChange={(next) =>
+              onChange({ ...value, wantsWheelCard: next as "yes" | "no" })
+            }
             options={[
               { value: "yes", label: "รับบัตร" },
               { value: "no", label: "ไม่รับบัตร" },
@@ -156,7 +164,7 @@ export function LeadLoanInfoCard({ product }: LeadLoanInfoCardProps) {
           </div>
           <RadioPair
             value={hasPpi}
-            onChange={setHasPpi}
+            onChange={(next) => onChange({ ...value, hasPpi: next as "yes" | "no" })}
             options={[
               {
                 value: "yes",
@@ -172,15 +180,18 @@ export function LeadLoanInfoCard({ product }: LeadLoanInfoCardProps) {
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">จำนวนงวด :</span>
-          <Select
-            className="w-64"
-            options={INSTALLMENT_TERM_OPTIONS.map((term) => ({
-              value: String(term),
-              label: `${term} งวด (ดอกเบี้ย ${monthlyRatePercent}% ต่อเดือน)`,
-            }))}
-            value={String(installmentTerm)}
-            onChange={(e) => setInstallmentTerm(Number(e.target.value))}
-          />
+          <div className="w-64">
+            <Select
+              options={INSTALLMENT_TERM_OPTIONS.map((term) => ({
+                value: String(term),
+                label: `${term} งวด (ดอกเบี้ย ${monthlyRatePercent}% ต่อเดือน)`,
+              }))}
+              value={String(installmentTerm)}
+              onChange={(e) =>
+                onChange({ ...value, installmentTerm: Number(e.target.value) })
+              }
+            />
+          </div>
         </div>
 
         <div className="flex items-center justify-between text-sm">

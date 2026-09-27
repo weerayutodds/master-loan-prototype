@@ -36,3 +36,19 @@ export type CarInfo = {
   bodyType?: string;
   subModel?: string;
 };
+
+export type LoanInfo = {
+  requestedAmount?: number;
+  wantsWheelCard?: "yes" | "no";
+  hasPpi?: "yes" | "no";
+  installmentTerm?: number;
+};
+
+export type CarInsuranceInfo = {
+  possessionDate?: string;
+  carInsuranceExpiry?: string;
+  carInsuranceCompany?: string;
+  compulsoryExpiry?: string;
+  compulsoryBundledWithCarInsurance?: boolean;
+  compulsoryCompany?: string;
+};

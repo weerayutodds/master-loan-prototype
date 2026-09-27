@@ -28,6 +28,17 @@ export type CustomerLeadOpportunity = {
   carTransmission: string | null;
   carBodyType: string | null;
   carSubModel: string | null;
+  selectedProductId: string | null;
+  requestedAmount: string | null;
+  wantsWheelCard: "yes" | "no" | null;
+  hasPpi: "yes" | "no" | null;
+  installmentTerm: string | null;
+  possessionDate: string | null;
+  carInsuranceExpiry: string | null;
+  carInsuranceCompany: string | null;
+  compulsoryExpiry: string | null;
+  compulsoryBundledWithCarInsurance: boolean;
+  compulsoryCompany: string | null;
   createdAt: string;
   updatedAt: string;
 };

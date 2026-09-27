@@ -7,7 +7,10 @@ import {LoanCalBar} from "@/components/organisms/LoanCalBar"
 import {LoanQuestionsPanel} from "@/components/organisms/LoanQuestionsPanel"
 import {ProductCatalog} from "@/components/organisms/ProductCatalog"
 import {ProductGuide} from "@/components/organisms/ProductGuide"
-import {updateOpportunityLoanQuestions} from "@/lib/actions/customer-lead-opportunity"
+import {
+  updateOpportunityLoanQuestions,
+  updateOpportunitySelectedProduct,
+} from "@/lib/actions/customer-lead-opportunity"
 import {
   collateralTypeOptions,
   loanPurposeOptions,
@@ -18,7 +21,9 @@ import {
 import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
 import type {
   CarInfo,
+  CarInsuranceInfo,
   CollateralType,
+  LoanInfo,
   LoanPurpose,
   RefinanceStatus,
 } from "@/types/ratebook"
@@ -58,9 +63,45 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
         }
       : {},
   )
-  const [showCarInfo, setShowCarInfo] = useState(false)
-  const [showProductGuide, setShowProductGuide] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState<ProductCatalogItem | null>(null)
+  const [loanInfo, setLoanInfo] = useState<LoanInfo>(
+    initialOpportunity
+      ? {
+          requestedAmount:
+            initialOpportunity.requestedAmount != null
+              ? Number(initialOpportunity.requestedAmount)
+              : undefined,
+          wantsWheelCard: initialOpportunity.wantsWheelCard ?? undefined,
+          hasPpi: initialOpportunity.hasPpi ?? undefined,
+          installmentTerm:
+            initialOpportunity.installmentTerm != null
+              ? Number(initialOpportunity.installmentTerm)
+              : undefined,
+        }
+      : {},
+  )
+  const [carInsuranceInfo, setCarInsuranceInfo] = useState<CarInsuranceInfo>(
+    initialOpportunity
+      ? {
+          possessionDate: initialOpportunity.possessionDate ?? undefined,
+          carInsuranceExpiry: initialOpportunity.carInsuranceExpiry ?? undefined,
+          carInsuranceCompany: initialOpportunity.carInsuranceCompany ?? undefined,
+          compulsoryExpiry: initialOpportunity.compulsoryExpiry ?? undefined,
+          compulsoryBundledWithCarInsurance:
+            initialOpportunity.compulsoryBundledWithCarInsurance,
+          compulsoryCompany: initialOpportunity.compulsoryCompany ?? undefined,
+        }
+      : {},
+  )
+  const hasSavedProduct = Boolean(initialOpportunity?.selectedProductId)
+  const [showCarInfo, setShowCarInfo] = useState(hasSavedProduct)
+  const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct)
+  const [selectedProduct, setSelectedProduct] = useState<ProductCatalogItem | null>(
+    initialOpportunity?.selectedProductId
+      ? productCatalogMock.items.find(
+          (item) => item.id === initialOpportunity.selectedProductId,
+        ) ?? null
+      : null,
+  )
 
   function commitLoanQuestionsIfComplete(
     nextLoanPurpose: LoanPurpose | null,
@@ -76,6 +117,13 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
           refinanceStatus: nextRefinanceStatus,
         })
       }
+    }
+  }
+
+  function handleSelectedProductConfirmed(item: ProductCatalogItem) {
+    setSelectedProduct(item)
+    if (opportunityId) {
+      void updateOpportunitySelectedProduct(opportunityId, item.id)
     }
   }
 
@@ -117,12 +165,18 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
           setShowCarInfo(value)
         }}
         hasSelectedProduct={selectedProduct !== null}
+        loanInfo={loanInfo}
+        carInsuranceInfo={carInsuranceInfo}
       />
       {selectedProduct && initialOpportunity ? (
         <LeadContent
           initialOpportunity={initialOpportunity}
           carInfo={carInfo}
           selectedProduct={selectedProduct}
+          loanInfo={loanInfo}
+          onLoanInfoChange={setLoanInfo}
+          carInsuranceInfo={carInsuranceInfo}
+          onCarInsuranceInfoChange={setCarInsuranceInfo}
         />
       ) : (
         <div className="space-y-6">
@@ -152,7 +206,7 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
               <ProductGuide data={productGuideMock} />
               <ProductCatalog
                 data={productCatalogMock}
-                onSelectConfirmed={setSelectedProduct}
+                onSelectConfirmed={handleSelectedProductConfirmed}
               />
             </>
           )}

@@ -3,17 +3,22 @@
 import { Select } from "@/components/atoms/Select";
 import { Card } from "@/components/molecules/Card";
 import { insuranceCompanyOptions } from "@/lib/mock";
-import { useState } from "react";
+import type { CarInsuranceInfo } from "@/types/ratebook";
 
 const PLACEHOLDER = { value: "", label: "เลือกข้อมูล" };
 
-export function LeadCarInsuranceCard() {
-  const [possessionDate, setPossessionDate] = useState("");
-  const [carInsuranceExpiry, setCarInsuranceExpiry] = useState("");
-  const [carInsuranceCompany, setCarInsuranceCompany] = useState("");
-  const [compulsoryExpiry, setCompulsoryExpiry] = useState("");
-  const [compulsoryBundledWithCarInsurance, setCompulsoryBundledWithCarInsurance] = useState(false);
-  const [compulsoryCompany, setCompulsoryCompany] = useState("");
+type LeadCarInsuranceCardProps = {
+  value: CarInsuranceInfo;
+  onChange: (value: CarInsuranceInfo) => void;
+};
+
+export function LeadCarInsuranceCard({ value, onChange }: LeadCarInsuranceCardProps) {
+  const possessionDate = value.possessionDate ?? "";
+  const carInsuranceExpiry = value.carInsuranceExpiry ?? "";
+  const carInsuranceCompany = value.carInsuranceCompany ?? "";
+  const compulsoryExpiry = value.compulsoryExpiry ?? "";
+  const compulsoryBundledWithCarInsurance = value.compulsoryBundledWithCarInsurance ?? false;
+  const compulsoryCompany = value.compulsoryCompany ?? "";
 
   return (
     <Card className="space-y-4">
@@ -26,7 +31,7 @@ export function LeadCarInsuranceCard() {
         <input
           type="date"
           value={possessionDate}
-          onChange={(e) => setPossessionDate(e.target.value)}
+          onChange={(e) => onChange({ ...value, possessionDate: e.target.value })}
           className="w-full max-w-xs rounded-lg border border-secondary-border bg-surface px-3 py-2 text-sm text-foreground outline-none"
         />
       </div>
@@ -39,7 +44,7 @@ export function LeadCarInsuranceCard() {
             <input
               type="date"
               value={carInsuranceExpiry}
-              onChange={(e) => setCarInsuranceExpiry(e.target.value)}
+              onChange={(e) => onChange({ ...value, carInsuranceExpiry: e.target.value })}
               className="w-full rounded-lg border border-secondary-border bg-surface px-3 py-2 text-sm text-foreground outline-none"
             />
           </div>
@@ -48,7 +53,7 @@ export function LeadCarInsuranceCard() {
             <Select
               options={[PLACEHOLDER, ...insuranceCompanyOptions]}
               value={carInsuranceCompany}
-              onChange={(e) => setCarInsuranceCompany(e.target.value)}
+              onChange={(e) => onChange({ ...value, carInsuranceCompany: e.target.value })}
             />
           </div>
         </div>
@@ -64,7 +69,12 @@ export function LeadCarInsuranceCard() {
                 <input
                   type="checkbox"
                   checked={compulsoryBundledWithCarInsurance}
-                  onChange={(e) => setCompulsoryBundledWithCarInsurance(e.target.checked)}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      compulsoryBundledWithCarInsurance: e.target.checked,
+                    })
+                  }
                   className="size-4 rounded border-radio-border"
                 />
                 พร้อมประกันรถยนต์
@@ -73,7 +83,7 @@ export function LeadCarInsuranceCard() {
             <input
               type="date"
               value={compulsoryExpiry}
-              onChange={(e) => setCompulsoryExpiry(e.target.value)}
+              onChange={(e) => onChange({ ...value, compulsoryExpiry: e.target.value })}
               disabled={compulsoryBundledWithCarInsurance}
               className="w-full rounded-lg border border-secondary-border bg-surface px-3 py-2 text-sm text-foreground outline-none disabled:bg-surface-muted disabled:text-muted-foreground"
             />
@@ -83,7 +93,7 @@ export function LeadCarInsuranceCard() {
             <Select
               options={[PLACEHOLDER, ...insuranceCompanyOptions]}
               value={compulsoryCompany}
-              onChange={(e) => setCompulsoryCompany(e.target.value)}
+              onChange={(e) => onChange({ ...value, compulsoryCompany: e.target.value })}
               disabled={compulsoryBundledWithCarInsurance}
             />
           </div>

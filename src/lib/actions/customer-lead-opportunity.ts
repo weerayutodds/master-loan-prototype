@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getCustomerLeadById } from "@/lib/customer-lead";
 import sql from "@/lib/db";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
-import type { CarInfo, CollateralIdentifier, CollateralType, CustomerInfo, LoanPurpose, RefinanceStatus } from "@/types/ratebook";
+import type { CarInfo, CarInsuranceInfo, CollateralIdentifier, CollateralType, CustomerInfo, LoanInfo, LoanPurpose, RefinanceStatus } from "@/types/ratebook";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRow(row: any): CustomerLeadOpportunity {
@@ -34,6 +34,17 @@ function mapRow(row: any): CustomerLeadOpportunity {
     carTransmission: row.car_transmission,
     carBodyType: row.car_body_type,
     carSubModel: row.car_sub_model,
+    selectedProductId: row.selected_product_id,
+    requestedAmount: row.requested_amount,
+    wantsWheelCard: row.wants_wheel_card,
+    hasPpi: row.has_ppi,
+    installmentTerm: row.installment_term,
+    possessionDate: row.possession_date,
+    carInsuranceExpiry: row.car_insurance_expiry,
+    carInsuranceCompany: row.car_insurance_company,
+    compulsoryExpiry: row.compulsory_expiry,
+    compulsoryBundledWithCarInsurance: row.compulsory_bundled_with_car_insurance,
+    compulsoryCompany: row.compulsory_company,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
   };
@@ -98,6 +109,62 @@ export async function updateOpportunityCustomerInfo(
       first_name = ${input.firstName},
       last_name = ${input.lastName},
       phone = ${input.phone},
+      updated_at = now()
+    where id = ${opportunityId}
+    returning *
+  `;
+
+  return mapRow(row);
+}
+
+export async function updateOpportunitySelectedProduct(
+  opportunityId: string,
+  productId: string,
+): Promise<CustomerLeadOpportunity> {
+  const [row] = await sql`
+    update customer_lead_opportunity
+    set
+      selected_product_id = ${productId},
+      updated_at = now()
+    where id = ${opportunityId}
+    returning *
+  `;
+
+  return mapRow(row);
+}
+
+export async function updateOpportunityLoanInfo(
+  opportunityId: string,
+  input: LoanInfo,
+): Promise<CustomerLeadOpportunity> {
+  const [row] = await sql`
+    update customer_lead_opportunity
+    set
+      requested_amount = ${input.requestedAmount != null ? String(input.requestedAmount) : null},
+      wants_wheel_card = ${input.wantsWheelCard ?? null},
+      has_ppi = ${input.hasPpi ?? null},
+      installment_term = ${input.installmentTerm != null ? String(input.installmentTerm) : null},
+      updated_at = now()
+    where id = ${opportunityId}
+    returning *
+  `;
+
+  return mapRow(row);
+}
+
+export async function updateOpportunityCarInsurance(
+  opportunityId: string,
+  input: CarInsuranceInfo,
+): Promise<CustomerLeadOpportunity> {
+  const [row] = await sql`
+    update customer_lead_opportunity
+    set
+      possession_date = ${input.possessionDate ?? null},
+      car_insurance_expiry = ${input.carInsuranceExpiry ?? null},
+      car_insurance_company = ${input.carInsuranceCompany ?? null},
+      compulsory_expiry = ${input.compulsoryExpiry ?? null},
+      compulsory_bundled_with_car_insurance = ${input.compulsoryBundledWithCarInsurance ?? false},
+      compulsory_company = ${input.compulsoryCompany ?? null},
       updated_at = now()
     where id = ${opportunityId}
     returning *

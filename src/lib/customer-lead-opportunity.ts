@@ -32,6 +32,17 @@ function mapRow(row: any): CustomerLeadOpportunity {
     carTransmission: row.car_transmission,
     carBodyType: row.car_body_type,
     carSubModel: row.car_sub_model,
+    selectedProductId: row.selected_product_id,
+    requestedAmount: row.requested_amount,
+    wantsWheelCard: row.wants_wheel_card,
+    hasPpi: row.has_ppi,
+    installmentTerm: row.installment_term,
+    possessionDate: row.possession_date,
+    carInsuranceExpiry: row.car_insurance_expiry,
+    carInsuranceCompany: row.car_insurance_company,
+    compulsoryExpiry: row.compulsory_expiry,
+    compulsoryBundledWithCarInsurance: row.compulsory_bundled_with_car_insurance,
+    compulsoryCompany: row.compulsory_company,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
   };
@@ -48,7 +59,10 @@ export async function getCustomerLeadOpportunityById(
       loan_purpose, collateral_type, refinance_status,
       license_plate_number, license_plate_province, chassis_number, brand_model,
       car_brand, car_model, car_year, car_condition, car_doors, car_type, car_engine_cc,
-      car_transmission, car_body_type, car_sub_model,
+      car_transmission, car_body_type, car_sub_model, selected_product_id,
+      requested_amount, wants_wheel_card, has_ppi, installment_term,
+      possession_date, car_insurance_expiry, car_insurance_company,
+      compulsory_expiry, compulsory_bundled_with_car_insurance, compulsory_company,
       created_at, updated_at
     from customer_lead_opportunity
     where id = ${id}
@@ -68,7 +82,10 @@ export async function listCustomerLeadOpportunitiesByLeadId(
       loan_purpose, collateral_type, refinance_status,
       license_plate_number, license_plate_province, chassis_number, brand_model,
       car_brand, car_model, car_year, car_condition, car_doors, car_type, car_engine_cc,
-      car_transmission, car_body_type, car_sub_model,
+      car_transmission, car_body_type, car_sub_model, selected_product_id,
+      requested_amount, wants_wheel_card, has_ppi, installment_term,
+      possession_date, car_insurance_expiry, car_insurance_company,
+      compulsory_expiry, compulsory_bundled_with_car_insurance, compulsory_company,
       created_at, updated_at
     from customer_lead_opportunity
     where lead_id = ${leadId}

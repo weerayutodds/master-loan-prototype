@@ -10,7 +10,7 @@ import { LeadLoanInfoCard } from "@/components/molecules/LeadLoanInfoCard";
 import { followUpTimelineMock } from "@/lib/mock";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type { ProductCatalogItem } from "@/types/product-catalog";
-import type { CarInfo } from "@/types/ratebook";
+import type { CarInfo, CarInsuranceInfo, LoanInfo } from "@/types/ratebook";
 import { useState } from "react";
 
 const COLLATERAL_LOAN_LABEL: Record<string, string> = {
@@ -36,9 +36,21 @@ type LeadContentProps = {
   initialOpportunity: CustomerLeadOpportunity;
   carInfo: CarInfo;
   selectedProduct: ProductCatalogItem;
+  loanInfo: LoanInfo;
+  onLoanInfoChange: (value: LoanInfo) => void;
+  carInsuranceInfo: CarInsuranceInfo;
+  onCarInsuranceInfoChange: (value: CarInsuranceInfo) => void;
 };
 
-export function LeadContent({ initialOpportunity, carInfo, selectedProduct }: LeadContentProps) {
+export function LeadContent({
+  initialOpportunity,
+  carInfo,
+  selectedProduct,
+  loanInfo,
+  onLoanInfoChange,
+  carInsuranceInfo,
+  onCarInsuranceInfoChange,
+}: LeadContentProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("loan");
   const loanLabel =
     COLLATERAL_LOAN_LABEL[initialOpportunity.collateralType ?? "car"] ?? "สินเชื่อรถยนต์";
@@ -89,8 +101,12 @@ export function LeadContent({ initialOpportunity, carInfo, selectedProduct }: Le
         <div className="space-y-6">
           <p className="text-sm text-muted-foreground">{loanLabel}</p>
           <LeadCollateralInfoCard carInfo={carInfo} />
-          <LeadLoanInfoCard product={selectedProduct} />
-          <LeadCarInsuranceCard />
+          <LeadLoanInfoCard
+            product={selectedProduct}
+            value={loanInfo}
+            onChange={onLoanInfoChange}
+          />
+          <LeadCarInsuranceCard value={carInsuranceInfo} onChange={onCarInsuranceInfoChange} />
           <LeadFollowUpTimeline entries={followUpTimelineMock} />
         </div>
       )}

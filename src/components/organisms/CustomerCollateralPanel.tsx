@@ -11,17 +11,21 @@ import { CollateralDetailModal } from "@/components/organisms/CollateralDetailMo
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal"
 import {
   updateOpportunityCarInfo,
+  updateOpportunityCarInsurance,
   updateOpportunityCollateralDetail,
   updateOpportunityCustomerInfo,
+  updateOpportunityLoanInfo,
 } from "@/lib/actions/customer-lead-opportunity"
 import { maskIdCardNumber } from "@/lib/format"
 import { carBrandOptions, carModelOptions, provinceOptions } from "@/lib/mock"
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity"
 import type {
   CarInfo,
+  CarInsuranceInfo,
   CollateralIdentifier,
   CollateralType,
   CustomerInfo,
+  LoanInfo,
 } from "@/types/ratebook"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -37,6 +41,8 @@ type CustomerCollateralPanelProps = {
   showCarInfo: boolean
   setShowCarInfo: (value: boolean) => void
   hasSelectedProduct?: boolean
+  loanInfo?: LoanInfo
+  carInsuranceInfo?: CarInsuranceInfo
 }
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -82,6 +88,8 @@ export function CustomerCollateralPanel({
   showCarInfo,
   setShowCarInfo,
   hasSelectedProduct = false,
+  loanInfo,
+  carInsuranceInfo,
 }: CustomerCollateralPanelProps) {
   const router = useRouter()
   const [customer, setCustomer] = useState<CustomerInfo | null>(
@@ -129,6 +137,10 @@ export function CustomerCollateralPanel({
           brandModel,
         }),
         updateOpportunityCarInfo(opportunityId, carInfo),
+        loanInfo ? updateOpportunityLoanInfo(opportunityId, loanInfo) : null,
+        carInsuranceInfo
+          ? updateOpportunityCarInsurance(opportunityId, carInsuranceInfo)
+          : null,
       ])
       setSavedToastOpen(true)
     } catch (error) {

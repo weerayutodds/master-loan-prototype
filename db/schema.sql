@@ -50,6 +50,19 @@ create table customer_lead_opportunity (
   car_transmission text,
   car_body_type text,
   car_sub_model text,
+  selected_product_id text,
+
+  requested_amount text,
+  wants_wheel_card text check (wants_wheel_card in ('yes', 'no')),
+  has_ppi text check (has_ppi in ('yes', 'no')),
+  installment_term text check (installment_term in ('36', '48', '60', '72', '84')),
+
+  possession_date text,
+  car_insurance_expiry text,
+  car_insurance_company text,
+  compulsory_expiry text,
+  compulsory_bundled_with_car_insurance boolean not null default false,
+  compulsory_company text,
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
