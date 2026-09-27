@@ -17,7 +17,7 @@ import {
   updateOpportunityLoanInfo,
 } from "@/lib/actions/customer-lead-opportunity"
 import { maskIdCardNumber } from "@/lib/format"
-import { carBrandOptions, carModelOptions, provinceOptions } from "@/lib/mock"
+import { getVehicleBrandLabel, getVehicleModelLabel, provinceOptions } from "@/lib/mock"
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity"
 import type {
   CarInfo,
@@ -58,20 +58,18 @@ function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
 function formatBrandModelYear(
   carInfo: CarInfo,
   opportunity: CustomerLeadOpportunity | null,
+  collateralType: CollateralType | null,
 ): string {
   const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined
   const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined
   const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined
 
-  const brandLabel = carBrandOptions.find(
-    (option) => option.value === brandValue,
-  )?.label
-  const modelLabel = carModelOptions.find(
-    (option) => option.value === modelValue,
-  )?.label
-  const parts = [brandLabel?.toUpperCase(), modelLabel?.toUpperCase()].filter(
-    (part): part is string => Boolean(part),
-  )
+  const brandLabel = getVehicleBrandLabel(collateralType, brandValue)
+  const modelLabel = getVehicleModelLabel(collateralType, brandValue, modelValue)
+  const parts = [
+    brandLabel === "-" ? undefined : brandLabel.toUpperCase(),
+    modelLabel === "-" ? undefined : modelLabel.toUpperCase(),
+  ].filter((part): part is string => Boolean(part))
   if (yearValue) {
     const buddhistYear = Number(yearValue) + 543
     parts.push(`${yearValue} (${buddhistYear})`)
@@ -148,7 +146,7 @@ export function CustomerCollateralPanel({
     }
   }
 
-  const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity)
+  const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity, collateralType)
 
   const progressItems = [
     {

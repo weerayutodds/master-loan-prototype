@@ -4,6 +4,23 @@ export type LoanPurpose = "need-money" | "buy-car";
 export type CollateralType = "motorcycle" | "car" | "truck" | "land";
 export type RefinanceStatus = "still-paying" | "paid-off";
 
+export type VehicleCollateralType = Extract<
+  CollateralType,
+  "motorcycle" | "car" | "truck"
+>;
+
+export type VehicleSubModelOption = { value: string; label: string };
+export type VehicleModelOption = {
+  value: string;
+  label: string;
+  subModels: VehicleSubModelOption[];
+};
+export type VehicleBrandOption = {
+  value: string;
+  label: string;
+  models: VehicleModelOption[];
+};
+
 export type OptionCardData<T extends string> = {
   value: T;
   label: string;

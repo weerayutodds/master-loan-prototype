@@ -1,16 +1,16 @@
 import { Button } from "@/components/atoms/Button";
 import { Card } from "@/components/molecules/Card";
 import {
-  carBodyTypeOptions,
-  carBrandOptions,
   carConditionOptions,
   carDoorsOptions,
-  carEngineCcOptions,
-  carModelOptions,
-  carSubModelOptions,
-  carTypeOptions,
+  carEngineCcOptionsByCollateralType,
+  carTypeOptionsByCollateralType,
+  getVehicleBrandLabel,
+  getVehicleModelLabel,
+  getVehicleSubModelLabel,
+  toVehicleCollateralType,
 } from "@/lib/mock";
-import type { CarInfo } from "@/types/ratebook";
+import type { CarInfo, CollateralType } from "@/types/ratebook";
 
 function optionLabel(options: { value: string; label: string }[], value?: string): string {
   return options.find((option) => option.value === value)?.label ?? "-";
@@ -18,15 +18,17 @@ function optionLabel(options: { value: string; label: string }[], value?: string
 
 type LeadCollateralInfoCardProps = {
   carInfo: CarInfo;
+  collateralType: CollateralType | null;
 };
 
-export function LeadCollateralInfoCard({ carInfo }: LeadCollateralInfoCardProps) {
-  const brandLabel = optionLabel(carBrandOptions, carInfo.brand).toUpperCase();
-  const modelLabel = optionLabel(carModelOptions, carInfo.model).toUpperCase();
+export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollateralInfoCardProps) {
+  const vehicleCollateralType = toVehicleCollateralType(collateralType);
+  const brandLabel = getVehicleBrandLabel(collateralType, carInfo.brand).toUpperCase();
+  const modelLabel = getVehicleModelLabel(collateralType, carInfo.brand, carInfo.model).toUpperCase();
   const yearLabel = carInfo.year ? `${carInfo.year} (${Number(carInfo.year) + 543})` : "-";
   const doorsLabel = optionLabel(carDoorsOptions, carInfo.doors);
   const typeLabel = carInfo.carType
-    ? `${optionLabel(carTypeOptions, carInfo.carType)} ${doorsLabel}`
+    ? `${optionLabel(carTypeOptionsByCollateralType[vehicleCollateralType], carInfo.carType)} ${doorsLabel}`
     : "-";
 
   const fields: { label: string; value: string; bold?: boolean }[] = [
@@ -36,10 +38,16 @@ export function LeadCollateralInfoCard({ carInfo }: LeadCollateralInfoCardProps)
     { label: "ประเภทรถ", value: typeLabel },
     { label: "สภาพรถ", value: optionLabel(carConditionOptions, carInfo.condition), bold: true },
     { label: "จำนวนประตู", value: doorsLabel },
-    { label: "ขนาดเครื่องยนต์", value: optionLabel(carEngineCcOptions, carInfo.engineCc) },
+    {
+      label: "ขนาดเครื่องยนต์",
+      value: optionLabel(carEngineCcOptionsByCollateralType[vehicleCollateralType], carInfo.engineCc),
+    },
     { label: "ระบบเกียร์", value: carInfo.transmission?.toUpperCase() ?? "-" },
     { label: "ประเภทตัวถัง", value: carInfo.bodyType?.toUpperCase() ?? "-" },
-    { label: "รุ่นย่อย", value: optionLabel(carSubModelOptions, carInfo.subModel) },
+    {
+      label: "รุ่นย่อย",
+      value: getVehicleSubModelLabel(collateralType, carInfo.brand, carInfo.model, carInfo.subModel),
+    },
   ];
 
   return (

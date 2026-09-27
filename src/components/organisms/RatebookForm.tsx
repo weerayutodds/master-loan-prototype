@@ -184,6 +184,7 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
             <CarInfoForm
               opportunityId={opportunityId}
               carInfo={carInfo}
+              collateralType={collateralType}
               onCarInfoChange={setCarInfo}
               onViewAppraisal={() => setShowProductGuide(true)}
             />

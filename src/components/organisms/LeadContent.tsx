@@ -100,7 +100,10 @@ export function LeadContent({
       {activeTab === "loan" && (
         <div className="space-y-6">
           <p className="text-sm text-muted-foreground">{loanLabel}</p>
-          <LeadCollateralInfoCard carInfo={carInfo} />
+          <LeadCollateralInfoCard
+            carInfo={carInfo}
+            collateralType={initialOpportunity.collateralType}
+          />
           <LeadLoanInfoCard
             product={selectedProduct}
             value={loanInfo}

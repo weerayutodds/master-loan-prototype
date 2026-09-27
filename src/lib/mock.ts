@@ -10,6 +10,10 @@ import type {
   LoanPurpose,
   OptionCardData,
   RefinanceStatus,
+  VehicleBrandOption,
+  VehicleCollateralType,
+  VehicleModelOption,
+  VehicleSubModelOption,
 } from "@/types/ratebook"
 import type {
   CardCustomerData,
@@ -113,29 +117,404 @@ export const verificationMethodOptions: {
   {value: "manual", label: "กรอกข้อมูลเอง"},
 ]
 
-export const carBrandOptions: {value: string; label: string}[] = [
-  {value: "toyota", label: "Toyota"},
-  {value: "honda", label: "Honda"},
-  {value: "isuzu", label: "Isuzu"},
-  {value: "nissan", label: "Nissan"},
-  {value: "mazda", label: "Mazda"},
-  {value: "ford", label: "Ford"},
-  {value: "mitsubishi", label: "Mitsubishi"},
-  {value: "suzuki", label: "Suzuki"},
-]
+function subModels(
+  entries: [string, string][],
+): VehicleSubModelOption[] {
+  return entries.map(([value, label]) => ({value, label}))
+}
 
-export const carModelOptions: {value: string; label: string}[] = [
-  {value: "vios", label: "Vios"},
-  {value: "yaris", label: "Yaris"},
-  {value: "city", label: "City"},
-  {value: "civic", label: "Civic"},
-  {value: "d-max", label: "D-Max"},
-  {value: "almera", label: "Almera"},
-  {value: "cx-5", label: "CX-5"},
-  {value: "ranger", label: "Ranger"},
-  {value: "triton", label: "Triton"},
-  {value: "swift", label: "Swift"},
-]
+function model(
+  value: string,
+  label: string,
+  entries: [string, string][],
+): VehicleModelOption {
+  return {value, label, subModels: subModels(entries)}
+}
+
+function brand(
+  value: string,
+  label: string,
+  models: VehicleModelOption[],
+): VehicleBrandOption {
+  return {value, label, models}
+}
+
+export const vehicleCatalogByCollateralType: Record<
+  VehicleCollateralType,
+  VehicleBrandOption[]
+> = {
+  car: [
+    brand("toyota", "Toyota", [
+      model("vios", "Vios", [
+        ["1.5-j", "1.5 J"],
+        ["1.5-e", "1.5 E"],
+        ["1.5-g", "1.5 G"],
+      ]),
+      model("yaris", "Yaris", [
+        ["entry", "1.2 Entry"],
+        ["sport", "1.2 Sport"],
+        ["premium", "1.2 Premium"],
+      ]),
+      model("fortuner", "Fortuner", [
+        ["standard", "2.4 Standard"],
+        ["legender", "2.8 Legender"],
+      ]),
+      model("hilux-revo", "Hilux Revo", [
+        ["standard-cab", "Standard Cab"],
+        ["smart-cab", "Smart Cab"],
+        ["double-cab", "Double Cab"],
+      ]),
+    ]),
+    brand("honda", "Honda", [
+      model("city", "City", [
+        ["s", "S"],
+        ["v", "V"],
+        ["sv", "SV"],
+      ]),
+      model("civic", "Civic", [
+        ["el", "EL"],
+        ["rs", "RS"],
+        ["hatchback-rs", "Hatchback RS"],
+      ]),
+      model("cr-v", "CR-V", [
+        ["e", "E"],
+        ["el", "EL"],
+        ["se", "SE"],
+      ]),
+    ]),
+    brand("isuzu", "Isuzu", [
+      model("d-max", "D-Max", [
+        ["spark", "Spark"],
+        ["hi-lander", "Hi-Lander"],
+        ["v-cross", "V-Cross"],
+      ]),
+      model("mu-x", "MU-X", [
+        ["standard", "Standard"],
+        ["ultimate", "Ultimate"],
+      ]),
+    ]),
+    brand("nissan", "Nissan", [
+      model("almera", "Almera", [
+        ["e", "E"],
+        ["v", "V"],
+        ["vl", "VL"],
+      ]),
+      model("navara", "Navara", [
+        ["calibre", "Calibre"],
+        ["pro-4x", "Pro-4X"],
+      ]),
+    ]),
+    brand("mazda", "Mazda", [
+      model("mazda2", "Mazda2", [
+        ["s", "S"],
+        ["sports-high", "Sports High"],
+      ]),
+      model("cx-5", "CX-5", [
+        ["c", "C"],
+        ["sp", "SP"],
+      ]),
+      model("bt-50", "BT-50", [
+        ["standard-cab", "Standard Cab"],
+        ["double-cab", "Double Cab"],
+      ]),
+    ]),
+    brand("ford", "Ford", [
+      model("ranger", "Ranger", [
+        ["xl", "XL"],
+        ["xlt", "XLT"],
+        ["wildtrak", "Wildtrak"],
+      ]),
+      model("everest", "Everest", [
+        ["ambiente", "Ambiente"],
+        ["titanium", "Titanium"],
+      ]),
+    ]),
+    brand("mitsubishi", "Mitsubishi", [
+      model("triton", "Triton", [
+        ["glx", "GLX"],
+        ["gls", "GLS"],
+        ["athlete", "Athlete"],
+      ]),
+      model("xpander", "Xpander", [
+        ["gls", "GLS"],
+        ["ultimate", "Ultimate"],
+      ]),
+    ]),
+    brand("suzuki", "Suzuki", [
+      model("swift", "Swift", [
+        ["ga", "GA"],
+        ["gl", "GL"],
+      ]),
+      model("ciaz", "Ciaz", [
+        ["gl", "GL"],
+        ["glx", "GLX"],
+      ]),
+    ]),
+  ],
+  motorcycle: [
+    brand("honda", "Honda", [
+      model("wave110i", "Wave110i", [
+        ["standard", "Standard"],
+        ["fi", "Fi"],
+      ]),
+      model("click160i", "Click160i", [
+        ["standard", "Standard"],
+        ["abs", "ABS"],
+      ]),
+      model("pcx160", "PCX160", [
+        ["standard", "Standard"],
+        ["abs", "ABS"],
+      ]),
+      model("cbr150r", "CBR150R", [
+        ["standard", "Standard"],
+        ["abs", "ABS"],
+      ]),
+    ]),
+    brand("yamaha", "Yamaha", [
+      model("fino", "Fino", [
+        ["standard", "Standard"],
+        ["premium", "Premium"],
+      ]),
+      model("aerox155", "Aerox155", [
+        ["standard", "Standard"],
+        ["abs", "ABS"],
+      ]),
+      model("nmax", "NMAX", [
+        ["standard", "Standard"],
+        ["abs", "ABS"],
+      ]),
+      model("exciter155vva", "Exciter155VVA", [
+        ["standard", "Standard"],
+        ["gp", "GP"],
+      ]),
+    ]),
+    brand("suzuki", "Suzuki", [
+      model("smash", "Smash", [["standard", "Standard"]]),
+      model("address110", "Address110", [["standard", "Standard"]]),
+      model("gsx-r150", "GSX-R150", [["standard", "Standard"]]),
+    ]),
+    brand("kawasaki", "Kawasaki", [
+      model("ninja250", "Ninja250", [
+        ["standard", "Standard"],
+        ["se", "SE"],
+      ]),
+      model("z250", "Z250", [["standard", "Standard"]]),
+      model("klx150", "KLX150", [["standard", "Standard"]]),
+    ]),
+    brand("vespa", "Vespa", [
+      model("primavera150", "Primavera150", [["standard", "Standard"]]),
+      model("sprint150", "Sprint150", [["standard", "Standard"]]),
+      model("gts300", "GTS300", [["standard", "Standard"]]),
+    ]),
+    brand("gpx", "GPX", [
+      model("demon150gr", "Demon150GR", [["standard", "Standard"]]),
+      model("legend250", "Legend250", [["standard", "Standard"]]),
+    ]),
+  ],
+  truck: [
+    brand("isuzu", "Isuzu", [
+      model("ftr", "FTR", [
+        ["4x2", "4x2"],
+        ["6x2", "6x2"],
+      ]),
+      model("fvr", "FVR", [
+        ["6x2", "6x2"],
+        ["6x4", "6x4"],
+      ]),
+      model("elf", "ELF", [["standard", "Standard"]]),
+    ]),
+    brand("hino", "Hino", [
+      model("300-series", "300 Series", [
+        ["standard", "Standard"],
+        ["wide-cab", "Wide Cab"],
+      ]),
+      model("500-series", "500 Series", [
+        ["4x2", "4x2"],
+        ["6x2", "6x2"],
+      ]),
+      model("700-series", "700 Series", [["6x4", "6x4"]]),
+    ]),
+    brand("fuso", "Mitsubishi Fuso", [
+      model("fighter", "Fighter", [["standard", "Standard"]]),
+      model("canter", "Canter", [["standard", "Standard"]]),
+    ]),
+    brand("volvo", "Volvo Trucks", [
+      model("fm", "FM", [
+        ["4x2", "4x2"],
+        ["6x4", "6x4"],
+      ]),
+      model("fh", "FH", [["6x4", "6x4"]]),
+    ]),
+    brand("scania", "Scania", [
+      model("p-series", "P-series", [["standard", "Standard"]]),
+      model("r-series", "R-series", [["standard", "Standard"]]),
+    ]),
+    brand("ud", "UD Trucks", [
+      model("quon", "Quon", [["standard", "Standard"]]),
+      model("condor", "Condor", [["standard", "Standard"]]),
+    ]),
+    brand("hyundai", "Hyundai", [
+      model("mighty", "Mighty", [["standard", "Standard"]]),
+      model("hd", "HD", [["standard", "Standard"]]),
+    ]),
+  ],
+}
+
+export const carTypeOptionsByCollateralType: Record<
+  VehicleCollateralType,
+  {value: string; label: string}[]
+> = {
+  car: [
+    {value: "sedan", label: "รถเก๋ง"},
+    {value: "pickup", label: "รถกระบะ"},
+    {value: "suv", label: "รถ SUV"},
+    {value: "van", label: "รถตู้"},
+  ],
+  truck: [
+    {value: "4-wheel", label: "รถบรรทุก 4 ล้อ"},
+    {value: "6-wheel", label: "รถบรรทุก 6 ล้อ"},
+    {value: "10-wheel", label: "รถบรรทุก 10 ล้อ"},
+    {value: "trailer", label: "รถพ่วง"},
+  ],
+  motorcycle: [
+    {value: "family", label: "ครอบครัว"},
+    {value: "scooter", label: "สกู๊ตเตอร์ออโตเมติก"},
+    {value: "sport", label: "สปอร์ต"},
+    {value: "big-bike", label: "บิ๊กไบค์"},
+    {value: "adv", label: "ADV/Adventure"},
+  ],
+}
+
+export const carBodyTypeOptionsByCollateralType: Record<
+  VehicleCollateralType,
+  {value: string; label: string}[]
+> = {
+  car: [
+    {value: "sedan", label: "ซีดาน"},
+    {value: "pickup", label: "กระบะ"},
+    {value: "suv", label: "SUV"},
+    {value: "van", label: "รถตู้"},
+    {value: "hatchback", label: "แฮทช์แบ็ก"},
+  ],
+  truck: [
+    {value: "cab-chassis", label: "แค็บ"},
+    {value: "full-cab", label: "4 ประตู"},
+    {value: "flatbed", label: "กระบะบรรทุก"},
+    {value: "box", label: "ตู้ทึบ"},
+    {value: "tanker", label: "ถังบรรทุก"},
+  ],
+  motorcycle: [
+    {value: "standard", label: "มาตรฐาน"},
+    {value: "sport", label: "สปอร์ต"},
+    {value: "scooter", label: "สกู๊ตเตอร์"},
+    {value: "cruiser", label: "ครุยเซอร์"},
+    {value: "adventure", label: "แอดเวนเจอร์"},
+  ],
+}
+
+export const carEngineCcOptionsByCollateralType: Record<
+  VehicleCollateralType,
+  {value: string; label: string}[]
+> = {
+  car: [
+    {value: "1000", label: "1000 ซีซี"},
+    {value: "1200", label: "1200 ซีซี"},
+    {value: "1500", label: "1500 ซีซี"},
+    {value: "1800", label: "1800 ซีซี"},
+    {value: "2000", label: "2000 ซีซี"},
+    {value: "2500", label: "2500 ซีซี"},
+    {value: "3000", label: "3000 ซีซี"},
+  ],
+  truck: [
+    {value: "2500", label: "2500 ซีซี"},
+    {value: "3000", label: "3000 ซีซี"},
+    {value: "4000", label: "4000 ซีซี"},
+    {value: "6000", label: "6000 ซีซี"},
+    {value: "8000", label: "8000 ซีซี"},
+    {value: "10000", label: "10000 ซีซี"},
+    {value: "13000", label: "13000 ซีซี"},
+  ],
+  motorcycle: [
+    {value: "110", label: "110 ซีซี"},
+    {value: "125", label: "125 ซีซี"},
+    {value: "150", label: "150 ซีซี"},
+    {value: "160", label: "160 ซีซี"},
+    {value: "250", label: "250 ซีซี"},
+    {value: "300", label: "300 ซีซี"},
+    {value: "400", label: "400 ซีซี"},
+  ],
+}
+
+export function toVehicleCollateralType(
+  collateralType?: CollateralType | null,
+): VehicleCollateralType {
+  return collateralType === "motorcycle" || collateralType === "truck"
+    ? collateralType
+    : "car"
+}
+
+export function getVehicleBrands(
+  collateralType?: CollateralType | null,
+): VehicleBrandOption[] {
+  return vehicleCatalogByCollateralType[toVehicleCollateralType(collateralType)]
+}
+
+export function getVehicleModels(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+): VehicleModelOption[] {
+  return (
+    getVehicleBrands(collateralType).find((option) => option.value === brandValue)
+      ?.models ?? []
+  )
+}
+
+export function getVehicleSubModels(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+  modelValue?: string,
+): VehicleSubModelOption[] {
+  return (
+    getVehicleModels(collateralType, brandValue).find(
+      (option) => option.value === modelValue,
+    )?.subModels ?? []
+  )
+}
+
+export function getVehicleBrandLabel(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+): string {
+  return (
+    getVehicleBrands(collateralType).find((option) => option.value === brandValue)
+      ?.label ?? "-"
+  )
+}
+
+export function getVehicleModelLabel(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+  modelValue?: string,
+): string {
+  return (
+    getVehicleModels(collateralType, brandValue).find(
+      (option) => option.value === modelValue,
+    )?.label ?? "-"
+  )
+}
+
+export function getVehicleSubModelLabel(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+  modelValue?: string,
+  subModelValue?: string,
+): string {
+  return (
+    getVehicleSubModels(collateralType, brandValue, modelValue).find(
+      (option) => option.value === subModelValue,
+    )?.label ?? "-"
+  )
+}
 
 export const carYearOptions: {value: string; label: string}[] = Array.from(
   {length: 15},
@@ -158,41 +537,9 @@ export const carDoorsOptions: {value: string; label: string}[] = [
   {value: "5", label: "5 ประตู"},
 ]
 
-export const carTypeOptions: {value: string; label: string}[] = [
-  {value: "sedan", label: "รถเก๋ง"},
-  {value: "pickup", label: "รถกระบะ"},
-  {value: "suv", label: "รถ SUV"},
-  {value: "van", label: "รถตู้"},
-  {value: "truck", label: "รถบรรทุก"},
-]
-
-export const carEngineCcOptions: {value: string; label: string}[] = [
-  {value: "1000", label: "1000 ซีซี"},
-  {value: "1200", label: "1200 ซีซี"},
-  {value: "1500", label: "1500 ซีซี"},
-  {value: "1800", label: "1800 ซีซี"},
-  {value: "2000", label: "2000 ซีซี"},
-  {value: "2500", label: "2500 ซีซี"},
-  {value: "3000", label: "3000 ซีซี"},
-]
-
 export const carTransmissionOptions: {value: string; label: string}[] = [
   {value: "manual", label: "เกียร์ธรรมดา"},
   {value: "auto", label: "เกียร์อัตโนมัติ"},
-]
-
-export const carBodyTypeOptions: {value: string; label: string}[] = [
-  {value: "sedan", label: "ซีดาน"},
-  {value: "pickup", label: "กระบะ"},
-  {value: "suv", label: "SUV"},
-  {value: "van", label: "รถตู้"},
-  {value: "hatchback", label: "แฮทช์แบ็ก"},
-]
-
-export const carSubModelOptions: {value: string; label: string}[] = [
-  {value: "standard", label: "Standard"},
-  {value: "sport", label: "Sport"},
-  {value: "hybrid", label: "Hybrid"},
 ]
 
 export const mockCardCustomer: CardCustomerData = {

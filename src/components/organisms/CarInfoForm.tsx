@@ -6,18 +6,19 @@ import { Select } from "@/components/atoms/Select";
 import { FormField } from "@/components/molecules/FormField";
 import { updateOpportunityCarInfo } from "@/lib/actions/customer-lead-opportunity";
 import {
-  carBodyTypeOptions,
-  carBrandOptions,
+  carBodyTypeOptionsByCollateralType,
   carConditionOptions,
   carDoorsOptions,
-  carEngineCcOptions,
-  carModelOptions,
-  carSubModelOptions,
+  carEngineCcOptionsByCollateralType,
   carTransmissionOptions,
-  carTypeOptions,
+  carTypeOptionsByCollateralType,
   carYearOptions,
+  getVehicleBrands,
+  getVehicleModels,
+  getVehicleSubModels,
+  toVehicleCollateralType,
 } from "@/lib/mock";
-import type { CarInfo } from "@/types/ratebook";
+import type { CarInfo, CollateralType } from "@/types/ratebook";
 
 const PLACEHOLDER = { value: "", label: "เลือกข้อมูล" };
 
@@ -43,6 +44,7 @@ function InfoLabel({ children }: { children: React.ReactNode }) {
 type CarInfoFormProps = {
   opportunityId: string | null;
   carInfo: CarInfo;
+  collateralType: CollateralType | null;
   onCarInfoChange: (carInfo: CarInfo) => void;
   onViewAppraisal: () => void;
 };
@@ -50,14 +52,35 @@ type CarInfoFormProps = {
 export function CarInfoForm({
   opportunityId,
   carInfo,
+  collateralType,
   onCarInfoChange,
   onViewAppraisal,
 }: CarInfoFormProps) {
   function update<K extends keyof CarInfo>(key: K, value: string) {
+    if (key === "brand") {
+      onCarInfoChange({ brand: value });
+      return;
+    }
+    if (key === "model") {
+      onCarInfoChange({ brand: carInfo.brand, model: value });
+      return;
+    }
     onCarInfoChange({ ...carInfo, [key]: value });
   }
 
-  const isComplete = REQUIRED_FIELDS.every((field) => Boolean(carInfo[field]));
+  const isMotorcycle = collateralType === "motorcycle";
+  const requiredFields = isMotorcycle
+    ? REQUIRED_FIELDS.filter((field) => field !== "doors")
+    : REQUIRED_FIELDS;
+  const isComplete = requiredFields.every((field) => Boolean(carInfo[field]));
+
+  const vehicleCollateralType = toVehicleCollateralType(collateralType);
+  const brandOptions = getVehicleBrands(collateralType);
+  const modelOptions = getVehicleModels(collateralType, carInfo.brand);
+  const subModelOptions = getVehicleSubModels(collateralType, carInfo.brand, carInfo.model);
+  const carTypeOptions = carTypeOptionsByCollateralType[vehicleCollateralType];
+  const carBodyTypeOptions = carBodyTypeOptionsByCollateralType[vehicleCollateralType];
+  const carEngineCcOptions = carEngineCcOptionsByCollateralType[vehicleCollateralType];
 
   return (
     <div className="space-y-4">
@@ -73,15 +96,16 @@ export function CarInfoForm({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label="ยี่ห้อรถ">
             <Select
-              options={[PLACEHOLDER, ...carBrandOptions]}
+              options={[PLACEHOLDER, ...brandOptions]}
               value={carInfo.brand ?? ""}
               onChange={(e) => update("brand", e.target.value)}
             />
           </FormField>
           <FormField label={<InfoLabel>รุ่นรถ</InfoLabel>}>
             <Select
-              options={[PLACEHOLDER, ...carModelOptions]}
+              options={[PLACEHOLDER, ...modelOptions]}
               value={carInfo.model ?? ""}
+              disabled={!carInfo.brand}
               onChange={(e) => update("model", e.target.value)}
             />
           </FormField>
@@ -106,6 +130,7 @@ export function CarInfoForm({
             <Select
               options={[PLACEHOLDER, ...carDoorsOptions]}
               value={carInfo.doors ?? ""}
+              disabled={isMotorcycle}
               onChange={(e) => update("doors", e.target.value)}
             />
           </FormField>
@@ -142,8 +167,9 @@ export function CarInfoForm({
           </FormField>
           <FormField label="รุ่นย่อย (ไม่บังคับ)">
             <Select
-              options={[PLACEHOLDER, ...carSubModelOptions]}
+              options={[PLACEHOLDER, ...subModelOptions]}
               value={carInfo.subModel ?? ""}
+              disabled={!carInfo.model}
               onChange={(e) => update("subModel", e.target.value)}
             />
           </FormField>
