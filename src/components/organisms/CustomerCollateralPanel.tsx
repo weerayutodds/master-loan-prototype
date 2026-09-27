@@ -9,7 +9,6 @@ import { LeadProgressTooltip } from "@/components/molecules/LeadProgressTooltip"
 import { Toast } from "@/components/molecules/Toast";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
-import { GenderAgePopover } from "@/components/organisms/GenderAgePopover";
 import {
   updateOpportunityCarInfo,
   updateOpportunityCarInsurance,
@@ -23,7 +22,6 @@ import {
   getVehicleModelLabel,
   provinceOptions,
 } from "@/lib/mock";
-import type { Gender } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
@@ -34,7 +32,7 @@ import type {
   LoanInfo,
 } from "@/types/ratebook";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 const TOTAL_SECTIONS = 4;
 
@@ -105,8 +103,6 @@ export function CustomerCollateralPanel({
 }: CustomerCollateralPanelProps) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
-  const [genderAgeOpen, setGenderAgeOpen] = useState(false);
-  const genderAgeRef = useRef<HTMLDivElement>(null);
   const [collateralIdentifier, setCollateralIdentifier] =
     useState<CollateralIdentifier | null>(
       initialOpportunity &&
@@ -129,27 +125,6 @@ export function CustomerCollateralPanel({
   const [savedToastOpen, setSavedToastOpen] = useState(false);
 
   const idCardNumber = initialOpportunity?.idCardNumber ?? "";
-
-  useEffect(() => {
-    if (!genderAgeOpen) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (!genderAgeRef.current?.contains(event.target as Node)) {
-        setGenderAgeOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [genderAgeOpen]);
-
-  async function handleSaveGenderAge(value: { gender: Gender; birthDate: string }) {
-    if (!customer) return;
-    const nextCustomer: CustomerInfo = { ...customer, ...value };
-    onCustomerChange(nextCustomer);
-    setGenderAgeOpen(false);
-    if (opportunityId) {
-      await updateOpportunityCustomerInfo(opportunityId, nextCustomer);
-    }
-  }
 
   async function handleSaveLead() {
     if (!opportunityId) return;
@@ -204,28 +179,9 @@ export function CustomerCollateralPanel({
             <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
               <Icon name="phone" className="size-4" />
               {customer.phone}
-              <div ref={genderAgeRef} className="relative">
-                {customer.birthDate ? (
-                  <button
-                    type="button"
-                    onClick={() => setGenderAgeOpen((value) => !value)}
-                    className="flex items-center gap-1.5"
-                  >
-                    <span>{`| ${calculateAge(customer.birthDate)} ปี`}</span>
-                    <Icon name="info" className="size-4 text-primary-to" />
-                  </button>
-                ) : null}
-                {genderAgeOpen ? (
-                  <div className="absolute left-0 top-full z-50 mt-3">
-                    <GenderAgePopover
-                      initialGender={customer.gender ?? null}
-                      initialBirthDate={customer.birthDate ?? null}
-                      onSave={handleSaveGenderAge}
-                      onCancel={() => setGenderAgeOpen(false)}
-                    />
-                  </div>
-                ) : null}
-              </div>
+              {customer.birthDate ? (
+                <span>{`| ${calculateAge(customer.birthDate)} ปี`}</span>
+              ) : null}
             </div>
           </div>
           <div className="group/progress relative shrink-0">

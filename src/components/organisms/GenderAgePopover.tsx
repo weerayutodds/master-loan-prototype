@@ -5,7 +5,7 @@ import {Icon} from "@/components/atoms/Icon"
 import {calculateAge} from "@/lib/format"
 import {genderOptions} from "@/lib/mock"
 import type {Gender} from "@/types/customer-lead"
-import {useState} from "react"
+import {useRef, useState} from "react"
 
 const MIN_AGE = 20
 
@@ -30,10 +30,21 @@ export function GenderAgePopover({
 }: GenderAgePopoverProps) {
   const [gender, setGender] = useState<Gender | null>(initialGender)
   const [birthDate, setBirthDate] = useState(initialBirthDate ?? "")
+  const dateInputRef = useRef<HTMLInputElement>(null)
 
   const age = birthDate ? calculateAge(birthDate) : 0
   const isUnderMinAge = birthDate !== "" && age < MIN_AGE
   const canSave = gender !== null && birthDate !== "" && !isUnderMinAge
+
+  function openDatePicker() {
+    const input = dateInputRef.current
+    if (!input) return
+    if (typeof input.showPicker === "function") {
+      input.showPicker()
+    } else {
+      input.focus()
+    }
+  }
 
   return (
     <div className="relative w-66.5 rounded-[20px] border-2 border-card-border bg-surface p-4 shadow-primary-s">
@@ -70,13 +81,21 @@ export function GenderAgePopover({
         <div className="flex">
           <div className="flex flex-1 items-center gap-1 rounded-l-md border border-secondary-border bg-surface px-2 py-1.5">
             <input
+              ref={dateInputRef}
               type="date"
               value={birthDate}
               max={getMaxBirthDate()}
               onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full text-sm text-foreground outline-none"
+              className="w-full text-sm text-foreground outline-none [&::-webkit-calendar-picker-indicator]:hidden"
             />
-            <Icon name="calendar" className="size-4 shrink-0 text-unit-label" />
+            <button
+              type="button"
+              onClick={openDatePicker}
+              aria-label="เลือกวันเกิด"
+              className="shrink-0"
+            >
+              <Icon name="calendar" className="size-4 text-unit-label" />
+            </button>
           </div>
           <div
             className={`flex w-12.5 shrink-0 items-center justify-center gap-1 rounded-r-md border border-l-0 bg-surface px-2 py-1.5 ${

@@ -14,8 +14,8 @@ import {
 } from "@/lib/loan-cal"
 import {GENDER_LABELS} from "@/lib/mock"
 import type {Gender} from "@/types/customer-lead"
-import type {CustomerInfo} from "@/types/ratebook"
 import type {ProductCatalogData} from "@/types/product-catalog"
+import type {CustomerInfo} from "@/types/ratebook"
 import {useEffect, useMemo, useRef, useState} from "react"
 
 type CalculatedInputs = {
@@ -106,7 +106,6 @@ export function LoanCalBar({
     left: number
     bottom: number
   } | null>(null)
-  const [genderAgeIntent, setGenderAgeIntent] = useState<"label" | "ppi">("label")
   const containerRef = useRef<HTMLDivElement>(null)
   const genderAgeAnchorRef = useRef<HTMLDivElement>(null)
   const genderAgePopoverRef = useRef<HTMLDivElement>(null)
@@ -141,21 +140,23 @@ export function LoanCalBar({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [genderAgeOpen])
 
-  function openGenderAgePopover(intent: "label" | "ppi") {
+  function openGenderAgePopover() {
     const rect = genderAgeAnchorRef.current?.getBoundingClientRect()
     if (rect) {
-      setGenderAgePosition({left: rect.left, bottom: window.innerHeight - rect.top + 12})
+      setGenderAgePosition({
+        left: rect.left,
+        bottom: window.innerHeight - rect.top + 12,
+      })
     }
-    setGenderAgeIntent(intent)
     setGenderAgeOpen(true)
   }
 
   function handleTogglePpi(nextChecked: boolean) {
-    if (nextChecked && !(customer?.gender && customer?.birthDate)) {
-      openGenderAgePopover("ppi")
+    if (!nextChecked) {
+      setHasPpi(false)
       return
     }
-    setHasPpi(nextChecked)
+    openGenderAgePopover()
   }
 
   const summary = useMemo(
@@ -174,10 +175,19 @@ export function LoanCalBar({
   )
 
   function handleCalculate() {
-    setCalculated({requestedAmount, interestRatePercent, installmentTerm, isTLC, hasPpi})
+    setCalculated({
+      requestedAmount,
+      interestRatePercent,
+      installmentTerm,
+      isTLC,
+      hasPpi,
+    })
   }
 
-  async function handleSaveGenderAge(value: {gender: Gender; birthDate: string}) {
+  async function handleSaveGenderAge(value: {
+    gender: Gender
+    birthDate: string
+  }) {
     const nextCustomer: CustomerInfo = {
       firstName: customer?.firstName ?? "",
       lastName: customer?.lastName ?? "",
@@ -186,7 +196,7 @@ export function LoanCalBar({
     }
     onCustomerChange(nextCustomer)
     setGenderAgeOpen(false)
-    if (genderAgeIntent === "ppi") setHasPpi(true)
+    setHasPpi(true)
     if (opportunityId) {
       await updateOpportunityCustomerInfo(opportunityId, nextCustomer)
     }
@@ -278,20 +288,16 @@ export function LoanCalBar({
           </div>
           <div ref={genderAgeAnchorRef} className="w-20 shrink-0">
             {customer?.gender && customer?.birthDate ? (
-              <button
-                type="button"
-                onClick={() =>
-                  genderAgeOpen
-                    ? setGenderAgeOpen(false)
-                    : openGenderAgePopover("label")
-                }
-                className="mb-2 block shrink-0 self-center text-xs text-pale-blue"
-              >
+              <span className="mb-1 block shrink-0 self-center text-[10px] text-pale-blue w-full">
                 {`เพศ ${GENDER_LABELS[customer.gender]} | ${calculateAge(customer.birthDate)} ปี`}
-              </button>
+              </span>
             ) : null}
 
-            <ToggleChip label="PPI" checked={hasPpi} onChange={handleTogglePpi} />
+            <ToggleChip
+              label="PPI"
+              checked={hasPpi}
+              onChange={handleTogglePpi}
+            />
           </div>
 
           {genderAgeOpen && genderAgePosition ? (
@@ -369,7 +375,9 @@ export function LoanCalBar({
             ) : null}
           </div>
           <p className="text-xl font-semibold text-primary-to">
-            {summary !== null ? summary.totalPayment.toLocaleString("th-TH") : 0}
+            {summary !== null
+              ? summary.totalPayment.toLocaleString("th-TH")
+              : 0}
             &nbsp;
             <span className="text-xs font-normal text-price-label">บาท</span>
           </p>
