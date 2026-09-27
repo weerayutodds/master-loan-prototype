@@ -1,24 +1,28 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/atoms/Badge"
-import { Button } from "@/components/atoms/Button"
-import { Icon } from "@/components/atoms/Icon"
-import { ProgressRing } from "@/components/atoms/ProgressRing"
-import { Card } from "@/components/molecules/Card"
-import { LeadProgressTooltip } from "@/components/molecules/LeadProgressTooltip"
-import { Toast } from "@/components/molecules/Toast"
-import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal"
-import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal"
+import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
+import { Icon } from "@/components/atoms/Icon";
+import { ProgressRing } from "@/components/atoms/ProgressRing";
+import { Card } from "@/components/molecules/Card";
+import { LeadProgressTooltip } from "@/components/molecules/LeadProgressTooltip";
+import { Toast } from "@/components/molecules/Toast";
+import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
+import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
 import {
   updateOpportunityCarInfo,
   updateOpportunityCarInsurance,
   updateOpportunityCollateralDetail,
   updateOpportunityCustomerInfo,
   updateOpportunityLoanInfo,
-} from "@/lib/actions/customer-lead-opportunity"
-import { maskIdCardNumber } from "@/lib/format"
-import { getVehicleBrandLabel, getVehicleModelLabel, provinceOptions } from "@/lib/mock"
-import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity"
+} from "@/lib/actions/customer-lead-opportunity";
+import { maskIdCardNumber } from "@/lib/format";
+import {
+  getVehicleBrandLabel,
+  getVehicleModelLabel,
+  provinceOptions,
+} from "@/lib/mock";
+import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
   CarInsuranceInfo,
@@ -26,33 +30,33 @@ import type {
   CollateralType,
   CustomerInfo,
   LoanInfo,
-} from "@/types/ratebook"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+} from "@/types/ratebook";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const TOTAL_SECTIONS = 4
+const TOTAL_SECTIONS = 4;
 
 type CustomerCollateralPanelProps = {
-  initialOpportunity?: CustomerLeadOpportunity | null
-  opportunityId: string | null
-  tags: string[]
-  carInfo: CarInfo
-  collateralType: CollateralType | null
-  showCarInfo: boolean
-  setShowCarInfo: (value: boolean) => void
-  hasSelectedProduct?: boolean
-  loanInfo?: LoanInfo
-  carInsuranceInfo?: CarInsuranceInfo
-}
+  initialOpportunity?: CustomerLeadOpportunity | null;
+  opportunityId: string | null;
+  tags: string[];
+  carInfo: CarInfo;
+  collateralType: CollateralType | null;
+  showCarInfo: boolean;
+  setShowCarInfo: (value: boolean) => void;
+  hasSelectedProduct?: boolean;
+  loanInfo?: LoanInfo;
+  carInsuranceInfo?: CarInsuranceInfo;
+};
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
   if (identifier.licensePlateNumber && identifier.licensePlateProvince) {
     const province = provinceOptions.find(
       (option) => option.value === identifier.licensePlateProvince,
-    )
-    return `${identifier.licensePlateNumber} · ${province?.label ?? ""}`
+    );
+    return `${identifier.licensePlateNumber} · ${province?.label ?? ""}`;
   }
-  return identifier.chassisNumber ?? ""
+  return identifier.chassisNumber ?? "";
 }
 
 function formatBrandModelYear(
@@ -60,21 +64,25 @@ function formatBrandModelYear(
   opportunity: CustomerLeadOpportunity | null,
   collateralType: CollateralType | null,
 ): string {
-  const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined
-  const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined
-  const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined
+  const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined;
+  const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined;
+  const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined;
 
-  const brandLabel = getVehicleBrandLabel(collateralType, brandValue)
-  const modelLabel = getVehicleModelLabel(collateralType, brandValue, modelValue)
+  const brandLabel = getVehicleBrandLabel(collateralType, brandValue);
+  const modelLabel = getVehicleModelLabel(
+    collateralType,
+    brandValue,
+    modelValue,
+  );
   const parts = [
     brandLabel === "-" ? undefined : brandLabel.toUpperCase(),
     modelLabel === "-" ? undefined : modelLabel.toUpperCase(),
-  ].filter((part): part is string => Boolean(part))
+  ].filter((part): part is string => Boolean(part));
   if (yearValue) {
-    const buddhistYear = Number(yearValue) + 543
-    parts.push(`${yearValue} (${buddhistYear})`)
+    const buddhistYear = Number(yearValue) + 543;
+    parts.push(`${yearValue} (${buddhistYear})`);
   }
-  return parts.join(" • ")
+  return parts.join(" • ");
 }
 
 export function CustomerCollateralPanel({
@@ -89,7 +97,7 @@ export function CustomerCollateralPanel({
   loanInfo,
   carInsuranceInfo,
 }: CustomerCollateralPanelProps) {
-  const router = useRouter()
+  const router = useRouter();
   const [customer, setCustomer] = useState<CustomerInfo | null>(
     initialOpportunity
       ? {
@@ -98,8 +106,8 @@ export function CustomerCollateralPanel({
           phone: initialOpportunity.phone,
         }
       : null,
-  )
-  const [modalOpen, setModalOpen] = useState(false)
+  );
+  const [modalOpen, setModalOpen] = useState(false);
   const [collateralIdentifier, setCollateralIdentifier] =
     useState<CollateralIdentifier | null>(
       initialOpportunity &&
@@ -113,18 +121,18 @@ export function CustomerCollateralPanel({
             chassisNumber: initialOpportunity.chassisNumber ?? undefined,
           }
         : null,
-    )
-  const [collateralModalOpen, setCollateralModalOpen] = useState(false)
+    );
+  const [collateralModalOpen, setCollateralModalOpen] = useState(false);
   const [brandModel, setBrandModel] = useState(
     initialOpportunity?.brandModel ?? "",
-  )
-  const [editingBrandModel, setEditingBrandModel] = useState(false)
-  const [savedToastOpen, setSavedToastOpen] = useState(false)
+  );
+  const [editingBrandModel, setEditingBrandModel] = useState(false);
+  const [savedToastOpen, setSavedToastOpen] = useState(false);
 
-  const idCardNumber = initialOpportunity?.idCardNumber ?? ""
+  const idCardNumber = initialOpportunity?.idCardNumber ?? "";
 
   async function handleSaveLead() {
-    if (!opportunityId) return
+    if (!opportunityId) return;
     try {
       await Promise.all([
         customer
@@ -139,25 +147,29 @@ export function CustomerCollateralPanel({
         carInsuranceInfo
           ? updateOpportunityCarInsurance(opportunityId, carInsuranceInfo)
           : null,
-      ])
-      setSavedToastOpen(true)
+      ]);
+      setSavedToastOpen(true);
     } catch (error) {
-      console.error("Failed to save lead", error)
+      console.error("Failed to save lead", error);
     }
   }
 
-  const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity, collateralType)
+  const brandModelDisplay = formatBrandModelYear(
+    carInfo,
+    initialOpportunity,
+    collateralType,
+  );
 
   const progressItems = [
     {
       label: "ชื่อ นามสกุล",
       filled: Boolean(customer?.firstName && customer?.lastName),
     },
-    {label: "เบอร์มือถือ", filled: Boolean(customer?.phone)},
-    {label: "เลขทะเบียน / เลขตัวถัง", filled: collateralIdentifier !== null},
-    {label: "ยี่ห้อ / รุ่น", filled: brandModelDisplay !== ""},
-  ]
-  const filledSectionCount = progressItems.filter((item) => item.filled).length
+    { label: "เบอร์มือถือ", filled: Boolean(customer?.phone) },
+    { label: "เลขทะเบียน / เลขตัวถัง", filled: collateralIdentifier !== null },
+    { label: "ยี่ห้อ / รุ่น", filled: brandModelDisplay !== "" },
+  ];
+  const filledSectionCount = progressItems.filter((item) => item.filled).length;
 
   return (
     <Card className="space-y-4 border-2">
@@ -287,16 +299,6 @@ export function CustomerCollateralPanel({
               <span className="text-sm text-muted-foreground">
                 ยี่ห้อ / รุ่น
               </span>
-              {!showCarInfo && (
-                <button
-                  type="button"
-                  onClick={() => setShowCarInfo(true)}
-                  className="flex items-center gap-1 text-xs font-semibold text-primary-to"
-                >
-                  <Icon name="edit" className="size-3" />
-                  {brandModelDisplay ? "แก้ไข" : "เพิ่ม"}
-                </button>
-              )}
             </div>
             <span className="text-sm font-medium text-foreground text-left">
               {brandModelDisplay}
@@ -354,8 +356,8 @@ export function CustomerCollateralPanel({
         initialValue={customer ?? undefined}
         onClose={() => setModalOpen(false)}
         onSave={(info) => {
-          setCustomer(info)
-          setModalOpen(false)
+          setCustomer(info);
+          setModalOpen(false);
         }}
       />
 
@@ -364,10 +366,10 @@ export function CustomerCollateralPanel({
         initialValue={collateralIdentifier ?? undefined}
         onClose={() => setCollateralModalOpen(false)}
         onSave={(value) => {
-          setCollateralIdentifier(value)
-          setCollateralModalOpen(false)
+          setCollateralIdentifier(value);
+          setCollateralModalOpen(false);
         }}
       />
     </Card>
-  )
+  );
 }

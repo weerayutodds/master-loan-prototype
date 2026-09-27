@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/atoms/Icon";
 
 type TopHeaderProps = {
@@ -6,15 +8,18 @@ type TopHeaderProps = {
 };
 
 export function TopHeader({ title }: TopHeaderProps) {
+  const router = useRouter();
+
   return (
     <div className="sticky top-0 z-10 flex h-11 items-center justify-between border-b border-secondary-border bg-surface/70 px-6 backdrop-blur-md">
-      <Link
-        href="/"
+      <button
+        type="button"
+        onClick={() => router.back()}
         className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
       >
         <Icon name="arrow-left" className="size-5" />
-        หน้าแรก
-      </Link>
+        ย้อนกลับ
+      </button>
       <h1 className="text-lg font-medium text-foreground">{title}</h1>
       <button
         type="button"

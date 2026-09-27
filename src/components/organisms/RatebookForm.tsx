@@ -1,5 +1,6 @@
 "use client"
 
+import {usePageTitleOverride} from "@/components/organisms/AppShell"
 import {CarInfoForm} from "@/components/organisms/CarInfoForm"
 import {CustomerCollateralPanel} from "@/components/organisms/CustomerCollateralPanel"
 import {LeadContent} from "@/components/organisms/LeadContent"
@@ -120,8 +121,11 @@ export function RatebookForm({initialOpportunity}: RatebookFormProps) {
     }
   }
 
+  usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
+
   function handleSelectedProductConfirmed(item: ProductCatalogItem) {
     setSelectedProduct(item)
+    window.scrollTo({top: 0, behavior: "instant"})
     if (opportunityId) {
       void updateOpportunitySelectedProduct(opportunityId, item.id)
     }

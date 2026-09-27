@@ -24,6 +24,9 @@ export default async function CustomerLeadListPage({
     leadId ? listCustomerLeadOpportunitiesByLeadId(leadId) : Promise.resolve([]),
   ]);
 
+  const isDipChip = focusLead?.verificationMethod === "card";
+  const visibleTabs = isDipChip ? LEAD_LIST_TABS : LEAD_LIST_TABS.slice(0, 1);
+
   return (
     <>
       <Card className="flex flex-wrap items-center justify-between gap-6">
@@ -62,7 +65,7 @@ export default async function CustomerLeadListPage({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
-          {LEAD_LIST_TABS.map((tab, index) => (
+          {visibleTabs.map((tab, index) => (
             <span
               key={tab}
               className={`rounded-full border px-4 py-2 text-sm font-medium ${
