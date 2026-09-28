@@ -50,17 +50,14 @@ type CustomerCollateralPanelProps = {
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
-  if (
-    identifier.licensePlateNumber &&
-    identifier.licensePlateProvince &&
-    identifier.chassisNumber
-  ) {
-    const province = provinceOptions.find(
-      (option) => option.value === identifier.licensePlateProvince,
-    );
-    return `${identifier.licensePlateNumber} ${province?.label ?? ""} · ${identifier.chassisNumber ?? ""}`;
-  }
-  return identifier.chassisNumber ?? "";
+  const province = provinceOptions.find(
+    (option) => option.value === identifier.licensePlateProvince,
+  );
+  const licensePlate =
+    identifier.licensePlateNumber && province
+      ? `${identifier.licensePlateNumber} ${province.label}`
+      : undefined;
+  return [licensePlate, identifier.chassisNumber].filter(Boolean).join(" · ");
 }
 
 function formatBrandModelYear(

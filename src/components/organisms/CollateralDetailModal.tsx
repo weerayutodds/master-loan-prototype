@@ -64,7 +64,11 @@ export function CollateralDetailModal({
   }, [open, initialValue, reset]);
 
   function onSubmit(data: FormValues) {
-    onSave(data);
+    onSave({
+      licensePlateNumber: data.licensePlateNumber?.trim() || undefined,
+      licensePlateProvince: data.licensePlateProvince || undefined,
+      chassisNumber: data.chassisNumber?.trim() || undefined,
+    });
   }
 
   return (
