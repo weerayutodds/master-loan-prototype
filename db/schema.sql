@@ -73,7 +73,7 @@ create table customer_lead_opportunity (
   requested_amount text,
   wants_wheel_card text check (wants_wheel_card in ('yes', 'no')),
   has_ppi text check (has_ppi in ('yes', 'no')),
-  installment_term text check (installment_term in ('36', '48', '60', '72', '84')),
+  installment_term text check (installment_term in ('12', '18', '24', '30', '36', '42', '48', '54', '60')),
 
   possession_date text,
   car_insurance_expiry text,

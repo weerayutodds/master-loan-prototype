@@ -2,6 +2,12 @@ import type { ProductCatalogData, ProductCatalogFilter } from "@/types/product-c
 
 export const TRANSFER_BOOK_STATUS = "โอนเล่ม";
 
+/** งวดผ่อน options, shared by `LoanCalBar` and `LeadLoanInfoCard` so they can't drift apart. */
+export const INSTALLMENT_TERM_OPTIONS = [12, 18, 24, 30, 36, 42, 48, 54, 60];
+export const DEFAULT_INSTALLMENT_TERM = 60;
+/** มอเตอร์ไซค์ is fixed at this term — the dropdown offers nothing else. */
+export const MOTORCYCLE_INSTALLMENT_TERM = 30;
+
 /** Every book status present in the catalog, in catalog order; the first one is the default. */
 export function getBookStatusOptions(productCatalog: ProductCatalogData): string[] {
   return Array.from(new Set(productCatalog.items.map((item) => item.bookStatusLabel)));

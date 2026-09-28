@@ -11,7 +11,10 @@ import {
   calculateFlatRateEquivalent,
   calculateLoanCalSummary,
   calculateLtvPercent,
+  DEFAULT_INSTALLMENT_TERM,
   getBookStatusOptions,
+  INSTALLMENT_TERM_OPTIONS,
+  MOTORCYCLE_INSTALLMENT_TERM,
   TRANSFER_BOOK_STATUS,
   type InterestRateType,
 } from "@/lib/loan-cal";
@@ -37,9 +40,6 @@ type CalculatedInputs = {
   hasPpi: boolean;
 };
 
-const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84];
-const DEFAULT_INSTALLMENT_TERM = 60;
-const MOTORCYCLE_INSTALLMENT_TERM = 30;
 const MAX_REDUCING_RATE_PERCENT = 24;
 const MAX_FLAT_RATE_PERCENT = 2;
 const DEFAULT_REDUCING_RATE_PERCENT = "24";

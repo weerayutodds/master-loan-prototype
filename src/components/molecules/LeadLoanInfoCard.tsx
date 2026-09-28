@@ -4,6 +4,8 @@ import { Badge } from "@/components/atoms/Badge";
 import { Card } from "@/components/molecules/Card";
 import { Select } from "@/components/atoms/Select";
 import {
+  DEFAULT_INSTALLMENT_TERM,
+  INSTALLMENT_TERM_OPTIONS,
   PPI_ANNUAL_PREMIUM,
   calculateMonthlyPayment,
   getMaxApprovedAmount,
@@ -12,7 +14,6 @@ import type { ProductCatalogItem } from "@/types/product-catalog";
 import type { LoanInfo } from "@/types/ratebook";
 import { useMemo } from "react";
 
-const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84];
 const MIN_REQUESTED_AMOUNT = 20000;
 
 function parseMonthlyRatePercent(label: string): number {
@@ -78,7 +79,7 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
   const requestedAmount = value.requestedAmount ?? maxApprovedAmount;
   const wantsWheelCard = value.wantsWheelCard ?? "yes";
   const hasPpi = value.hasPpi ?? "yes";
-  const installmentTerm = value.installmentTerm ?? 60;
+  const installmentTerm = value.installmentTerm ?? DEFAULT_INSTALLMENT_TERM;
 
   const monthlyPayment = calculateMonthlyPayment(
     requestedAmount,
@@ -148,7 +149,9 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
               onChange({
                 ...value,
                 wantsWheelCard: next as "yes" | "no",
-                ...(next === "yes" ? { installmentTerm: 60 } : {}),
+                ...(next === "yes"
+                  ? { installmentTerm: DEFAULT_INSTALLMENT_TERM }
+                  : {}),
               })
             }
             options={[
