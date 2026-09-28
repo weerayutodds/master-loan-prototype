@@ -16,22 +16,30 @@ type ProductCatalogProps = {
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
 
-/** Lowest number in a label like "80% - 130% LTV" or "456,000 - 741,000". */
-function parseMinValue(label: string): number {
+/** Numbers in a label like "80% - 130% LTV" or "100,000-200,000" as [min, max]. */
+function parseRange(label: string): [number, number] {
   const values = (label.match(/\d[\d,]*(\.\d+)?/g) ?? []).map((value) =>
     Number(value.replace(/,/g, "")),
   );
-  return values.length ? Math.min(...values) : 0;
+  return values.length ? [Math.min(...values), Math.max(...values)] : [0, 0];
+}
+
+/**
+ * Matches when the product is at or above the request (e.g. 200,000 for 150,000),
+ * or when the request falls inside the product's range (e.g. 100,000-200,000 for 150,000).
+ */
+function meetsRequest(label: string, requested: number): boolean {
+  if (requested <= 0) return true;
+  const [min, max] = parseRange(label);
+  const isAtOrAbove = min >= requested;
+  const isWithinRange = min <= requested && requested <= max;
+  return isAtOrAbove || isWithinRange;
 }
 
 function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): boolean {
   if (filter.bookStatus && item.bookStatusLabel !== filter.bookStatus) return false;
-  if (filter.requestedAmount > 0 && parseMinValue(item.approvedAmount) < filter.requestedAmount) {
-    return false;
-  }
-  if (filter.requestedLtvPercent > 0 && parseMinValue(item.ltvLabel) < filter.requestedLtvPercent) {
-    return false;
-  }
+  if (!meetsRequest(item.approvedAmount, filter.requestedAmount)) return false;
+  if (!meetsRequest(item.ltvLabel, filter.requestedLtvPercent)) return false;
   return true;
 }
 
