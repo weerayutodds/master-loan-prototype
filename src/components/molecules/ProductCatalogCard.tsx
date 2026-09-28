@@ -54,12 +54,6 @@ export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) 
 
         <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:gap-8">
           <div>
-            <p className="text-muted-foreground">เฉพาะ NCB</p>
-            <p className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}>
-              {item.ncbGradeLabel}
-            </p>
-          </div>
-          <div>
             <p className="text-muted-foreground">เล่มทะเบียน</p>
             <p className="font-medium text-foreground">{item.bookStatusLabel}</p>
           </div>
@@ -67,6 +61,12 @@ export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) 
             <p className="text-muted-foreground">อัตราดอกเบี้ย</p>
             <p className="font-medium text-foreground">{item.interestRateLabel}</p>
             <p className="text-primary-to">{item.interestReductionLabel}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">เฉพาะ NCB</p>
+            <p className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}>
+              {item.ncbGradeLabel}
+            </p>
           </div>
         </div>
 
