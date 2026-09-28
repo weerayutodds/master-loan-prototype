@@ -9,6 +9,7 @@ import {LoanQuestionsPanel} from "@/components/organisms/LoanQuestionsPanel"
 import {ProductCatalog} from "@/components/organisms/ProductCatalog"
 import {ProductGuide} from "@/components/organisms/ProductGuide"
 import {
+  createCustomerLeadOpportunity,
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
   updateOpportunitySelectedProduct,
@@ -39,6 +40,7 @@ import type {
   LoanPurpose,
   RefinanceStatus,
 } from "@/types/ratebook"
+import {useRouter} from "next/navigation"
 import {useState} from "react"
 
 type RatebookFormProps = {
@@ -78,6 +80,7 @@ export function RatebookForm({
   initialOpportunity,
   initialLead = null,
 }: RatebookFormProps) {
+  const router = useRouter()
   const opportunityId = initialOpportunity?.id ?? null
   const leadId = initialOpportunity?.leadId ?? initialLead?.id ?? null
 
@@ -100,8 +103,7 @@ export function RatebookForm({
           }
         : null,
   )
-  // customer_lead.ncb_grade is the single source of truth, so it's preferred
-  // over the opportunity's own snapshot copy, which can go stale.
+
   const [ncbGrade, setNcbGrade] = useState<NcbGrade | null>(
     initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null,
   )
@@ -229,7 +231,7 @@ export function RatebookForm({
 
   usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
 
-  function handleSelectedProductConfirmed(item: ProductCatalogItem) {
+  async function handleSelectedProductConfirmed(item: ProductCatalogItem) {
     setSelectedProduct(item)
     window.scrollTo({top: 0, behavior: "instant"})
     const nextLoanInfo: LoanInfo = {
@@ -237,9 +239,17 @@ export function RatebookForm({
       requestedAmount: loanInfo.requestedAmount ?? getMaxApprovedAmount(item),
     }
     setLoanInfo(nextLoanInfo)
-    if (opportunityId) {
-      void updateOpportunitySelectedProduct(opportunityId, item.id)
-      void updateOpportunityLoanInfo(opportunityId, nextLoanInfo)
+
+    let currentOpportunityId = opportunityId
+    if (!currentOpportunityId) {
+      if (!leadId) return
+      const created = await createCustomerLeadOpportunity(leadId)
+      currentOpportunityId = created.id
+    }
+    void updateOpportunitySelectedProduct(currentOpportunityId, item.id)
+    void updateOpportunityLoanInfo(currentOpportunityId, nextLoanInfo)
+    if (currentOpportunityId !== opportunityId) {
+      router.replace(`/ratebook?opportunityId=${currentOpportunityId}`)
     }
   }
 
