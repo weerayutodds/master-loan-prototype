@@ -43,7 +43,7 @@ export default async function CustomerLeadListPage({
             {focusLead?.idCardNumber ? (
               <Badge tone="success">
                 <span className="inline-flex items-center gap-1">
-                  <Icon name="check" className="size-3.5" />
+                  <Icon name="check-circle-solid" className="size-4" />
                   Dip Chip
                 </span>
               </Badge>
@@ -96,14 +96,18 @@ export default async function CustomerLeadListPage({
         {focusLead ? (
           <Link
             href={`/ratebook?leadId=${focusLead.id}`}
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90"
+            className="inline-flex min-w-20 items-center justify-center rounded-lg bg-[linear-gradient(150.46deg,var(--primary)_10%,var(--primary-to)_78.19%)] px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95"
           >
             จัดสินเชื่อ
           </Link>
         ) : (
-          <Button variant="primary" size="sm" disabled>
+          <button
+            type="button"
+            disabled
+            className="inline-flex min-w-20 cursor-not-allowed items-center justify-center rounded-lg bg-surface-muted px-3 py-2 text-sm font-semibold text-muted-foreground"
+          >
             จัดสินเชื่อ
-          </Button>
+          </button>
         )}
       </div>
 
@@ -117,6 +121,7 @@ export default async function CustomerLeadListPage({
               alt=""
               width={64}
               height={64}
+              priority
             />
             <p className="text-lg font-semibold text-foreground">ไม่มีรายการ</p>
           </Card>

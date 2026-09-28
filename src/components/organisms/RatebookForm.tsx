@@ -316,8 +316,8 @@ export function RatebookForm({
   ].filter((tag): tag is string => Boolean(tag));
 
   return (
-    <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_2fr]">
-      <div className="lg:sticky lg:top-[4.75rem]">
+    <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div className="lg:sticky lg:top-19">
         <CustomerCollateralPanel
           initialOpportunity={initialOpportunity}
           initialLead={initialLead}

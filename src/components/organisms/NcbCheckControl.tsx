@@ -76,7 +76,7 @@ export function NcbCheckControl({
             width={160}
             height={100}
             priority
-            className="h-[100px] w-[160px] object-contain"
+            className="h-25 w-40 object-contain"
           />
         </div>
       </Modal>
