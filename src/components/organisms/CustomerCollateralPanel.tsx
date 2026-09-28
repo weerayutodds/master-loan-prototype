@@ -10,6 +10,7 @@ import {Toast} from "@/components/molecules/Toast"
 import {CollateralDetailModal} from "@/components/organisms/CollateralDetailModal"
 import {CustomerInfoModal} from "@/components/organisms/CustomerInfoModal"
 import {NcbCheckControl} from "@/components/organisms/NcbCheckControl"
+import {PhoneNumberModal} from "@/components/organisms/PhoneNumberModal"
 import {
   createCustomerLeadOpportunity,
   updateOpportunityCarInfo,
@@ -141,6 +142,7 @@ export function CustomerCollateralPanel({
         : null,
     )
   const [collateralModalOpen, setCollateralModalOpen] = useState(false)
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false)
   const [brandModel, setBrandModel] = useState(
     initialOpportunity?.brandModel ?? "",
   )
@@ -234,7 +236,17 @@ export function CustomerCollateralPanel({
             </button>
             <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
               <Icon name="phone" className="size-4" />
-              {customer.phone}
+              {customer.phone ? (
+                <span>{customer.phone}</span>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => setPhoneModalOpen(true)}
+                >
+                  เพิ่มเบอร์มือถือ
+                </Button>
+              )}
               {customer.birthDate ? (
                 <span>{`| ${calculateAge(customer.birthDate)} ปี`}</span>
               ) : null}
@@ -397,6 +409,16 @@ export function CustomerCollateralPanel({
         onSave={(value) => {
           setCollateralIdentifier(value)
           setCollateralModalOpen(false)
+        }}
+      />
+
+      <PhoneNumberModal
+        open={phoneModalOpen}
+        initialValue={customer?.phone}
+        onClose={() => setPhoneModalOpen(false)}
+        onSave={(phone) => {
+          if (customer) onCustomerChange({...customer, phone})
+          setPhoneModalOpen(false)
         }}
       />
     </Card>

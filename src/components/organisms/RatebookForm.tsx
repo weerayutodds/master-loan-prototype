@@ -250,8 +250,19 @@ export function RatebookForm({
   // Shared by the sidebar's and the product cards' "ตรวจ eNCB" buttons.
   async function handleNcbChecked(nextGrade: NcbGrade) {
     setNcbGrade(nextGrade)
-    // The eNCB check reads the ID card, which counts as a Dipchip.
+    // The eNCB check reads the ID card, which counts as a Dipchip. The first
+    // time this happens, the customer's own info is filled in from the card too.
     const cardIdNumber = idCardNumber || mockCardCustomer.idCardNumber
+    if (verificationMethod !== "card") {
+      const [firstName, ...rest] = mockCardCustomer.name.split(" ")
+      setCustomer((current) => ({
+        firstName,
+        lastName: rest.join(" "),
+        phone: current?.phone ?? "",
+        gender: mockCardCustomer.gender,
+        birthDate: mockCardCustomer.birthDate,
+      }))
+    }
     setIdCardNumber(cardIdNumber)
     setVerificationMethod("card")
     // customer_lead.ncb_grade is the single source of truth for the
