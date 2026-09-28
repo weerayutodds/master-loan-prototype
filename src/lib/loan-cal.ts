@@ -1,3 +1,11 @@
+/** Reads the top of a product's "456,000 - 741,000"-style approved-amount range. */
+export function getMaxApprovedAmount(product: { approvedAmount: string }): number {
+  const amounts = (product.approvedAmount.match(/[\d,]+/g) ?? []).map((match) =>
+    Number(match.replace(/,/g, "")),
+  );
+  return amounts[amounts.length - 1] ?? 0;
+}
+
 export function calculateLtvPercent(amount: number, appraisalPrice: number): number {
   if (appraisalPrice <= 0) return 0;
   return Math.round((amount / appraisalPrice) * 100);

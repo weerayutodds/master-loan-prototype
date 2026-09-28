@@ -1,8 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getCustomerLeadById } from "@/lib/customer-lead";
 import sql from "@/lib/db";
+import {
+  MOCK_OPPORTUNITY_BRANCH_NAME,
+  MOCK_OPPORTUNITY_STAFF_CODE,
+  MOCK_OPPORTUNITY_STAFF_NAME,
+} from "@/lib/mock";
+import type { NcbGrade } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type { CarInfo, CarInsuranceInfo, CollateralIdentifier, CollateralType, CustomerInfo, LoanInfo, LoanPurpose, RefinanceStatus } from "@/types/ratebook";
 
@@ -19,6 +26,11 @@ function mapRow(row: any): CustomerLeadOpportunity {
     verificationMethod: row.verification_method,
     gender: row.gender,
     birthDate: row.birth_date ? row.birth_date.toISOString().slice(0, 10) : null,
+    status: row.status,
+    branchName: row.branch_name,
+    referenceCode: row.reference_code,
+    staffName: row.staff_name,
+    staffCode: row.staff_code,
     loanPurpose: row.loan_purpose,
     collateralType: row.collateral_type,
     refinanceStatus: row.refinance_status,
@@ -61,18 +73,23 @@ export async function createCustomerLeadOpportunity(
     throw new Error(`customer_lead not found: ${leadId}`);
   }
 
+  const referenceCode = `CF${Math.floor(100000 + Math.random() * 900000)}`;
+
   const [row] = await sql`
     insert into customer_lead_opportunity (
       lead_id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method,
-      gender, birth_date
+      gender, birth_date, branch_name, reference_code, staff_name, staff_code
     )
     values (
       ${lead.id}, ${lead.firstName}, ${lead.lastName}, ${lead.phone},
       ${lead.idCardNumber}, ${lead.ncbGrade}, ${lead.verificationMethod},
-      ${lead.gender}, ${lead.birthDate}
+      ${lead.gender}, ${lead.birthDate}, ${MOCK_OPPORTUNITY_BRANCH_NAME}, ${referenceCode},
+      ${MOCK_OPPORTUNITY_STAFF_NAME}, ${MOCK_OPPORTUNITY_STAFF_CODE}
     )
     returning *
   `;
+
+  revalidatePath("/customer-lead-list");
 
   return mapRow(row);
 }
@@ -103,6 +120,8 @@ export async function updateOpportunityLoanQuestions(
     returning *
   `;
 
+  revalidatePath("/customer-lead-list");
+
   return mapRow(row);
 }
 
@@ -123,6 +142,26 @@ export async function updateOpportunityCustomerInfo(
     returning *
   `;
 
+  revalidatePath("/customer-lead-list");
+
+  return mapRow(row);
+}
+
+export async function updateOpportunityNcbGrade(
+  opportunityId: string,
+  ncbGrade: NcbGrade,
+): Promise<CustomerLeadOpportunity> {
+  const [row] = await sql`
+    update customer_lead_opportunity
+    set
+      ncb_grade = ${ncbGrade},
+      updated_at = now()
+    where id = ${opportunityId}
+    returning *
+  `;
+
+  revalidatePath("/customer-lead-list");
+
   return mapRow(row);
 }
 
@@ -138,6 +177,8 @@ export async function updateOpportunitySelectedProduct(
     where id = ${opportunityId}
     returning *
   `;
+
+  revalidatePath("/customer-lead-list");
 
   return mapRow(row);
 }
@@ -157,6 +198,8 @@ export async function updateOpportunityLoanInfo(
     where id = ${opportunityId}
     returning *
   `;
+
+  revalidatePath("/customer-lead-list");
 
   return mapRow(row);
 }
@@ -179,6 +222,8 @@ export async function updateOpportunityCarInsurance(
     returning *
   `;
 
+  revalidatePath("/customer-lead-list");
+
   return mapRow(row);
 }
 
@@ -199,6 +244,8 @@ export async function updateOpportunityCollateralDetail(
     where id = ${opportunityId}
     returning *
   `;
+
+  revalidatePath("/customer-lead-list");
 
   return mapRow(row);
 }
@@ -224,6 +271,8 @@ export async function updateOpportunityCarInfo(
     where id = ${opportunityId}
     returning *
   `;
+
+  revalidatePath("/customer-lead-list");
 
   return mapRow(row);
 }

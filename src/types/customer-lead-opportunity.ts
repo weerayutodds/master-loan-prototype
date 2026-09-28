@@ -13,6 +13,11 @@ export type CustomerLeadOpportunity = {
   verificationMethod: VerificationMethod;
   gender: Gender | null;
   birthDate: string | null;
+  status: string;
+  branchName: string | null;
+  referenceCode: string | null;
+  staffName: string | null;
+  staffCode: string | null;
   loanPurpose: LoanPurpose | null;
   collateralType: CollateralType | null;
   refinanceStatus: RefinanceStatus | null;

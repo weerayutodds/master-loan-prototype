@@ -28,6 +28,12 @@ export function calculateAge(birthDate: string): number {
   return age;
 }
 
+export function formatDateTime(isoString: string): string {
+  const date = new Date(isoString);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export function formatThaiPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 10) {

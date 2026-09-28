@@ -1,102 +1,102 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
-import { Input } from "@/components/atoms/Input";
-import { Select } from "@/components/atoms/Select";
-import { Card } from "@/components/molecules/Card";
-import { FormField } from "@/components/molecules/FormField";
-import { SegmentedControl } from "@/components/molecules/SegmentedControl";
-import { createCustomerLead } from "@/lib/actions/customer-lead";
-import { formatPhoneInput } from "@/lib/format";
-import { mockCardCustomer } from "@/lib/mock";
-import { isValidThaiPhone } from "@/lib/validation";
+import {Button} from "@/components/atoms/Button"
+import {Icon} from "@/components/atoms/Icon"
+import {Input} from "@/components/atoms/Input"
+import {Select} from "@/components/atoms/Select"
+import {Card} from "@/components/molecules/Card"
+import {FormField} from "@/components/molecules/FormField"
+import {SegmentedControl} from "@/components/molecules/SegmentedControl"
+import {createCustomerLead} from "@/lib/actions/customer-lead"
+import {formatPhoneInput} from "@/lib/format"
+import {mockCardCustomer} from "@/lib/mock"
+import {isValidThaiPhone} from "@/lib/validation"
 import type {
   CardCustomerData,
   CardReadStatus,
   CustomerType,
   VerificationMethod,
-} from "@/types/customer-form";
+} from "@/types/customer-form"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useRouter} from "next/navigation"
+import {useEffect, useRef, useState} from "react"
+import {useForm, type Resolver} from "react-hook-form"
+import {z} from "zod"
 
-const CARD_READ_DELAY_MS = 1500;
+const CARD_READ_DELAY_MS = 1500
 
 const phoneSchema = z
   .string()
   .min(1, "กรุณากรอกเบอร์มือถือ")
-  .refine((value) => isValidThaiPhone(value), "รูปแบบเบอร์มือถือไม่ถูกต้อง");
+  .refine((value) => isValidThaiPhone(value), "รูปแบบเบอร์มือถือไม่ถูกต้อง")
 
-const cardSchema = z.object({ cardPhone: phoneSchema });
+const cardSchema = z.object({cardPhone: phoneSchema})
 const manualSchema = z.object({
   firstName: z.string().min(1, "กรุณากรอกชื่อ"),
   lastName: z.string().min(1, "กรุณากรอกนามสกุล"),
   phone: phoneSchema,
-});
+})
 
 type CustomerVerificationPanelProps = {
-  customerTypeOptions: { value: CustomerType; label: string }[];
-  verificationMethodOptions: { value: VerificationMethod; label: string }[];
-};
+  customerTypeOptions: {value: CustomerType; label: string}[]
+  verificationMethodOptions: {value: VerificationMethod; label: string}[]
+}
 
 type CustomerFormValues = {
-  customerType: CustomerType;
-  cardPhone: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-};
+  customerType: CustomerType
+  cardPhone: string
+  firstName: string
+  lastName: string
+  phone: string
+}
 
 export function CustomerVerificationPanel({
   customerTypeOptions,
   verificationMethodOptions,
 }: CustomerVerificationPanelProps) {
-  const router = useRouter();
+  const router = useRouter()
   const [verificationMethod, setVerificationMethod] =
-    useState<VerificationMethod>("card");
-  const [cardStatus, setCardStatus] = useState<CardReadStatus>("idle");
+    useState<VerificationMethod>("card")
+  const [cardStatus, setCardStatus] = useState<CardReadStatus>("idle")
   const [cardCustomer, setCardCustomer] = useState<CardCustomerData | null>(
     null,
-  );
+  )
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: {errors, isSubmitting},
   } = useForm<CustomerFormValues>({
     mode: "onChange",
     shouldUnregister: true,
-    defaultValues: { customerType: "individual" },
+    defaultValues: {customerType: "individual"},
     resolver: zodResolver(
       verificationMethod === "card" ? cardSchema : manualSchema,
     ) as unknown as Resolver<CustomerFormValues>,
-  });
+  })
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   function handleCardTap() {
-    if (cardStatus === "loading") return;
-    setCardStatus("loading");
+    if (cardStatus === "loading") return
+    setCardStatus("loading")
     timeoutRef.current = setTimeout(() => {
-      setCardCustomer(mockCardCustomer);
-      setCardStatus("success");
-    }, CARD_READ_DELAY_MS);
+      setCardCustomer(mockCardCustomer)
+      setCardStatus("success")
+    }, CARD_READ_DELAY_MS)
   }
 
   async function onSubmit(data: CustomerFormValues) {
     const normalized =
       verificationMethod === "card"
         ? (() => {
-            const [firstName, ...rest] = (cardCustomer?.name ?? "").split(" ");
+            const [firstName, ...rest] = (cardCustomer?.name ?? "").split(" ")
             return {
               firstName,
               lastName: rest.join(" "),
@@ -104,7 +104,7 @@ export function CustomerVerificationPanel({
               idCardNumber: cardCustomer?.idCardNumber ?? "",
               gender: cardCustomer?.gender ?? null,
               birthDate: cardCustomer?.birthDate ?? null,
-            };
+            }
           })()
         : {
             firstName: data.firstName,
@@ -113,18 +113,18 @@ export function CustomerVerificationPanel({
             idCardNumber: "",
             gender: null,
             birthDate: null,
-          };
+          }
 
     const lead = await createCustomerLead({
       ...normalized,
       verificationMethod,
-    });
-    router.push(`/customer-lead-list?leadId=${lead.id}`);
+    })
+    router.push(`/customer-lead-list?leadId=${lead.id}`)
   }
 
-  const hasErrors = Object.keys(errors).length > 0;
+  const hasErrors = Object.keys(errors).length > 0
   const continueDisabled =
-    hasErrors || (verificationMethod === "card" && cardStatus !== "success");
+    hasErrors || (verificationMethod === "card" && cardStatus !== "success")
 
   return (
     <Card className="mx-auto max-w-md">
@@ -174,11 +174,11 @@ export function CustomerVerificationPanel({
                   type="tel"
                   inputMode="numeric"
                   maxLength={12}
-                  placeholder="081-123-5678"
+                  placeholder="กรอกเบอร์มือถือ"
                   invalid={!!errors.cardPhone}
                   {...register("cardPhone", {
                     onChange: (e) => {
-                      e.target.value = formatPhoneInput(e.target.value);
+                      e.target.value = formatPhoneInput(e.target.value)
                     },
                   })}
                 />
@@ -238,7 +238,7 @@ export function CustomerVerificationPanel({
                 invalid={!!errors.phone}
                 {...register("phone", {
                   onChange: (e) => {
-                    e.target.value = formatPhoneInput(e.target.value);
+                    e.target.value = formatPhoneInput(e.target.value)
                   },
                 })}
               />
@@ -256,5 +256,5 @@ export function CustomerVerificationPanel({
         </Button>
       </form>
     </Card>
-  );
+  )
 }

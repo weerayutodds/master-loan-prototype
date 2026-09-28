@@ -14,7 +14,10 @@ export function TopHeader({ title }: TopHeaderProps) {
     <div className="sticky top-0 z-10 flex h-11 items-center justify-between border-b border-secondary-border bg-surface/70 px-6 backdrop-blur-md">
       <button
         type="button"
-        onClick={() => router.back()}
+        onClick={() => {
+         router.back();
+          router.refresh();
+        }}
         className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
       >
         <Icon name="arrow-left" className="size-5" />

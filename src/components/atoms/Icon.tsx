@@ -10,6 +10,7 @@ export type IconName =
   | "arrow-up"
   | "arrow-down"
   | "arrow-left"
+  | "arrow-right"
   | "motorcycle"
   | "car"
   | "truck"
@@ -112,6 +113,13 @@ const paths: Record<IconName, React.ReactNode> = {
   "arrow-left": (
     <path
       d="M19 12H5m0 0 6-6m-6 6 6 6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+  "arrow-right": (
+    <path
+      d="M5 12h14m0 0-6-6m6 6-6 6"
       strokeLinecap="round"
       strokeLinejoin="round"
     />

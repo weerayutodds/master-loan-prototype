@@ -9,9 +9,11 @@ import { LoanQuestionsPanel } from "@/components/organisms/LoanQuestionsPanel";
 import { ProductCatalog } from "@/components/organisms/ProductCatalog";
 import { ProductGuide } from "@/components/organisms/ProductGuide";
 import {
+  updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
   updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity";
+import { getMaxApprovedAmount } from "@/lib/loan-cal";
 import {
   collateralTypeOptions,
   existingFinanceOptions,
@@ -21,6 +23,7 @@ import {
   loanPurposeOptions,
   refinanceStatusOptions,
 } from "@/lib/mock";
+import type { CustomerLead } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
@@ -39,10 +42,15 @@ import { useState } from "react";
 
 type RatebookFormProps = {
   initialOpportunity: CustomerLeadOpportunity | null;
+  initialLead?: CustomerLead | null;
 };
 
-export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
+export function RatebookForm({
+  initialOpportunity,
+  initialLead = null,
+}: RatebookFormProps) {
   const opportunityId = initialOpportunity?.id ?? null;
+  const leadId = initialOpportunity?.leadId ?? initialLead?.id ?? null;
 
   const [customer, setCustomer] = useState<CustomerInfo | null>(
     initialOpportunity
@@ -53,7 +61,15 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
           gender: initialOpportunity.gender ?? undefined,
           birthDate: initialOpportunity.birthDate ?? undefined,
         }
-      : null,
+      : initialLead
+        ? {
+            firstName: initialLead.firstName,
+            lastName: initialLead.lastName,
+            phone: initialLead.phone,
+            gender: initialLead.gender ?? undefined,
+            birthDate: initialLead.birthDate ?? undefined,
+          }
+        : null,
   );
   const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(
     initialOpportunity?.loanPurpose ?? null,
@@ -175,8 +191,14 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
   function handleSelectedProductConfirmed(item: ProductCatalogItem) {
     setSelectedProduct(item);
     window.scrollTo({ top: 0, behavior: "instant" });
+    const nextLoanInfo: LoanInfo = {
+      ...loanInfo,
+      requestedAmount: loanInfo.requestedAmount ?? getMaxApprovedAmount(item),
+    };
+    setLoanInfo(nextLoanInfo);
     if (opportunityId) {
       void updateOpportunitySelectedProduct(opportunityId, item.id);
+      void updateOpportunityLoanInfo(opportunityId, nextLoanInfo);
     }
   }
 
@@ -249,10 +271,16 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
     <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_2fr]">
       <CustomerCollateralPanel
         initialOpportunity={initialOpportunity}
+        initialLead={initialLead}
         opportunityId={opportunityId}
+        leadId={leadId}
         tags={tags}
         carInfo={carInfo}
         collateralType={collateralType}
+        loanPurpose={loanPurpose}
+        refinanceStatus={refinanceStatus}
+        existingFinance={existingFinance}
+        selectedProductId={selectedProduct?.id ?? null}
         hasSelectedProduct={selectedProduct !== null}
         loanInfo={loanInfo}
         carInsuranceInfo={carInsuranceInfo}

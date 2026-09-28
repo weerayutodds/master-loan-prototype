@@ -69,6 +69,11 @@ export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatal
               {chip}
             </span>
           ))}
+          {filter && filter.requestedLtvPercent > 0 ? (
+            <span className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground">
+              {filter.requestedLtvPercent} %LTV
+            </span>
+          ) : null}
           <span className="flex items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground">
             {data.gradeFilterLabel}
             <Icon name="arrow-down" className="size-3.5 text-muted-foreground" />

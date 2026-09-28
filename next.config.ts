@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    // Without this, pages built from DB data (e.g. /customer-lead-list) can
+    // show a stale client-side snapshot after using the browser back button
+    // from a page that just saved new data (e.g. /ratebook).
+    staleTimes: {
+      dynamic: 0,
+    },
+  },
 };
 
 export default nextConfig;

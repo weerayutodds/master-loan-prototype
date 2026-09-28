@@ -3,18 +3,17 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Card } from "@/components/molecules/Card";
 import { Select } from "@/components/atoms/Select";
-import { PPI_ANNUAL_PREMIUM, calculateMonthlyPayment } from "@/lib/loan-cal";
+import {
+  PPI_ANNUAL_PREMIUM,
+  calculateMonthlyPayment,
+  getMaxApprovedAmount,
+} from "@/lib/loan-cal";
 import type { ProductCatalogItem } from "@/types/product-catalog";
 import type { LoanInfo } from "@/types/ratebook";
 import { useMemo } from "react";
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84];
 const MIN_REQUESTED_AMOUNT = 20000;
-
-function parseAmounts(value: string): number[] {
-  const matches = value.match(/[\d,]+/g) ?? [];
-  return matches.map((match) => Number(match.replace(/,/g, "")));
-}
 
 function parseMonthlyRatePercent(label: string): number {
   const match = label.match(/(\d+(\.\d+)?)/);
@@ -70,8 +69,7 @@ type LeadLoanInfoCardProps = {
 };
 
 export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardProps) {
-  const approvedAmounts = useMemo(() => parseAmounts(product.approvedAmount), [product]);
-  const maxApprovedAmount = approvedAmounts[approvedAmounts.length - 1] ?? 0;
+  const maxApprovedAmount = useMemo(() => getMaxApprovedAmount(product), [product]);
   const monthlyRatePercent = useMemo(
     () => parseMonthlyRatePercent(product.interestRateLabel),
     [product],

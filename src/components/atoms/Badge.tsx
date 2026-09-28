@@ -1,6 +1,6 @@
 type BadgeProps = {
   children: React.ReactNode;
-  tone?: "danger" | "neutral" | "primary" | "success" | "info";
+  tone?: "danger" | "neutral" | "primary" | "success" | "info" | "warning";
   className?: string;
 };
 
@@ -10,6 +10,7 @@ const toneClasses: Record<NonNullable<BadgeProps["tone"]>, string> = {
   primary: "bg-primary/10 text-primary",
   success: "bg-success text-primary-foreground",
   info: "bg-pale-blue text-primary-to",
+  warning: "border border-badge-warning-border bg-badge-warning-bg text-badge-warning-fg",
 };
 
 export function Badge({ children, tone = "neutral", className = "" }: BadgeProps) {

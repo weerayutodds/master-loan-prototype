@@ -9,12 +9,18 @@ import { LeadProgressTooltip } from "@/components/molecules/LeadProgressTooltip"
 import { Toast } from "@/components/molecules/Toast";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import { NcbCheckControl } from "@/components/organisms/NcbCheckControl";
+import { updateCustomerLeadNcbGrade } from "@/lib/actions/customer-lead";
 import {
+  createCustomerLeadOpportunity,
   updateOpportunityCarInfo,
   updateOpportunityCarInsurance,
   updateOpportunityCollateralDetail,
   updateOpportunityCustomerInfo,
   updateOpportunityLoanInfo,
+  updateOpportunityLoanQuestions,
+  updateOpportunityNcbGrade,
+  updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity";
 import { calculateAge, maskIdCardNumber } from "@/lib/format";
 import {
@@ -22,6 +28,7 @@ import {
   getVehicleModelLabel,
   provinceOptions,
 } from "@/lib/mock";
+import type { CustomerLead } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
@@ -30,6 +37,8 @@ import type {
   CollateralType,
   CustomerInfo,
   LoanInfo,
+  LoanPurpose,
+  RefinanceStatus,
 } from "@/types/ratebook";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,10 +47,16 @@ const TOTAL_SECTIONS = 4;
 
 type CustomerCollateralPanelProps = {
   initialOpportunity?: CustomerLeadOpportunity | null;
+  initialLead?: CustomerLead | null;
   opportunityId: string | null;
+  leadId: string | null;
   tags: string[];
   carInfo: CarInfo;
   collateralType: CollateralType | null;
+  loanPurpose: LoanPurpose | null;
+  refinanceStatus: RefinanceStatus | null;
+  existingFinance: string | null;
+  selectedProductId: string | null;
   hasSelectedProduct?: boolean;
   loanInfo?: LoanInfo;
   carInsuranceInfo?: CarInsuranceInfo;
@@ -88,10 +103,16 @@ function formatBrandModelYear(
 
 export function CustomerCollateralPanel({
   initialOpportunity = null,
+  initialLead = null,
   opportunityId,
+  leadId,
   tags,
   carInfo,
   collateralType,
+  loanPurpose,
+  refinanceStatus,
+  existingFinance,
+  selectedProductId,
   hasSelectedProduct = false,
   loanInfo,
   carInsuranceInfo,
@@ -121,25 +142,69 @@ export function CustomerCollateralPanel({
   const [editingBrandModel, setEditingBrandModel] = useState(false);
   const [savedToastOpen, setSavedToastOpen] = useState(false);
 
-  const idCardNumber = initialOpportunity?.idCardNumber ?? "";
+  const idCardNumber =
+    initialOpportunity?.idCardNumber ?? initialLead?.idCardNumber ?? "";
+  const verificationMethod =
+    initialOpportunity?.verificationMethod ??
+    initialLead?.verificationMethod ??
+    null;
+  // customer_lead.ncb_grade is the single source of truth, so it's preferred
+  // over the opportunity's own snapshot copy, which can go stale.
+  const ncbGrade =
+    initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null;
 
   async function handleSaveLead() {
-    if (!opportunityId) return;
+    if (!customer) return;
     try {
+      // First save with no opportunity yet creates one from the lead snapshot;
+      // every save after that just updates the existing row.
+      let currentOpportunityId = opportunityId;
+      if (!currentOpportunityId) {
+        if (!leadId) return;
+        const created = await createCustomerLeadOpportunity(leadId);
+        currentOpportunityId = created.id;
+      }
+
+      // A รีไฟแนนซ์ can't be marked complete until ไฟแนนซ์เดิม is known too.
+      const financeAnswered =
+        refinanceStatus === "still-paying" ? Boolean(existingFinance) : true;
+      const loanQuestionsAnswered =
+        loanPurpose && collateralType && refinanceStatus && financeAnswered;
+
       await Promise.all([
-        customer
-          ? updateOpportunityCustomerInfo(opportunityId, customer)
-          : null,
-        updateOpportunityCollateralDetail(opportunityId, {
+        updateOpportunityCustomerInfo(currentOpportunityId, customer),
+        updateOpportunityCollateralDetail(currentOpportunityId, {
           collateralIdentifier,
           brandModel,
         }),
-        updateOpportunityCarInfo(opportunityId, carInfo),
-        loanInfo ? updateOpportunityLoanInfo(opportunityId, loanInfo) : null,
+        updateOpportunityCarInfo(currentOpportunityId, carInfo),
+        loanInfo
+          ? updateOpportunityLoanInfo(currentOpportunityId, loanInfo)
+          : null,
         carInsuranceInfo
-          ? updateOpportunityCarInsurance(opportunityId, carInsuranceInfo)
+          ? updateOpportunityCarInsurance(currentOpportunityId, carInsuranceInfo)
+          : null,
+        // These normally persist the moment they're answered/selected (see
+        // RatebookForm), but that's a no-op while there's no opportunity yet
+        // (fresh leadId-only flow) — so they're re-flushed here too, since
+        // this is the point an opportunity is guaranteed to exist.
+        loanQuestionsAnswered
+          ? updateOpportunityLoanQuestions(currentOpportunityId, {
+              loanPurpose,
+              collateralType,
+              refinanceStatus,
+              existingFinanceCompany:
+                refinanceStatus === "still-paying" ? existingFinance : null,
+            })
+          : null,
+        selectedProductId
+          ? updateOpportunitySelectedProduct(currentOpportunityId, selectedProductId)
           : null,
       ]);
+
+      if (currentOpportunityId !== opportunityId) {
+        router.replace(`/ratebook?opportunityId=${currentOpportunityId}`);
+      }
       setSavedToastOpen(true);
     } catch (error) {
       console.error("Failed to save lead", error);
@@ -213,7 +278,7 @@ export function CustomerCollateralPanel({
               {maskIdCardNumber(idCardNumber)}
             </Badge>
           ) : null}
-          {initialOpportunity?.verificationMethod !== "card" ? (
+          {verificationMethod !== "card" ? (
             <Button
               variant="outline"
               size="xs"
@@ -227,19 +292,20 @@ export function CustomerCollateralPanel({
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">NCB เกรด</span>
-        {initialOpportunity?.ncbGrade ? (
-          <Badge tone="success" className="px-3 py-1 text-sm font-semibold">
-            เกรด {initialOpportunity.ncbGrade}
-          </Badge>
-        ) : (
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => router.push("/customer-form")}
-          >
-            ตรวจ eNCB
-          </Button>
-        )}
+        <NcbCheckControl
+          ncbGrade={ncbGrade}
+          onChecked={async (nextGrade) => {
+            // customer_lead.ncb_grade is the single source of truth for the
+            // customer, so it's written there regardless of opportunity state;
+            // the opportunity's own copy is also kept in sync when one exists.
+            if (leadId) {
+              await updateCustomerLeadNcbGrade(leadId, nextGrade);
+            }
+            if (opportunityId) {
+              await updateOpportunityNcbGrade(opportunityId, nextGrade);
+            }
+          }}
+        />
       </div>
 
       <div className="border-t border-dashed border-secondary-border" />

@@ -40,6 +40,17 @@ create table customer_lead_opportunity (
   -- approved finance list lives in mock data and changes over time.
   existing_finance_company text,
 
+  -- follow-up stage shown on the lead-list card. Only one value exists today
+  -- ("ติดตาม"); the domain isn't fully known yet so it's left unconstrained.
+  status text not null default 'ติดตาม',
+  -- branch/staff assignment shown on the lead-list card. No branch/staff
+  -- entity or auth context exists yet, so these are populated with mock
+  -- values at creation time rather than modeled as real relations.
+  branch_name text,
+  reference_code text,
+  staff_name text,
+  staff_code text,
+
   license_plate_number text,
   license_plate_province text,
   chassis_number text,

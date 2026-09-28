@@ -2,7 +2,7 @@
 
 import sql from "@/lib/db";
 import type { VerificationMethod } from "@/types/customer-form";
-import type { CustomerLead, Gender } from "@/types/customer-lead";
+import type { CustomerLead, Gender, NcbGrade } from "@/types/customer-lead";
 
 type CreateCustomerLeadInput = {
   firstName: string;
@@ -33,6 +33,31 @@ export async function createCustomerLead(
       verification_method = excluded.verification_method,
       gender = excluded.gender,
       birth_date = excluded.birth_date
+    returning id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method, gender, birth_date, created_at
+  `;
+
+  return {
+    id: row.id,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    phone: row.phone,
+    idCardNumber: row.id_card_number,
+    ncbGrade: row.ncb_grade,
+    verificationMethod: row.verification_method,
+    gender: row.gender,
+    birthDate: row.birth_date ? row.birth_date.toISOString().slice(0, 10) : null,
+    createdAt: row.created_at.toISOString(),
+  };
+}
+
+export async function updateCustomerLeadNcbGrade(
+  leadId: string,
+  ncbGrade: NcbGrade,
+): Promise<CustomerLead> {
+  const [row] = await sql`
+    update customer_lead
+    set ncb_grade = ${ncbGrade}
+    where id = ${leadId}
     returning id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method, gender, birth_date, created_at
   `;
 

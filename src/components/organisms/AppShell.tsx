@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Sidebar } from "@/components/organisms/Sidebar";
 import { TopHeader } from "@/components/organisms/TopHeader";
@@ -29,9 +29,20 @@ export function usePageTitleOverride(title: string | null) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [titleOverride, setTitleOverride] = useState<string | null>(null);
   const basePageTitle = PAGE_TITLES[pathname];
   const pageTitle = basePageTitle ? titleOverride ?? basePageTitle : undefined;
+
+  useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) {
+        router.refresh();
+      }
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, [router]);
 
   return (
     <div className="flex flex-1">

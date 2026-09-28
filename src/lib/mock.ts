@@ -80,6 +80,12 @@ export const followUpTasks: FollowUpTask[] = [
   },
 ]
 
+// No branch/staff entity or auth context exists yet, so every opportunity is
+// stamped with the same mock assignment until that's built for real.
+export const MOCK_OPPORTUNITY_BRANCH_NAME = "สาขาสะพานควาย 1234";
+export const MOCK_OPPORTUNITY_STAFF_NAME = "น.ส. สุกันยา สุริยันต์";
+export const MOCK_OPPORTUNITY_STAFF_CODE = "L1610000047/799645";
+
 export const loanPurposeOptions: OptionCardData<LoanPurpose>[] = [
   {value: "need-money", label: "ต้องการเงิน", description: "จำนำทะเบียน"},
   {value: "buy-car", label: "อยากซื้อรถ", description: "ซื้อ-ขาย ดีลเลอร์"},

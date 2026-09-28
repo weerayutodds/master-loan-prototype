@@ -352,6 +352,9 @@ export function LoanCalBar({
                     setRequestedLtvPercent(
                       calculateLtvPercent(amount, appraisalPrice),
                     )
+                    if (isRefinance) {
+                      setPayoffAmount(Math.max(0, amount - cashBackAmount))
+                    }
                   }}
                   onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"
