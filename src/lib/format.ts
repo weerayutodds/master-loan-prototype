@@ -34,6 +34,11 @@ export function formatDateTime(isoString: string): string {
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+export function formatRatePercent(value: number): string {
+  const rounded = Math.round(value * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2);
+}
+
 export function formatThaiPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 10) {

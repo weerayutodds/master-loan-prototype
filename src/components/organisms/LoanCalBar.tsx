@@ -5,7 +5,7 @@ import {Select} from "@/components/atoms/Select"
 import {LoanCalDetailPopover} from "@/components/molecules/LoanCalDetailPopover"
 import {GenderAgePopover} from "@/components/organisms/GenderAgePopover"
 import {updateOpportunityCustomerInfo} from "@/lib/actions/customer-lead-opportunity"
-import {calculateAge} from "@/lib/format"
+import {calculateAge, formatRatePercent} from "@/lib/format"
 import {
   calculateAmountFromLtv,
   calculateFlatRateEquivalent,
@@ -42,6 +42,23 @@ const MOTORCYCLE_DEFAULT_INSTALLMENT_TERM = 30
 const TRANSFER_BOOK_STATUS = "โอนเล่ม"
 const MAX_REDUCING_RATE_PERCENT = 24
 const MAX_FLAT_RATE_PERCENT = 2
+const DEFAULT_REDUCING_RATE_PERCENT = "24"
+const DEFAULT_FLAT_RATE_PERCENT = "1.13"
+
+function sanitizeRateInput(raw: string, max: number): string | null {
+  const value = raw.replace(/[^\d.]/g, "")
+  if (!/^\d*\.?\d{0,2}$/.test(value)) return null
+  if (Number(value) > max) return null
+  return value
+}
+
+function parseRate(value: string): number {
+  return Number.parseFloat(value) || 0
+}
+
+function formatRate(value: string): string {
+  return value === "" ? "" : formatRatePercent(parseRate(value))
+}
 
 function FieldLabel({children}: {children: React.ReactNode}) {
   return (
@@ -133,8 +150,10 @@ export function LoanCalBar({
     isMotorcycle ? MOTORCYCLE_DEFAULT_INSTALLMENT_TERM : DEFAULT_INSTALLMENT_TERM,
   )
   const [hasPpi, setHasPpi] = useState(false)
-  const [interestRatePercent, setInterestRatePercent] = useState(24)
-  const [flatRateInput, setFlatRateInput] = useState("1")
+  const [reducingRateInput, setReducingRateInput] = useState(
+    DEFAULT_REDUCING_RATE_PERCENT,
+  )
+  const [flatRateInput, setFlatRateInput] = useState(DEFAULT_FLAT_RATE_PERCENT)
   const [calculated, setCalculated] = useState<CalculatedInputs | null>(null)
   const [showDetail, setShowDetail] = useState(false)
   const [genderAgeOpen, setGenderAgeOpen] = useState(false)
@@ -173,11 +192,19 @@ export function LoanCalBar({
     commitFilter({bookStatus: value})
   }
 
-  function handleFlatRateChange(raw: string) {
-    const value = raw.replace(/[^\d.]/g, "")
-    if (!/^\d*\.?\d{0,2}$/.test(value)) return
-    if (Number(value) > MAX_FLAT_RATE_PERCENT) return
-    setFlatRateInput(value)
+  function handleRateChange(raw: string) {
+    const value = sanitizeRateInput(
+      raw,
+      isTransferBook ? MAX_FLAT_RATE_PERCENT : MAX_REDUCING_RATE_PERCENT,
+    )
+    if (value === null) return
+    if (isTransferBook) setFlatRateInput(value)
+    else setReducingRateInput(value)
+  }
+
+  function handleRateBlur() {
+    if (isTransferBook) setFlatRateInput(formatRate)
+    else setReducingRateInput(formatRate)
   }
 
   function handleToggleTLC(nextChecked: boolean) {
@@ -246,9 +273,9 @@ export function LoanCalBar({
   function handleCalculate() {
     setCalculated({
       requestedAmount,
-      interestRatePercent: isTransferBook
-        ? Number(flatRateInput) || 0
-        : interestRatePercent,
+      interestRatePercent: parseRate(
+        isTransferBook ? flatRateInput : reducingRateInput,
+      ),
       rateType: isTransferBook ? "flat" : "reducing",
       installmentTerm,
       isTLC: isTransferBook ? false : isTLC,
@@ -462,31 +489,15 @@ export function LoanCalBar({
                 : "อัตราดอกเบี้ยลดต้นลดดอก"}
             </FieldLabel>
             <div className="flex h-9 items-center gap-1 rounded-md border border-secondary-border bg-surface px-2">
-              {isTransferBook ? (
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={flatRateInput}
-                  placeholder="0"
-                  onChange={(e) => handleFlatRateChange(e.target.value)}
-                  className="w-full text-sm text-foreground outline-none"
-                />
-              ) : (
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={interestRatePercent}
-                  onChange={(e) =>
-                    setInterestRatePercent(
-                      Math.min(
-                        MAX_REDUCING_RATE_PERCENT,
-                        Number(e.target.value.replace(/\D/g, "")) || 0,
-                      ),
-                    )
-                  }
-                  className="w-full text-sm text-foreground outline-none"
-                />
-              )}
+              <input
+                type="text"
+                inputMode="decimal"
+                value={isTransferBook ? flatRateInput : reducingRateInput}
+                placeholder="0.00"
+                onChange={(e) => handleRateChange(e.target.value)}
+                onBlur={handleRateBlur}
+                className="w-full text-sm text-foreground outline-none"
+              />
               <span className="text-xs  text-muted-foreground shrink-0">
                 {isTransferBook ? "% ต่อเดือน" : "% ต่อปี"}
               </span>

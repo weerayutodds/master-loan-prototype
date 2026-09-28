@@ -1,6 +1,7 @@
 "use client"
 
 import {Icon} from "@/components/atoms/Icon"
+import {formatRatePercent} from "@/lib/format"
 import {
   PPI_ANNUAL_PREMIUM,
   calculateLoanCalSummary,
@@ -75,17 +76,17 @@ export function LoanCalDetailPopover({
       {rateType === "flat" ? (
         <DetailRow
           label="อัตราดอกเบี้ยคงที่"
-          value={`${flatRatePercent} % ต่อเดือน`}
+          value={`${formatRatePercent(flatRatePercent)} % ต่อเดือน`}
         />
       ) : (
         <>
           <DetailRow
             label={`${rateLabelPrefix}ลดต้นลดดอก`}
-            value={`${interestRatePercent} % ต่อปี`}
+            value={`${formatRatePercent(interestRatePercent)} % ต่อปี`}
           />
           <DetailRow
             label={`${rateLabelPrefix}คงที่เทียบเคียง`}
-            value={`${flatRatePercent} % ต่อเดือน`}
+            value={`${formatRatePercent(flatRatePercent)} % ต่อเดือน`}
           />
         </>
       )}
