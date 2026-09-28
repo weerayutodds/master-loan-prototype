@@ -19,7 +19,11 @@ import type {
   ProductCatalogData,
   ProductCatalogFilter,
 } from "@/types/product-catalog"
-import type {CustomerInfo, RefinanceStatus} from "@/types/ratebook"
+import type {
+  CollateralType,
+  CustomerInfo,
+  RefinanceStatus,
+} from "@/types/ratebook"
 import {useEffect, useMemo, useRef, useState} from "react"
 
 type CalculatedInputs = {
@@ -32,6 +36,9 @@ type CalculatedInputs = {
 }
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84]
+const MOTORCYCLE_INSTALLMENT_TERM_OPTIONS = [30, ...INSTALLMENT_TERM_OPTIONS]
+const DEFAULT_INSTALLMENT_TERM = 60
+const MOTORCYCLE_DEFAULT_INSTALLMENT_TERM = 30
 const TRANSFER_BOOK_STATUS = "โอนเล่ม"
 const MAX_REDUCING_RATE_PERCENT = 24
 const MAX_FLAT_RATE_PERCENT = 2
@@ -79,6 +86,7 @@ function ToggleChip({
 type LoanCalBarProps = {
   productCatalog: ProductCatalogData
   appraisalPrice: number
+  collateralType: CollateralType | null
   customer: CustomerInfo | null
   opportunityId: string | null
   refinanceStatus: RefinanceStatus | null
@@ -89,18 +97,26 @@ type LoanCalBarProps = {
 export function LoanCalBar({
   productCatalog,
   appraisalPrice,
+  collateralType,
   customer,
   opportunityId,
   refinanceStatus,
   onCustomerChange,
   onFilterChange,
 }: LoanCalBarProps) {
+  const isMotorcycle = collateralType === "motorcycle"
+  const installmentTermOptions = isMotorcycle
+    ? MOTORCYCLE_INSTALLMENT_TERM_OPTIONS
+    : INSTALLMENT_TERM_OPTIONS
+
   const bookStatusOptions = useMemo(
     () =>
-      Array.from(
-        new Set(productCatalog.items.map((item) => item.bookStatusLabel)),
-      ).map((label) => ({label, value: label})),
-    [productCatalog],
+      isMotorcycle
+        ? [{label: TRANSFER_BOOK_STATUS, value: TRANSFER_BOOK_STATUS}]
+        : Array.from(
+            new Set(productCatalog.items.map((item) => item.bookStatusLabel)),
+          ).map((label) => ({label, value: label})),
+    [productCatalog, isMotorcycle],
   )
 
   const [bookStatus, setBookStatus] = useState(
@@ -111,9 +127,11 @@ export function LoanCalBar({
   const [payoffAmount, setPayoffAmount] = useState(0)
   const [cashBackAmount, setCashBackAmount] = useState(0)
   const [isTLC, setIsTLC] = useState(
-    productCatalog.filterChips.includes("บัตรติดล้อ"),
+    !isMotorcycle && productCatalog.filterChips.includes("บัตรติดล้อ"),
   )
-  const [installmentTerm, setInstallmentTerm] = useState(60)
+  const [installmentTerm, setInstallmentTerm] = useState(
+    isMotorcycle ? MOTORCYCLE_DEFAULT_INSTALLMENT_TERM : DEFAULT_INSTALLMENT_TERM,
+  )
   const [hasPpi, setHasPpi] = useState(false)
   const [interestRatePercent, setInterestRatePercent] = useState(24)
   const [flatRateInput, setFlatRateInput] = useState("1")
@@ -164,7 +182,7 @@ export function LoanCalBar({
 
   function handleToggleTLC(nextChecked: boolean) {
     setIsTLC(nextChecked)
-    if (nextChecked) setInstallmentTerm(60)
+    if (nextChecked) setInstallmentTerm(DEFAULT_INSTALLMENT_TERM)
   }
 
   useEffect(() => {
@@ -392,7 +410,7 @@ export function LoanCalBar({
           <div className="w-fit shrink-0">
             <FieldLabel>งวดผ่อน</FieldLabel>
             <Select
-              options={INSTALLMENT_TERM_OPTIONS.map((term) => ({
+              options={installmentTermOptions.map((term) => ({
                 label: `${term} งวด`,
                 value: String(term),
               }))}

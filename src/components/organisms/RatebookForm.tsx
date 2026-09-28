@@ -351,6 +351,7 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
               <LoanCalBar
                 productCatalog={productCatalogData}
                 appraisalPrice={productGuideData.appraisalPrice}
+                collateralType={collateralType}
                 customer={customer}
                 opportunityId={opportunityId}
                 refinanceStatus={refinanceStatus}
