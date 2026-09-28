@@ -4,6 +4,7 @@ import { Icon } from "@/components/atoms/Icon";
 import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
 import { ProductDetailDrawer } from "@/components/organisms/ProductDetailDrawer";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
+import type { NcbGrade } from "@/types/customer-lead";
 import type {
   ProductCatalogData,
   ProductCatalogFilter,
@@ -14,8 +15,32 @@ import { useState } from "react";
 type ProductCatalogProps = {
   data: ProductCatalogData;
   filter: ProductCatalogFilter | null;
+  /** Set once eNCB has been checked; null shows every grade. */
+  ncbGrade: NcbGrade | null;
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
+
+/** Grades in a label like "A01, A02", "A01 - A03" or "U01-U03", with ranges expanded. */
+function parseNcbGrades(label: string): Set<string> {
+  const grades = new Set<string>();
+  for (const [, letter, from, to] of label.matchAll(/([A-Z])(\d{2})(?:\s*-\s*[A-Z]?(\d{2}))?/g)) {
+    for (let n = Number(from); n <= Number(to ?? from); n++) {
+      grades.add(`${letter}${String(n).padStart(2, "0")}`);
+    }
+  }
+  return grades;
+}
+
+/**
+ * "ทุกเกรด" (no grades listed) accepts everyone; "Non …" / "Not …" / "ยกเว้น …" list the
+ * grades that are excluded; anything else lists the only grades accepted.
+ */
+function acceptsNcbGrade(label: string, grade: NcbGrade): boolean {
+  const grades = parseNcbGrades(label);
+  if (grades.size === 0) return true;
+  const isExclusion = /Non|Not|ยกเว้น/.test(label);
+  return isExclusion ? !grades.has(grade) : grades.has(grade);
+}
 
 /** Numbers in a label like "80% - 130% LTV" or "100,000-200,000" as [min, max]. */
 function parseRange(label: string): [number, number] {
@@ -44,14 +69,34 @@ function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): 
   return true;
 }
 
-export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatalogProps) {
+export function ProductCatalog({
+  data,
+  filter,
+  ncbGrade,
+  onSelectConfirmed,
+}: ProductCatalogProps) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const selectedItem = data.items.find((item) => item.id === selectedItemId) ?? null;
   const [detailItemId, setDetailItemId] = useState<string | null>(null);
   const detailItem = data.items.find((item) => item.id === detailItemId) ?? null;
 
-  const matchedItems = filter ? data.items.filter((item) => matchesFilter(item, filter)) : data.items;
-  const otherItems = filter ? data.items.filter((item) => !matchesFilter(item, filter)) : [];
+  // A grade the product doesn't accept can't be approved, so those are dropped
+  // outright rather than moved down to "ผลิตภัณฑ์อื่นที่น่าสนใจ".
+  const gradeEligibleItems = ncbGrade
+    ? data.items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, ncbGrade))
+    : data.items;
+  const matchedItems = filter
+    ? gradeEligibleItems.filter((item) => matchesFilter(item, filter))
+    : gradeEligibleItems;
+  const otherItems = filter
+    ? gradeEligibleItems.filter((item) => !matchesFilter(item, filter))
+    : [];
+
+  function emptyMessage() {
+    if (data.items.length === 0) return "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้";
+    if (gradeEligibleItems.length === 0) return `ไม่มีผลิตภัณฑ์ที่รองรับ NCB เกรด ${ncbGrade}`;
+    return "ไม่พบผลิตภัณฑ์ที่ตรงตามเงื่อนไข";
+  }
 
   function renderCards(items: ProductCatalogItem[]) {
     return items.map((item) => (
@@ -83,7 +128,7 @@ export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatal
             </span>
           ) : null}
           <span className="flex items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground">
-            {data.gradeFilterLabel}
+            {ncbGrade ? `เกรด ${ncbGrade}` : data.gradeFilterLabel}
             <Icon name="arrow-down" className="size-3.5 text-muted-foreground" />
           </span>
         </div>
@@ -92,9 +137,7 @@ export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatal
       <div className="space-y-4">
         {matchedItems.length === 0 ? (
           <p className="rounded-xl border-2 border-card-border bg-surface p-5 text-center text-sm text-muted-foreground shadow-primary-s">
-            {data.items.length === 0
-              ? "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้"
-              : "ไม่พบผลิตภัณฑ์ที่ตรงตามเงื่อนไข"}
+            {emptyMessage()}
           </p>
         ) : (
           renderCards(matchedItems)

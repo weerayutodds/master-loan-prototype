@@ -28,7 +28,7 @@ import {
   getVehicleModelLabel,
   provinceOptions,
 } from "@/lib/mock";
-import type { CustomerLead } from "@/types/customer-lead";
+import type { CustomerLead, NcbGrade } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
@@ -62,6 +62,8 @@ type CustomerCollateralPanelProps = {
   carInsuranceInfo?: CarInsuranceInfo;
   customer: CustomerInfo | null;
   onCustomerChange: (value: CustomerInfo) => void;
+  ncbGrade: NcbGrade | null;
+  onNcbGradeChange: (value: NcbGrade) => void;
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -118,6 +120,8 @@ export function CustomerCollateralPanel({
   carInsuranceInfo,
   customer,
   onCustomerChange,
+  ncbGrade,
+  onNcbGradeChange,
 }: CustomerCollateralPanelProps) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
@@ -148,10 +152,6 @@ export function CustomerCollateralPanel({
     initialOpportunity?.verificationMethod ??
     initialLead?.verificationMethod ??
     null;
-  // customer_lead.ncb_grade is the single source of truth, so it's preferred
-  // over the opportunity's own snapshot copy, which can go stale.
-  const ncbGrade =
-    initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null;
 
   async function handleSaveLead() {
     if (!customer) return;
@@ -295,6 +295,7 @@ export function CustomerCollateralPanel({
         <NcbCheckControl
           ncbGrade={ncbGrade}
           onChecked={async (nextGrade) => {
+            onNcbGradeChange(nextGrade);
             // customer_lead.ncb_grade is the single source of truth for the
             // customer, so it's written there regardless of opportunity state;
             // the opportunity's own copy is also kept in sync when one exists.

@@ -24,7 +24,7 @@ import {
   loanPurposeOptions,
   refinanceStatusOptions,
 } from "@/lib/mock";
-import type { CustomerLead } from "@/types/customer-lead";
+import type { CustomerLead, NcbGrade } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
@@ -102,6 +102,11 @@ export function RatebookForm({
             birthDate: initialLead.birthDate ?? undefined,
           }
         : null,
+  );
+  // customer_lead.ncb_grade is the single source of truth, so it's preferred
+  // over the opportunity's own snapshot copy, which can go stale.
+  const [ncbGrade, setNcbGrade] = useState<NcbGrade | null>(
+    initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null,
   );
   const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(
     initialOpportunity?.loanPurpose ?? null,
@@ -335,6 +340,8 @@ export function RatebookForm({
           carInsuranceInfo={carInsuranceInfo}
           customer={customer}
           onCustomerChange={setCustomer}
+          ncbGrade={ncbGrade}
+          onNcbGradeChange={setNcbGrade}
         />
       </div>
       {selectedProduct && initialOpportunity ? (
@@ -384,6 +391,7 @@ export function RatebookForm({
               <ProductCatalog
                 data={productCatalogData}
                 filter={productFilter}
+                ncbGrade={ncbGrade}
                 onSelectConfirmed={handleSelectedProductConfirmed}
               />
               <LoanCalBar
