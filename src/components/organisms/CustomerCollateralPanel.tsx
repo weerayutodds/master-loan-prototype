@@ -142,8 +142,7 @@ export function CustomerCollateralPanel({
     );
   const [collateralModalOpen, setCollateralModalOpen] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
-  const [dipchipChecking, setDipchipChecking] = useState(false);
-  const [brandModel, setBrandModel] = useState(
+  const [dipchipChecking, setDipchipChecking] = useState(false);  const [brandModel, setBrandModel] = useState(
     initialOpportunity?.brandModel ?? "",
   );
   const [editingBrandModel, setEditingBrandModel] = useState(false);
@@ -289,7 +288,7 @@ export function CustomerCollateralPanel({
         <NcbCheckControl
           ncbGrade={ncbGrade}
           onChecked={onNcbChecked}
-          awaitingResult={verificationMethod === "card"}
+          onCardRead={onDipchipRead}
         />
       </div>
 

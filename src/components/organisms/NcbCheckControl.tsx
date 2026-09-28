@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
-import { NcbCheckModal } from "@/components/organisms/NcbCheckModal";
+import { MOCK_NCB_GRADE, NcbCheckModal } from "@/components/organisms/NcbCheckModal";
 import type { NcbGrade } from "@/types/customer-lead";
 
 type NcbCheckControlProps = {
@@ -12,8 +12,8 @@ type NcbCheckControlProps = {
   onChecked: (ncbGrade: NcbGrade) => unknown;
   buttonVariant?: "primary" | "outline";
   buttonSize?: "xs" | "sm";
-  /** Dipchip-verified customers show "รอผล..." with a refresh button instead of "ตรวจ eNCB". */
-  awaitingResult?: boolean;
+  /** When set, "ตรวจ eNCB" only reads the card and then waits on "รีเฟรช" for the grade. */
+  onCardRead?: () => unknown;
 };
 
 export function NcbCheckControl({
@@ -21,16 +21,26 @@ export function NcbCheckControl({
   onChecked,
   buttonVariant = "outline",
   buttonSize = "xs",
-  awaitingResult = false,
+  onCardRead,
 }: NcbCheckControlProps) {
   const [checking, setChecking] = useState(false);
+  const [cardRead, setCardRead] = useState(false);
   // Covers the gap until a server-rendered parent re-renders with the saved grade.
   const [checkedGrade, setCheckedGrade] = useState<NcbGrade | null>(null);
   const grade = ncbGrade ?? checkedGrade;
 
-  async function handleComplete(nextGrade: NcbGrade) {
+  async function applyGrade(nextGrade: NcbGrade) {
     await onChecked(nextGrade);
     setCheckedGrade(nextGrade);
+  }
+
+  async function handleComplete(nextGrade: NcbGrade) {
+    if (onCardRead) {
+      await onCardRead();
+      setCardRead(true);
+    } else {
+      await applyGrade(nextGrade);
+    }
     setChecking(false);
   }
 
@@ -44,10 +54,10 @@ export function NcbCheckControl({
 
   return (
     <>
-      {awaitingResult ? (
+      {cardRead ? (
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground">รอผล...</span>
-          <Button variant="secondary" size="sm" onClick={() => setChecking(true)}>
+          <Button variant="secondary" size="sm" onClick={() => applyGrade(MOCK_NCB_GRADE)}>
             <Icon name="refresh" className="mr-1 size-3.5" />
             รีเฟรช
           </Button>

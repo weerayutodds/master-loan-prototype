@@ -6,7 +6,7 @@ import { Icon } from "@/components/atoms/Icon";
 import { Modal } from "@/components/molecules/Modal";
 import type { NcbGrade } from "@/types/customer-lead";
 
-const MOCK_NCB_GRADE: NcbGrade = "A02";
+export const MOCK_NCB_GRADE: NcbGrade = "A02";
 const CHECK_DURATION_MS = 2000;
 
 type NcbCheckModalProps = {
