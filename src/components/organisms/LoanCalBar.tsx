@@ -38,9 +38,8 @@ type CalculatedInputs = {
 }
 
 const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84]
-const MOTORCYCLE_INSTALLMENT_TERM_OPTIONS = [30, ...INSTALLMENT_TERM_OPTIONS]
 const DEFAULT_INSTALLMENT_TERM = 60
-const MOTORCYCLE_DEFAULT_INSTALLMENT_TERM = 30
+const MOTORCYCLE_INSTALLMENT_TERM = 30
 const MAX_REDUCING_RATE_PERCENT = 24
 const MAX_FLAT_RATE_PERCENT = 2
 const DEFAULT_REDUCING_RATE_PERCENT = "24"
@@ -124,16 +123,19 @@ export function LoanCalBar({
 }: LoanCalBarProps) {
   const isMotorcycle = collateralType === "motorcycle"
   const installmentTermOptions = isMotorcycle
-    ? MOTORCYCLE_INSTALLMENT_TERM_OPTIONS
+    ? [MOTORCYCLE_INSTALLMENT_TERM]
     : INSTALLMENT_TERM_OPTIONS
+  const defaultInstallmentTerm = isMotorcycle
+    ? MOTORCYCLE_INSTALLMENT_TERM
+    : DEFAULT_INSTALLMENT_TERM
 
   const bookStatusOptions = useMemo(
     () =>
-      getBookStatusOptions(productCatalog, collateralType).map((label) => ({
+      getBookStatusOptions(productCatalog).map((label) => ({
         label,
         value: label,
       })),
-    [productCatalog, collateralType],
+    [productCatalog],
   )
 
   const [bookStatus, setBookStatus] = useState(
@@ -146,9 +148,7 @@ export function LoanCalBar({
   const [isTLC, setIsTLC] = useState(
     !isMotorcycle && productCatalog.filterChips.includes("บัตรติดล้อ"),
   )
-  const [installmentTerm, setInstallmentTerm] = useState(
-    isMotorcycle ? MOTORCYCLE_DEFAULT_INSTALLMENT_TERM : DEFAULT_INSTALLMENT_TERM,
-  )
+  const [installmentTerm, setInstallmentTerm] = useState(defaultInstallmentTerm)
   const [hasPpi, setHasPpi] = useState(false)
   const [reducingRateInput, setReducingRateInput] = useState(
     DEFAULT_REDUCING_RATE_PERCENT,
@@ -209,7 +209,7 @@ export function LoanCalBar({
 
   function handleToggleTLC(nextChecked: boolean) {
     setIsTLC(nextChecked)
-    if (nextChecked) setInstallmentTerm(DEFAULT_INSTALLMENT_TERM)
+    if (nextChecked) setInstallmentTerm(defaultInstallmentTerm)
   }
 
   useEffect(() => {
@@ -440,7 +440,7 @@ export function LoanCalBar({
                 label: `${term} งวด`,
                 value: String(term),
               }))}
-              disabled={isTLC}
+              disabled={isTLC || isMotorcycle}
               value={String(installmentTerm)}
               onChange={(e) => setInstallmentTerm(Number(e.target.value))}
               className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"

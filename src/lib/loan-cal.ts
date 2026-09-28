@@ -1,24 +1,18 @@
 import type { ProductCatalogData, ProductCatalogFilter } from "@/types/product-catalog";
-import type { CollateralType } from "@/types/ratebook";
 
 export const TRANSFER_BOOK_STATUS = "โอนเล่ม";
 
-/** Motorcycles are always โอนเล่ม; otherwise every book status present in the catalog, in catalog order. */
-export function getBookStatusOptions(
-  productCatalog: ProductCatalogData,
-  collateralType: CollateralType | null,
-): string[] {
-  if (collateralType === "motorcycle") return [TRANSFER_BOOK_STATUS];
+/** Every book status present in the catalog, in catalog order; the first one is the default. */
+export function getBookStatusOptions(productCatalog: ProductCatalogData): string[] {
   return Array.from(new Set(productCatalog.items.map((item) => item.bookStatusLabel)));
 }
 
 /** What `LoanCalBar` starts with, so the catalog is split the same way before the user touches it. */
 export function getDefaultProductCatalogFilter(
   productCatalog: ProductCatalogData,
-  collateralType: CollateralType | null,
 ): ProductCatalogFilter {
   return {
-    bookStatus: getBookStatusOptions(productCatalog, collateralType)[0] ?? "",
+    bookStatus: getBookStatusOptions(productCatalog)[0] ?? "",
     requestedAmount: 0,
     requestedLtvPercent: 0,
   };

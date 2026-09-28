@@ -1433,8 +1433,8 @@ const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
       primaryActionLabel: "เลือก",
       primaryActionVariant: "filled",
     },
-    // Motorcycle HP. LoanCalBar pins the motorcycle book status to โอนเล่ม, so at least
-    // one of these has to survive isRuleEligible or the matched list renders empty.
+    // Motorcycle HP. LoanCalBar's book-status default is the first bookStatusLabel in
+    // this list, so the ungated ไม่โอนเล่ม rules above must stay first.
     {
       id: "mc-transfer-book",
       title: "สินเชื่อทะเบียนรถจักรยานยนต์ แบบโอนเล่ม",

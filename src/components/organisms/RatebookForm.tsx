@@ -435,10 +435,7 @@ export function RatebookForm({
                 data={productCatalogData}
                 filter={
                   productFilter ??
-                  getDefaultProductCatalogFilter(
-                    productCatalogData,
-                    collateralType,
-                  )
+                  getDefaultProductCatalogFilter(productCatalogData)
                 }
                 ncbGrade={ncbGrade}
                 onNcbChecked={handleNcbChecked}
