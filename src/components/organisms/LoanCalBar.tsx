@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import {Icon} from "@/components/atoms/Icon"
-import {Select} from "@/components/atoms/Select"
-import {LoanCalDetailPopover} from "@/components/molecules/LoanCalDetailPopover"
-import {GenderAgePopover} from "@/components/organisms/GenderAgePopover"
-import {updateOpportunityCustomerInfo} from "@/lib/actions/customer-lead-opportunity"
-import {calculateAge, formatRatePercent} from "@/lib/format"
+import { Icon } from "@/components/atoms/Icon";
+import { Select } from "@/components/atoms/Select";
+import { LoanCalDetailPopover } from "@/components/molecules/LoanCalDetailPopover";
+import { GenderAgePopover } from "@/components/organisms/GenderAgePopover";
+import { updateOpportunityCustomerInfo } from "@/lib/actions/customer-lead-opportunity";
+import { calculateAge, formatRatePercent } from "@/lib/format";
 import {
   calculateAmountFromLtv,
   calculateFlatRateEquivalent,
@@ -14,56 +14,56 @@ import {
   getBookStatusOptions,
   TRANSFER_BOOK_STATUS,
   type InterestRateType,
-} from "@/lib/loan-cal"
-import {GENDER_LABELS} from "@/lib/mock"
-import type {Gender} from "@/types/customer-lead"
+} from "@/lib/loan-cal";
+import { GENDER_LABELS } from "@/lib/mock";
+import type { Gender } from "@/types/customer-lead";
 import type {
   ProductCatalogData,
   ProductCatalogFilter,
-} from "@/types/product-catalog"
+} from "@/types/product-catalog";
 import type {
   CollateralType,
   CustomerInfo,
   RefinanceStatus,
-} from "@/types/ratebook"
-import {useEffect, useMemo, useRef, useState} from "react"
+} from "@/types/ratebook";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type CalculatedInputs = {
-  requestedAmount: number
-  interestRatePercent: number
-  rateType: InterestRateType
-  installmentTerm: number
-  isTLC: boolean
-  hasPpi: boolean
-}
+  requestedAmount: number;
+  interestRatePercent: number;
+  rateType: InterestRateType;
+  installmentTerm: number;
+  isTLC: boolean;
+  hasPpi: boolean;
+};
 
-const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84]
-const DEFAULT_INSTALLMENT_TERM = 60
-const MOTORCYCLE_INSTALLMENT_TERM = 30
-const MAX_REDUCING_RATE_PERCENT = 24
-const MAX_FLAT_RATE_PERCENT = 2
-const DEFAULT_REDUCING_RATE_PERCENT = "24"
-const DEFAULT_FLAT_RATE_PERCENT = "1.13"
+const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84];
+const DEFAULT_INSTALLMENT_TERM = 60;
+const MOTORCYCLE_INSTALLMENT_TERM = 30;
+const MAX_REDUCING_RATE_PERCENT = 24;
+const MAX_FLAT_RATE_PERCENT = 2;
+const DEFAULT_REDUCING_RATE_PERCENT = "24";
+const DEFAULT_FLAT_RATE_PERCENT = "2.05";
 
 function sanitizeRateInput(raw: string, max: number): string | null {
-  const value = raw.replace(/[^\d.]/g, "")
-  if (!/^\d*\.?\d{0,2}$/.test(value)) return null
-  if (Number(value) > max) return null
-  return value
+  const value = raw.replace(/[^\d.]/g, "");
+  if (!/^\d*\.?\d{0,2}$/.test(value)) return null;
+  if (Number(value) > max) return null;
+  return value;
 }
 
 function parseRate(value: string): number {
-  return Number.parseFloat(value) || 0
+  return Number.parseFloat(value) || 0;
 }
 
 function formatRate(value: string): string {
-  return value === "" ? "" : formatRatePercent(parseRate(value))
+  return value === "" ? "" : formatRatePercent(parseRate(value));
 }
 
-function FieldLabel({children}: {children: React.ReactNode}) {
+function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <span className="mb-1 block text-[10px] text-pale-blue">{children}</span>
-  )
+  );
 }
 
 function ToggleChip({
@@ -72,10 +72,10 @@ function ToggleChip({
   disabled = false,
   onChange,
 }: {
-  label: string
-  checked: boolean
-  disabled?: boolean
-  onChange: (value: boolean) => void
+  label: string;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (value: boolean) => void;
 }) {
   return (
     <button
@@ -97,19 +97,19 @@ function ToggleChip({
       </span>
       {label}
     </button>
-  )
+  );
 }
 
 type LoanCalBarProps = {
-  productCatalog: ProductCatalogData
-  appraisalPrice: number
-  collateralType: CollateralType | null
-  customer: CustomerInfo | null
-  opportunityId: string | null
-  refinanceStatus: RefinanceStatus | null
-  onCustomerChange: (value: CustomerInfo) => void
-  onFilterChange: (filter: ProductCatalogFilter) => void
-}
+  productCatalog: ProductCatalogData;
+  appraisalPrice: number;
+  collateralType: CollateralType | null;
+  customer: CustomerInfo | null;
+  opportunityId: string | null;
+  refinanceStatus: RefinanceStatus | null;
+  onCustomerChange: (value: CustomerInfo) => void;
+  onFilterChange: (filter: ProductCatalogFilter) => void;
+};
 
 export function LoanCalBar({
   productCatalog,
@@ -121,13 +121,13 @@ export function LoanCalBar({
   onCustomerChange,
   onFilterChange,
 }: LoanCalBarProps) {
-  const isMotorcycle = collateralType === "motorcycle"
+  const isMotorcycle = collateralType === "motorcycle";
   const installmentTermOptions = isMotorcycle
     ? [MOTORCYCLE_INSTALLMENT_TERM]
-    : INSTALLMENT_TERM_OPTIONS
+    : INSTALLMENT_TERM_OPTIONS;
   const defaultInstallmentTerm = isMotorcycle
     ? MOTORCYCLE_INSTALLMENT_TERM
-    : DEFAULT_INSTALLMENT_TERM
+    : DEFAULT_INSTALLMENT_TERM;
 
   const bookStatusOptions = useMemo(
     () =>
@@ -136,37 +136,39 @@ export function LoanCalBar({
         value: label,
       })),
     [productCatalog],
-  )
+  );
 
   const [bookStatus, setBookStatus] = useState(
     bookStatusOptions[0]?.label ?? "",
-  )
-  const [requestedAmount, setRequestedAmount] = useState(0)
-  const [requestedLtvPercent, setRequestedLtvPercent] = useState(0)
-  const [payoffAmount, setPayoffAmount] = useState(0)
-  const [cashBackAmount, setCashBackAmount] = useState(0)
+  );
+  const [requestedAmount, setRequestedAmount] = useState(0);
+  const [requestedLtvPercent, setRequestedLtvPercent] = useState(0);
+  const [payoffAmount, setPayoffAmount] = useState(0);
+  const [cashBackAmount, setCashBackAmount] = useState(0);
   const [isTLC, setIsTLC] = useState(
-    !isMotorcycle && productCatalog.filterChips.includes("บัตรติดล้อ"),
-  )
-  const [installmentTerm, setInstallmentTerm] = useState(defaultInstallmentTerm)
-  const [hasPpi, setHasPpi] = useState(false)
+    isMotorcycle || productCatalog.filterChips.includes("บัตรติดล้อ"),
+  );
+  const [installmentTerm, setInstallmentTerm] = useState(
+    defaultInstallmentTerm,
+  );
+  const [hasPpi, setHasPpi] = useState(false);
   const [reducingRateInput, setReducingRateInput] = useState(
     DEFAULT_REDUCING_RATE_PERCENT,
-  )
-  const [flatRateInput, setFlatRateInput] = useState(DEFAULT_FLAT_RATE_PERCENT)
-  const [calculated, setCalculated] = useState<CalculatedInputs | null>(null)
-  const [showDetail, setShowDetail] = useState(false)
-  const [genderAgeOpen, setGenderAgeOpen] = useState(false)
+  );
+  const [flatRateInput, setFlatRateInput] = useState(DEFAULT_FLAT_RATE_PERCENT);
+  const [calculated, setCalculated] = useState<CalculatedInputs | null>(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [genderAgeOpen, setGenderAgeOpen] = useState(false);
   const [genderAgePosition, setGenderAgePosition] = useState<{
-    left: number
-    bottom: number
-  } | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const genderAgeAnchorRef = useRef<HTMLDivElement>(null)
-  const genderAgePopoverRef = useRef<HTMLDivElement>(null)
+    left: number;
+    bottom: number;
+  } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const genderAgeAnchorRef = useRef<HTMLDivElement>(null);
+  const genderAgePopoverRef = useRef<HTMLDivElement>(null);
 
-  const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS
-  const isRefinance = refinanceStatus === "still-paying"
+  const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS;
+  const isRefinance = refinanceStatus === "still-paying";
 
   function commitFilter(overrides: Partial<ProductCatalogFilter> = {}) {
     onFilterChange({
@@ -174,101 +176,101 @@ export function LoanCalBar({
       requestedAmount,
       requestedLtvPercent,
       ...overrides,
-    })
+    });
   }
 
   function handleRefinanceAmountChange(
     nextPayoffAmount: number,
     nextCashBackAmount: number,
   ) {
-    const amount = nextPayoffAmount + nextCashBackAmount
-    setRequestedAmount(amount)
-    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice))
+    const amount = nextPayoffAmount + nextCashBackAmount;
+    setRequestedAmount(amount);
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
   }
 
   function handleBookStatusChange(value: string) {
-    setBookStatus(value)
-    if (value === TRANSFER_BOOK_STATUS) setIsTLC(false)
-    commitFilter({bookStatus: value})
+    setBookStatus(value);
+    if (value === TRANSFER_BOOK_STATUS) setIsTLC(false);
+    commitFilter({ bookStatus: value });
   }
 
   function handleRateChange(raw: string) {
     const value = sanitizeRateInput(
       raw,
       isTransferBook ? MAX_FLAT_RATE_PERCENT : MAX_REDUCING_RATE_PERCENT,
-    )
-    if (value === null) return
-    if (isTransferBook) setFlatRateInput(value)
-    else setReducingRateInput(value)
+    );
+    if (value === null) return;
+    if (isTransferBook) setFlatRateInput(value);
+    else setReducingRateInput(value);
   }
 
   function handleRateBlur() {
-    if (isTransferBook) setFlatRateInput(formatRate)
-    else setReducingRateInput(formatRate)
+    if (isTransferBook) setFlatRateInput(formatRate);
+    else setReducingRateInput(formatRate);
   }
 
   function handleToggleTLC(nextChecked: boolean) {
-    setIsTLC(nextChecked)
-    if (nextChecked) setInstallmentTerm(defaultInstallmentTerm)
+    setIsTLC(nextChecked);
+    if (nextChecked) setInstallmentTerm(defaultInstallmentTerm);
   }
 
   useEffect(() => {
-    if (!showDetail) return
+    if (!showDetail) return;
     function handleClickOutside(event: MouseEvent) {
       if (!containerRef.current?.contains(event.target as Node)) {
-        setShowDetail(false)
+        setShowDetail(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [showDetail])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDetail]);
 
   useEffect(() => {
-    if (!genderAgeOpen) return
+    if (!genderAgeOpen) return;
     function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node
+      const target = event.target as Node;
       if (
         !genderAgeAnchorRef.current?.contains(target) &&
         !genderAgePopoverRef.current?.contains(target)
       ) {
-        setGenderAgeOpen(false)
+        setGenderAgeOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [genderAgeOpen])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [genderAgeOpen]);
 
   function openGenderAgePopover() {
-    const rect = genderAgeAnchorRef.current?.getBoundingClientRect()
+    const rect = genderAgeAnchorRef.current?.getBoundingClientRect();
     if (rect) {
       setGenderAgePosition({
         left: rect.left,
         bottom: window.innerHeight - rect.top + 12,
-      })
+      });
     }
-    setGenderAgeOpen(true)
+    setGenderAgeOpen(true);
   }
 
   function handleTogglePpi(nextChecked: boolean) {
     if (!nextChecked) {
-      setHasPpi(false)
-      return
+      setHasPpi(false);
+      return;
     }
-    openGenderAgePopover()
+    openGenderAgePopover();
   }
 
   const summary = useMemo(
     () => (calculated ? calculateLoanCalSummary(calculated) : null),
     [calculated],
-  )
+  );
   const flatRatePercent = useMemo(() => {
-    if (!calculated) return 0
-    if (calculated.rateType === "flat") return calculated.interestRatePercent
+    if (!calculated) return 0;
+    if (calculated.rateType === "flat") return calculated.interestRatePercent;
     return calculateFlatRateEquivalent(
       calculated.interestRatePercent,
       calculated.installmentTerm,
-    )
-  }, [calculated])
+    );
+  }, [calculated]);
 
   function handleCalculate() {
     setCalculated({
@@ -280,25 +282,25 @@ export function LoanCalBar({
       installmentTerm,
       isTLC: isTransferBook ? false : isTLC,
       hasPpi,
-    })
-    setShowDetail(true)
+    });
+    setShowDetail(true);
   }
 
   async function handleSaveGenderAge(value: {
-    gender: Gender
-    birthDate: string
+    gender: Gender;
+    birthDate: string;
   }) {
     const nextCustomer: CustomerInfo = {
       firstName: customer?.firstName ?? "",
       lastName: customer?.lastName ?? "",
       phone: customer?.phone ?? "",
       ...value,
-    }
-    onCustomerChange(nextCustomer)
-    setGenderAgeOpen(false)
-    setHasPpi(true)
+    };
+    onCustomerChange(nextCustomer);
+    setGenderAgeOpen(false);
+    setHasPpi(true);
     if (opportunityId) {
-      await updateOpportunityCustomerInfo(opportunityId, nextCustomer)
+      await updateOpportunityCustomerInfo(opportunityId, nextCustomer);
     }
   }
 
@@ -329,9 +331,9 @@ export function LoanCalBar({
                     placeholder="0"
                     onChange={(e) => {
                       const amount =
-                        Number(e.target.value.replace(/\D/g, "")) || 0
-                      setPayoffAmount(amount)
-                      handleRefinanceAmountChange(amount, cashBackAmount)
+                        Number(e.target.value.replace(/\D/g, "")) || 0;
+                      setPayoffAmount(amount);
+                      handleRefinanceAmountChange(amount, cashBackAmount);
                     }}
                     onBlur={() => commitFilter()}
                     className="w-full text-sm text-foreground outline-none"
@@ -358,9 +360,9 @@ export function LoanCalBar({
                     placeholder="0"
                     onChange={(e) => {
                       const amount =
-                        Number(e.target.value.replace(/\D/g, "")) || 0
-                      setCashBackAmount(amount)
-                      handleRefinanceAmountChange(payoffAmount, amount)
+                        Number(e.target.value.replace(/\D/g, "")) || 0;
+                      setCashBackAmount(amount);
+                      handleRefinanceAmountChange(payoffAmount, amount);
                     }}
                     onBlur={() => commitFilter()}
                     className="w-full text-sm text-foreground outline-none"
@@ -388,13 +390,13 @@ export function LoanCalBar({
                   placeholder="0"
                   onChange={(e) => {
                     const amount =
-                      Number(e.target.value.replace(/\D/g, "")) || 0
-                    setRequestedAmount(amount)
+                      Number(e.target.value.replace(/\D/g, "")) || 0;
+                    setRequestedAmount(amount);
                     setRequestedLtvPercent(
                       calculateLtvPercent(amount, appraisalPrice),
-                    )
+                    );
                     if (isRefinance) {
-                      setPayoffAmount(Math.max(0, amount - cashBackAmount))
+                      setPayoffAmount(Math.max(0, amount - cashBackAmount));
                     }
                   }}
                   onBlur={() => commitFilter()}
@@ -410,11 +412,11 @@ export function LoanCalBar({
                   placeholder="0"
                   onChange={(e) => {
                     const ltvPercent =
-                      Number(e.target.value.replace(/\D/g, "")) || 0
-                    setRequestedLtvPercent(ltvPercent)
+                      Number(e.target.value.replace(/\D/g, "")) || 0;
+                    setRequestedLtvPercent(ltvPercent);
                     setRequestedAmount(
                       calculateAmountFromLtv(ltvPercent, appraisalPrice),
-                    )
+                    );
                   }}
                   onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"
@@ -558,5 +560,5 @@ export function LoanCalBar({
         </div>
       </div>
     </div>
-  )
+  );
 }
