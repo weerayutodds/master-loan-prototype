@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:catalog": "node scripts/generate-product-catalog.mjs",
+    "verify:catalog": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-product-catalog.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
