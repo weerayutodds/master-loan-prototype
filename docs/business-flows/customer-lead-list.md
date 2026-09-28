@@ -19,7 +19,7 @@ Entry point: `/customer-form` → "ดำเนินการต่อ" (once e
 
 ## Out of scope for this phase (flagged, not silently built)
 - "รายการใบคำขอ" and "รายการสัญญาสินเชื่อ" tabs — visual only even on the dipchip path; no application/contract data model exists yet, so only "รายการ Lead" has real content. They are also not clickable: the tab row is static markup, so "รายการ Lead" is always the active tab and there is no tab-switching behavior to hide.
-- "ตรวจ eNCB" button on the summary card — visual only; the NCB เกรด is already assigned automatically when the lead is created via the card-read path (see [customer-form.md](customer-form.md)), not triggered from here. It stays unset for leads created via manual entry.
+- "ตรวจ eNCB" button on the summary card — visual only. The NCB เกรด is no longer assigned on lead creation, even via Dipchip (see [customer-form.md](customer-form.md)), so new rows show the neutral "-" NCB badge until a real eNCB check exists.
 - The เมนู (☰) icon in the header — visual only, no menu wired.
 - Repeated "จัดสินเชื่อ"/"ทำรายการสินเชื่อ" clicks pile up multiple `customer_lead_opportunity` rows per lead by design — an accepted tradeoff, no dedupe/resume-draft logic.
 - The "รายการ Lead" tab label is unchanged even though its data source moved from `customer_lead` to `customer_lead_opportunity` — renaming it (e.g. to something like "รายการทำรายการสินเชื่อ") is a separate copy decision, not made here.

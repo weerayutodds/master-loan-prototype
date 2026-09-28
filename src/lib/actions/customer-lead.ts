@@ -2,13 +2,7 @@
 
 import sql from "@/lib/db";
 import type { VerificationMethod } from "@/types/customer-form";
-import type { CustomerLead, Gender, NcbGrade } from "@/types/customer-lead";
-
-const NCB_GRADES: NcbGrade[] = ["A01", "A02", "A03", "L05"];
-
-function pickRandomNcbGrade(): NcbGrade {
-  return NCB_GRADES[Math.floor(Math.random() * NCB_GRADES.length)];
-}
+import type { CustomerLead, Gender } from "@/types/customer-lead";
 
 type CreateCustomerLeadInput = {
   firstName: string;
@@ -23,9 +17,8 @@ type CreateCustomerLeadInput = {
 export async function createCustomerLead(
   input: CreateCustomerLeadInput,
 ): Promise<CustomerLead> {
-  // NCB grade simulates a real eNCB check, which only happens on a card read;
-  // manual entry has no such check, so the grade stays unset.
-  const ncbGrade = input.verificationMethod === "card" ? pickRandomNcbGrade() : null;
+  // A card read only verifies identity; the NCB grade stays unset until a separate eNCB check.
+  const ncbGrade = null;
   const gender = input.gender ?? null;
   const birthDate = input.birthDate ?? null;
 
