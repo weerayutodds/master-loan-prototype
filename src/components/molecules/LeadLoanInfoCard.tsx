@@ -145,7 +145,11 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
           <RadioPair
             value={wantsWheelCard}
             onChange={(next) =>
-              onChange({ ...value, wantsWheelCard: next as "yes" | "no" })
+              onChange({
+                ...value,
+                wantsWheelCard: next as "yes" | "no",
+                ...(next === "yes" ? { installmentTerm: 60 } : {}),
+              })
             }
             options={[
               { value: "yes", label: "รับบัตร" },
@@ -184,6 +188,7 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
                 label: `${term} งวด (ดอกเบี้ย ${monthlyRatePercent}% ต่อเดือน)`,
               }))}
               value={String(installmentTerm)}
+              disabled={wantsWheelCard === "yes"}
               onChange={(e) =>
                 onChange({ ...value, installmentTerm: Number(e.target.value) })
               }
