@@ -11,6 +11,8 @@ import {
   calculateFlatRateEquivalent,
   calculateLoanCalSummary,
   calculateLtvPercent,
+  getBookStatusOptions,
+  TRANSFER_BOOK_STATUS,
   type InterestRateType,
 } from "@/lib/loan-cal"
 import {GENDER_LABELS} from "@/lib/mock"
@@ -39,7 +41,6 @@ const INSTALLMENT_TERM_OPTIONS = [36, 48, 60, 72, 84]
 const MOTORCYCLE_INSTALLMENT_TERM_OPTIONS = [30, ...INSTALLMENT_TERM_OPTIONS]
 const DEFAULT_INSTALLMENT_TERM = 60
 const MOTORCYCLE_DEFAULT_INSTALLMENT_TERM = 30
-const TRANSFER_BOOK_STATUS = "โอนเล่ม"
 const MAX_REDUCING_RATE_PERCENT = 24
 const MAX_FLAT_RATE_PERCENT = 2
 const DEFAULT_REDUCING_RATE_PERCENT = "24"
@@ -128,12 +129,11 @@ export function LoanCalBar({
 
   const bookStatusOptions = useMemo(
     () =>
-      isMotorcycle
-        ? [{label: TRANSFER_BOOK_STATUS, value: TRANSFER_BOOK_STATUS}]
-        : Array.from(
-            new Set(productCatalog.items.map((item) => item.bookStatusLabel)),
-          ).map((label) => ({label, value: label})),
-    [productCatalog, isMotorcycle],
+      getBookStatusOptions(productCatalog, collateralType).map((label) => ({
+        label,
+        value: label,
+      })),
+    [productCatalog, collateralType],
   )
 
   const [bookStatus, setBookStatus] = useState(

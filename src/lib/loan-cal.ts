@@ -1,3 +1,29 @@
+import type { ProductCatalogData, ProductCatalogFilter } from "@/types/product-catalog";
+import type { CollateralType } from "@/types/ratebook";
+
+export const TRANSFER_BOOK_STATUS = "โอนเล่ม";
+
+/** Motorcycles are always โอนเล่ม; otherwise every book status present in the catalog, in catalog order. */
+export function getBookStatusOptions(
+  productCatalog: ProductCatalogData,
+  collateralType: CollateralType | null,
+): string[] {
+  if (collateralType === "motorcycle") return [TRANSFER_BOOK_STATUS];
+  return Array.from(new Set(productCatalog.items.map((item) => item.bookStatusLabel)));
+}
+
+/** What `LoanCalBar` starts with, so the catalog is split the same way before the user touches it. */
+export function getDefaultProductCatalogFilter(
+  productCatalog: ProductCatalogData,
+  collateralType: CollateralType | null,
+): ProductCatalogFilter {
+  return {
+    bookStatus: getBookStatusOptions(productCatalog, collateralType)[0] ?? "",
+    requestedAmount: 0,
+    requestedLtvPercent: 0,
+  };
+}
+
 /** Reads the top of a product's "456,000 - 741,000"-style approved-amount range. */
 export function getMaxApprovedAmount(product: { approvedAmount: string }): number {
   const amounts = (product.approvedAmount.match(/[\d,]+/g) ?? []).map((match) =>

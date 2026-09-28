@@ -16,7 +16,10 @@ import {
   updateOpportunityNcbGrade,
   updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity"
-import {getMaxApprovedAmount} from "@/lib/loan-cal"
+import {
+  getDefaultProductCatalogFilter,
+  getMaxApprovedAmount,
+} from "@/lib/loan-cal"
 import {
   collateralTypeOptions,
   existingFinanceOptions,
@@ -419,7 +422,13 @@ export function RatebookForm({
               <ProductGuide data={productGuideData} />
               <ProductCatalog
                 data={productCatalogData}
-                filter={productFilter}
+                filter={
+                  productFilter ??
+                  getDefaultProductCatalogFilter(
+                    productCatalogData,
+                    collateralType,
+                  )
+                }
                 ncbGrade={ncbGrade}
                 onNcbChecked={handleNcbChecked}
                 onSelectConfirmed={handleSelectedProductConfirmed}

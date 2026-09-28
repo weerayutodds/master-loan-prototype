@@ -15,7 +15,8 @@ import { useState } from "react";
 
 type ProductCatalogProps = {
   data: ProductCatalogData;
-  filter: ProductCatalogFilter | null;
+  /** Starts as `LoanCalBar`'s defaults, then follows whatever the user commits there. */
+  filter: ProductCatalogFilter;
   /** Set once eNCB has been checked; null shows every grade. */
   ncbGrade: NcbGrade | null;
   /** Same handler as the sidebar's "ตรวจ eNCB", so both paths share one outcome. */
@@ -98,12 +99,8 @@ export function ProductCatalog({
   const gradeEligibleItems = ncbGrade
     ? items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, ncbGrade))
     : items;
-  const matchedItems = filter
-    ? gradeEligibleItems.filter((item) => matchesFilter(item, filter))
-    : gradeEligibleItems;
-  const otherItems = filter
-    ? gradeEligibleItems.filter((item) => !matchesFilter(item, filter))
-    : [];
+  const matchedItems = gradeEligibleItems.filter((item) => matchesFilter(item, filter));
+  const otherItems = gradeEligibleItems.filter((item) => !matchesFilter(item, filter));
 
   function emptyMessage() {
     if (data.items.length === 0) return "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้";
@@ -136,7 +133,7 @@ export function ProductCatalog({
               {chip}
             </span>
           ))}
-          {filter && filter.requestedLtvPercent > 0 ? (
+          {filter.requestedLtvPercent > 0 ? (
             <span className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground">
               {filter.requestedLtvPercent} %LTV
             </span>
