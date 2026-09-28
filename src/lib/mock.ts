@@ -4,7 +4,7 @@ import type {
   NavItem,
   PerformanceStat,
   QuickAction,
-} from "@/types/dashboard"
+} from "@/types/dashboard";
 import type {
   CarInfo,
   CollateralType,
@@ -16,13 +16,13 @@ import type {
   VehicleModelOption,
   VehicleModelSpec,
   VehicleSubModelOption,
-} from "@/types/ratebook"
+} from "@/types/ratebook";
 import type {
   CardCustomerData,
   CustomerType,
   VerificationMethod,
-} from "@/types/customer-form"
-import type { ProductGuideData } from "@/types/product-guide"
+} from "@/types/customer-form";
+import type { ProductGuideData } from "@/types/product-guide";
 import type {
   ProductCatalogData,
   ProductCatalogDetail,
@@ -30,10 +30,10 @@ import type {
   ProductCatalogItem,
   ProductCatalogLtvGroup,
   ProductCatalogTag,
-} from "@/types/product-catalog"
-import { calculateAmountFromLtv } from "@/lib/loan-cal"
-import type { FollowUpEntry } from "@/types/lead-content"
-import type { Gender } from "@/types/customer-lead"
+} from "@/types/product-catalog";
+import { calculateAmountFromLtv } from "@/lib/loan-cal";
+import type { FollowUpEntry } from "@/types/lead-content";
+import type { Gender } from "@/types/customer-lead";
 
 export const navItems: NavItem[] = [
   { href: "/", label: "หน้าแรก", icon: "home", active: true },
@@ -42,13 +42,13 @@ export const navItems: NavItem[] = [
   { href: "/crm", label: "CRM", icon: "users" },
   { href: "/tasks", label: "งานติดตาม", icon: "calendar-check" },
   { href: "/encb", label: "eNCB", icon: "bar-chart" },
-]
+];
 
 export const currentUser: BranchUser = {
   name: "สมหมาย รักงาน",
   branch: "สาขาลาดพร้าว",
   initials: "สก",
-}
+};
 
 export const quickActions: QuickAction[] = [
   {
@@ -61,7 +61,7 @@ export const quickActions: QuickAction[] = [
     subtitle: "ตรวจสอบข้อมูลเครดิตบูโร",
     href: "/encb",
   },
-]
+];
 
 export const followUpTasks: FollowUpTask[] = [
   {
@@ -82,7 +82,7 @@ export const followUpTasks: FollowUpTask[] = [
     dueLabel: "Today",
     priority: "High",
   },
-]
+];
 
 // No branch/staff entity or auth context exists yet, so every opportunity is
 // stamped with the same mock assignment until that's built for real.
@@ -93,7 +93,7 @@ export const MOCK_OPPORTUNITY_STAFF_CODE = "L1610000047/799645";
 export const loanPurposeOptions: OptionCardData<LoanPurpose>[] = [
   { value: "need-money", label: "ต้องการเงิน", description: "จำนำทะเบียน" },
   { value: "buy-car", label: "อยากซื้อรถ", description: "ซื้อ-ขาย ดีลเลอร์" },
-]
+];
 
 export const provinceOptions: { value: string; label: string }[] = [
   { value: "bangkok", label: "กรุงเทพมหานคร" },
@@ -104,7 +104,7 @@ export const provinceOptions: { value: string; label: string }[] = [
   { value: "chon-buri", label: "ชลบุรี" },
   { value: "nakhon-ratchasima", label: "นครราชสีมา" },
   { value: "khon-kaen", label: "ขอนแก่น" },
-]
+];
 
 export const collateralTypeOptions: OptionCardData<CollateralType>[] = [
   {
@@ -112,15 +112,19 @@ export const collateralTypeOptions: OptionCardData<CollateralType>[] = [
     label: "มอเตอร์ไซค์",
     image: "/assets/collateral/motorcycle.png",
   },
-  { value: "car", label: "เก๋ง กระบะ ตู้", image: "/assets/collateral/car.png" },
+  {
+    value: "car",
+    label: "เก๋ง กระบะ ตู้",
+    image: "/assets/collateral/car.png",
+  },
   { value: "truck", label: "บรรทุก", image: "/assets/collateral/truck.png" },
   { value: "land", label: "ที่ดิน", image: "/assets/collateral/land.png" },
-]
+];
 
 export const refinanceStatusOptions: OptionCardData<RefinanceStatus>[] = [
   { value: "still-paying", label: "ยังผ่อนอยู่", description: "รีไฟแนนซ์" },
   { value: "paid-off", label: "ผ่อนหมดแล้ว", description: "ไม่ใช่รีไฟแนนซ์" },
-]
+];
 
 // ไฟแนนซ์เดิมที่รับรีไฟแนนซ์ — จาก image_figma/RateBook/car-precreen-refinance.png
 // หมายเหตุจาก Figma (ยังไม่แสดงใน UI):
@@ -130,7 +134,10 @@ export const existingFinanceOptions: { value: string; label: string }[] = [
   { value: "tisco", label: "ธนาคาร ทิสโก้ จำกัด (มหาชน)" },
   { value: "thanachart", label: "ธนาคาร ธนชาต จำกัด (มหาชน)" },
   { value: "scb", label: "ธนาคาร ไทยพาณิชย์ จำกัด (มหาชน)" },
-  { value: "tripetch-isuzu-leasing", label: "บริษัท ตรีเพชรอีซูซุลิสซิ่ง จำกัด" },
+  {
+    value: "tripetch-isuzu-leasing",
+    label: "บริษัท ตรีเพชรอีซูซุลิสซิ่ง จำกัด",
+  },
   { value: "kasikorn-leasing", label: "บริษัท ลิสซิ่งกสิกรไทย จำกัด" },
   { value: "kiatnakin", label: "ธนาคาร เกียรตินาคิน จำกัด (มหาชน)" },
   {
@@ -142,7 +149,10 @@ export const existingFinanceOptions: { value: string; label: string }[] = [
     value: "krungthai-business-leasing",
     label: "บริษัท กรุงไทยธุรกิจลีสซิ่ง จำกัด",
   },
-  { value: "toyota-leasing", label: "บริษัท โตโยต้า ลิสซิ่ง (ประเทศไทย) จำกัด" },
+  {
+    value: "toyota-leasing",
+    label: "บริษัท โตโยต้า ลิสซิ่ง (ประเทศไทย) จำกัด",
+  },
   { value: "cimb-thai-auto", label: "บริษัท ซีไอเอ็มบี ไทย ออโต้ จำกัด" },
   {
     value: "ayudhya-capital-auto-lease",
@@ -172,24 +182,22 @@ export const existingFinanceOptions: { value: string; label: string }[] = [
     value: "ngern-hai-jai",
     label: "บริษัท เงินให้ใจ จำกัด",
   },
-]
+];
 
 export const customerTypeOptions: { value: CustomerType; label: string }[] = [
   { value: "individual", label: "บุคคลธรรมดา" },
-]
+];
 
 export const verificationMethodOptions: {
-  value: VerificationMethod
-  label: string
+  value: VerificationMethod;
+  label: string;
 }[] = [
-    { value: "card", label: "เสียบบัตรประชาชน" },
-    { value: "manual", label: "กรอกข้อมูลเอง" },
-  ]
+  { value: "card", label: "เสียบบัตรประชาชน" },
+  { value: "manual", label: "กรอกข้อมูลเอง" },
+];
 
-function subModels(
-  entries: [string, string][],
-): VehicleSubModelOption[] {
-  return entries.map(([value, label]) => ({ value, label }))
+function subModels(entries: [string, string][]): VehicleSubModelOption[] {
+  return entries.map(([value, label]) => ({ value, label }));
 }
 
 function model(
@@ -199,7 +207,7 @@ function model(
   basePrice: number,
   spec: VehicleModelSpec,
 ): VehicleModelOption {
-  return { value, label, subModels: subModels(entries), basePrice, ...spec }
+  return { value, label, subModels: subModels(entries), basePrice, ...spec };
 }
 
 function brand(
@@ -207,7 +215,7 @@ function brand(
   label: string,
   models: VehicleModelOption[],
 ): VehicleBrandOption {
-  return { value, label, models }
+  return { value, label, models };
 }
 
 export const vehicleCatalogByCollateralType: Record<
@@ -216,260 +224,428 @@ export const vehicleCatalogByCollateralType: Record<
 > = {
   car: [
     brand("toyota", "Toyota", [
-      model("vios", "Vios", [
-        ["1.5-j", "1.5 J"],
-        ["1.5-e", "1.5 E"],
-        ["1.5-g", "1.5 G"],
-      ], 600000, {
-        carTypeByDoors: { "4": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan"],
-      }),
-      model("yaris", "Yaris", [
-        ["entry", "1.2 Entry"],
-        ["sport", "1.2 Sport"],
-        ["premium", "1.2 Premium"],
-      ], 580000, {
-        carTypeByDoors: { "4": "sedan", "5": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan", "hatchback"],
-      }),
-      model("fortuner", "Fortuner", [
-        ["standard", "2.4 Standard"],
-        ["legender", "2.8 Legender"],
-      ], 1350000, {
-        carTypeByDoors: { "5": "suv" },
-        transmissions: ["auto"],
-        bodyTypes: ["suv"],
-      }),
-      model("hilux-revo", "Hilux Revo", [
-        ["standard-cab", "Standard Cab"],
-        ["smart-cab", "Smart Cab"],
-        ["double-cab", "Double Cab"],
-      ], 700000, {
-        carTypeByDoors: { "2": "pickup", "4": "pickup" },
-        transmissions: ["manual", "auto"],
-        bodyTypes: ["pickup"],
-      }),
+      model(
+        "vios",
+        "Vios",
+        [
+          ["1.5-j", "1.5 J"],
+          ["1.5-e", "1.5 E"],
+          ["1.5-g", "1.5 G"],
+        ],
+        600000,
+        {
+          carTypeByDoors: { "4": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan"],
+        },
+      ),
+      model(
+        "yaris",
+        "Yaris",
+        [
+          ["entry", "1.2 Entry"],
+          ["sport", "1.2 Sport"],
+          ["premium", "1.2 Premium"],
+        ],
+        580000,
+        {
+          carTypeByDoors: { "4": "sedan", "5": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan", "hatchback"],
+        },
+      ),
+      model(
+        "fortuner",
+        "Fortuner",
+        [
+          ["standard", "2.4 Standard"],
+          ["legender", "2.8 Legender"],
+        ],
+        1350000,
+        {
+          carTypeByDoors: { "5": "suv" },
+          transmissions: ["auto"],
+          bodyTypes: ["suv"],
+        },
+      ),
+      model(
+        "hilux-revo",
+        "Hilux Revo",
+        [
+          ["standard-cab", "Standard Cab"],
+          ["smart-cab", "Smart Cab"],
+          ["double-cab", "Double Cab"],
+        ],
+        700000,
+        {
+          carTypeByDoors: { "2": "pickup", "4": "pickup" },
+          transmissions: ["manual", "auto"],
+          bodyTypes: ["pickup"],
+        },
+      ),
     ]),
     brand("honda", "Honda", [
-      model("city", "City", [
-        ["s", "S"],
-        ["v", "V"],
-        ["sv", "SV"],
-      ], 650000, {
-        carTypeByDoors: { "4": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan"],
-      }),
-      model("civic", "Civic", [
-        ["el", "EL"],
-        ["rs", "RS"],
-        ["hatchback-rs", "Hatchback RS"],
-      ], 950000, {
-        carTypeByDoors: { "4": "sedan", "5": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan", "hatchback"],
-      }),
-      model("cr-v", "CR-V", [
-        ["e", "E"],
-        ["el", "EL"],
-        ["se", "SE"],
-      ], 1300000, {
-        carTypeByDoors: { "5": "suv" },
-        transmissions: ["auto"],
-        bodyTypes: ["suv"],
-      }),
+      model(
+        "city",
+        "City",
+        [
+          ["s", "S"],
+          ["v", "V"],
+          ["sv", "SV"],
+        ],
+        650000,
+        {
+          carTypeByDoors: { "4": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan"],
+        },
+      ),
+      model(
+        "civic",
+        "Civic",
+        [
+          ["el", "EL"],
+          ["rs", "RS"],
+          ["hatchback-rs", "Hatchback RS"],
+        ],
+        950000,
+        {
+          carTypeByDoors: { "4": "sedan", "5": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan", "hatchback"],
+        },
+      ),
+      model(
+        "cr-v",
+        "CR-V",
+        [
+          ["e", "E"],
+          ["el", "EL"],
+          ["se", "SE"],
+        ],
+        1300000,
+        {
+          carTypeByDoors: { "5": "suv" },
+          transmissions: ["auto"],
+          bodyTypes: ["suv"],
+        },
+      ),
     ]),
     brand("isuzu", "Isuzu", [
-      model("d-max", "D-Max", [
-        ["spark", "Spark"],
-        ["hi-lander", "Hi-Lander"],
-        ["v-cross", "V-Cross"],
-      ], 650000, {
-        carTypeByDoors: { "2": "pickup", "4": "pickup" },
-        transmissions: ["manual", "auto"],
-        bodyTypes: ["pickup"],
-      }),
-      model("mu-x", "MU-X", [
-        ["standard", "Standard"],
-        ["ultimate", "Ultimate"],
-      ], 1300000, {
-        carTypeByDoors: { "5": "suv" },
-        transmissions: ["auto"],
-        bodyTypes: ["suv"],
-      }),
+      model(
+        "d-max",
+        "D-Max",
+        [
+          ["spark", "Spark"],
+          ["hi-lander", "Hi-Lander"],
+          ["v-cross", "V-Cross"],
+        ],
+        650000,
+        {
+          carTypeByDoors: { "2": "pickup", "4": "pickup" },
+          transmissions: ["manual", "auto"],
+          bodyTypes: ["pickup"],
+        },
+      ),
+      model(
+        "mu-x",
+        "MU-X",
+        [
+          ["standard", "Standard"],
+          ["ultimate", "Ultimate"],
+        ],
+        1300000,
+        {
+          carTypeByDoors: { "5": "suv" },
+          transmissions: ["auto"],
+          bodyTypes: ["suv"],
+        },
+      ),
     ]),
     brand("nissan", "Nissan", [
-      model("almera", "Almera", [
-        ["e", "E"],
-        ["v", "V"],
-        ["vl", "VL"],
-      ], 550000, {
-        carTypeByDoors: { "4": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan"],
-      }),
-      model("navara", "Navara", [
-        ["calibre", "Calibre"],
-        ["pro-4x", "Pro-4X"],
-      ], 700000, {
-        carTypeByDoors: { "2": "pickup", "4": "pickup" },
-        transmissions: ["manual", "auto"],
-        bodyTypes: ["pickup"],
-      }),
+      model(
+        "almera",
+        "Almera",
+        [
+          ["e", "E"],
+          ["v", "V"],
+          ["vl", "VL"],
+        ],
+        550000,
+        {
+          carTypeByDoors: { "4": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan"],
+        },
+      ),
+      model(
+        "navara",
+        "Navara",
+        [
+          ["calibre", "Calibre"],
+          ["pro-4x", "Pro-4X"],
+        ],
+        700000,
+        {
+          carTypeByDoors: { "2": "pickup", "4": "pickup" },
+          transmissions: ["manual", "auto"],
+          bodyTypes: ["pickup"],
+        },
+      ),
     ]),
     brand("mazda", "Mazda", [
-      model("mazda2", "Mazda2", [
-        ["s", "S"],
-        ["sports-high", "Sports High"],
-      ], 550000, {
-        carTypeByDoors: { "4": "sedan", "5": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan", "hatchback"],
-      }),
-      model("cx-5", "CX-5", [
-        ["c", "C"],
-        ["sp", "SP"],
-      ], 1200000, {
-        carTypeByDoors: { "5": "suv" },
-        transmissions: ["auto"],
-        bodyTypes: ["suv"],
-      }),
-      model("bt-50", "BT-50", [
-        ["standard-cab", "Standard Cab"],
-        ["double-cab", "Double Cab"],
-      ], 700000, {
-        carTypeByDoors: { "2": "pickup", "4": "pickup" },
-        transmissions: ["manual", "auto"],
-        bodyTypes: ["pickup"],
-      }),
+      model(
+        "mazda2",
+        "Mazda2",
+        [
+          ["s", "S"],
+          ["sports-high", "Sports High"],
+        ],
+        550000,
+        {
+          carTypeByDoors: { "4": "sedan", "5": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan", "hatchback"],
+        },
+      ),
+      model(
+        "cx-5",
+        "CX-5",
+        [
+          ["c", "C"],
+          ["sp", "SP"],
+        ],
+        1200000,
+        {
+          carTypeByDoors: { "5": "suv" },
+          transmissions: ["auto"],
+          bodyTypes: ["suv"],
+        },
+      ),
+      model(
+        "bt-50",
+        "BT-50",
+        [
+          ["standard-cab", "Standard Cab"],
+          ["double-cab", "Double Cab"],
+        ],
+        700000,
+        {
+          carTypeByDoors: { "2": "pickup", "4": "pickup" },
+          transmissions: ["manual", "auto"],
+          bodyTypes: ["pickup"],
+        },
+      ),
     ]),
     brand("ford", "Ford", [
-      model("ranger", "Ranger", [
-        ["xl", "XL"],
-        ["xlt", "XLT"],
-        ["wildtrak", "Wildtrak"],
-      ], 750000, {
-        carTypeByDoors: { "2": "pickup", "4": "pickup" },
-        transmissions: ["manual", "auto"],
-        bodyTypes: ["pickup"],
-      }),
-      model("everest", "Everest", [
-        ["ambiente", "Ambiente"],
-        ["titanium", "Titanium"],
-      ], 1400000, {
-        carTypeByDoors: { "5": "suv" },
-        transmissions: ["auto"],
-        bodyTypes: ["suv"],
-      }),
+      model(
+        "ranger",
+        "Ranger",
+        [
+          ["xl", "XL"],
+          ["xlt", "XLT"],
+          ["wildtrak", "Wildtrak"],
+        ],
+        750000,
+        {
+          carTypeByDoors: { "2": "pickup", "4": "pickup" },
+          transmissions: ["manual", "auto"],
+          bodyTypes: ["pickup"],
+        },
+      ),
+      model(
+        "everest",
+        "Everest",
+        [
+          ["ambiente", "Ambiente"],
+          ["titanium", "Titanium"],
+        ],
+        1400000,
+        {
+          carTypeByDoors: { "5": "suv" },
+          transmissions: ["auto"],
+          bodyTypes: ["suv"],
+        },
+      ),
     ]),
     brand("mitsubishi", "Mitsubishi", [
-      model("triton", "Triton", [
-        ["glx", "GLX"],
-        ["gls", "GLS"],
-        ["athlete", "Athlete"],
-      ], 650000, {
-        carTypeByDoors: { "2": "pickup", "4": "pickup" },
-        transmissions: ["manual", "auto"],
-        bodyTypes: ["pickup"],
-      }),
-      model("xpander", "Xpander", [
-        ["gls", "GLS"],
-        ["ultimate", "Ultimate"],
-      ], 800000, {
-        carTypeByDoors: { "5": "van" },
-        transmissions: ["auto"],
-        bodyTypes: ["van"],
-      }),
+      model(
+        "triton",
+        "Triton",
+        [
+          ["glx", "GLX"],
+          ["gls", "GLS"],
+          ["athlete", "Athlete"],
+        ],
+        650000,
+        {
+          carTypeByDoors: { "2": "pickup", "4": "pickup" },
+          transmissions: ["manual", "auto"],
+          bodyTypes: ["pickup"],
+        },
+      ),
+      model(
+        "xpander",
+        "Xpander",
+        [
+          ["gls", "GLS"],
+          ["ultimate", "Ultimate"],
+        ],
+        800000,
+        {
+          carTypeByDoors: { "5": "van" },
+          transmissions: ["auto"],
+          bodyTypes: ["van"],
+        },
+      ),
     ]),
     brand("suzuki", "Suzuki", [
-      model("swift", "Swift", [
-        ["ga", "GA"],
-        ["gl", "GL"],
-      ], 550000, {
-        carTypeByDoors: { "5": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["hatchback"],
-      }),
-      model("ciaz", "Ciaz", [
-        ["gl", "GL"],
-        ["glx", "GLX"],
-      ], 550000, {
-        carTypeByDoors: { "4": "sedan" },
-        transmissions: ["auto"],
-        bodyTypes: ["sedan"],
-      }),
+      model(
+        "swift",
+        "Swift",
+        [
+          ["ga", "GA"],
+          ["gl", "GL"],
+        ],
+        550000,
+        {
+          carTypeByDoors: { "5": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["hatchback"],
+        },
+      ),
+      model(
+        "ciaz",
+        "Ciaz",
+        [
+          ["gl", "GL"],
+          ["glx", "GLX"],
+        ],
+        550000,
+        {
+          carTypeByDoors: { "4": "sedan" },
+          transmissions: ["auto"],
+          bodyTypes: ["sedan"],
+        },
+      ),
     ]),
   ],
   motorcycle: [
     brand("honda", "Honda", [
-      model("wave110i", "Wave110i", [
-        ["standard", "Standard"],
-        ["fi", "Fi"],
-      ], 45000, {
-        carTypeByDoors: { "": "family" },
-        transmissions: ["manual"],
-        bodyTypes: ["standard"],
-      }),
-      model("click160i", "Click160i", [
-        ["standard", "Standard"],
-        ["abs", "ABS"],
-      ], 75000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("pcx160", "PCX160", [
-        ["standard", "Standard"],
-        ["abs", "ABS"],
-      ], 100000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("cbr150r", "CBR150R", [
-        ["standard", "Standard"],
-        ["abs", "ABS"],
-      ], 105000, {
-        carTypeByDoors: { "": "sport" },
-        transmissions: ["manual"],
-        bodyTypes: ["sport"],
-      }),
+      model(
+        "wave110i",
+        "Wave110i",
+        [
+          ["standard", "Standard"],
+          ["fi", "Fi"],
+        ],
+        45000,
+        {
+          carTypeByDoors: { "": "family" },
+          transmissions: ["manual"],
+          bodyTypes: ["standard"],
+        },
+      ),
+      model(
+        "click160i",
+        "Click160i",
+        [
+          ["standard", "Standard"],
+          ["abs", "ABS"],
+        ],
+        75000,
+        {
+          carTypeByDoors: { "": "scooter" },
+          transmissions: ["auto"],
+          bodyTypes: ["scooter"],
+        },
+      ),
+      model(
+        "pcx160",
+        "PCX160",
+        [
+          ["standard", "Standard"],
+          ["abs", "ABS"],
+        ],
+        100000,
+        {
+          carTypeByDoors: { "": "scooter" },
+          transmissions: ["auto"],
+          bodyTypes: ["scooter"],
+        },
+      ),
+      model(
+        "cbr150r",
+        "CBR150R",
+        [
+          ["standard", "Standard"],
+          ["abs", "ABS"],
+        ],
+        105000,
+        {
+          carTypeByDoors: { "": "sport" },
+          transmissions: ["manual"],
+          bodyTypes: ["sport"],
+        },
+      ),
     ]),
     brand("yamaha", "Yamaha", [
-      model("fino", "Fino", [
-        ["standard", "Standard"],
-        ["premium", "Premium"],
-      ], 48000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("aerox155", "Aerox155", [
-        ["standard", "Standard"],
-        ["abs", "ABS"],
-      ], 75000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("nmax", "NMAX", [
-        ["standard", "Standard"],
-        ["abs", "ABS"],
-      ], 90000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("exciter155vva", "Exciter155VVA", [
-        ["standard", "Standard"],
-        ["gp", "GP"],
-      ], 95000, {
-        carTypeByDoors: { "": "sport" },
-        transmissions: ["manual"],
-        bodyTypes: ["sport"],
-      }),
+      model(
+        "fino",
+        "Fino",
+        [
+          ["standard", "Standard"],
+          ["premium", "Premium"],
+        ],
+        48000,
+        {
+          carTypeByDoors: { "": "scooter" },
+          transmissions: ["auto"],
+          bodyTypes: ["scooter"],
+        },
+      ),
+      model(
+        "aerox155",
+        "Aerox155",
+        [
+          ["standard", "Standard"],
+          ["abs", "ABS"],
+        ],
+        75000,
+        {
+          carTypeByDoors: { "": "scooter" },
+          transmissions: ["auto"],
+          bodyTypes: ["scooter"],
+        },
+      ),
+      model(
+        "nmax",
+        "NMAX",
+        [
+          ["standard", "Standard"],
+          ["abs", "ABS"],
+        ],
+        90000,
+        {
+          carTypeByDoors: { "": "scooter" },
+          transmissions: ["auto"],
+          bodyTypes: ["scooter"],
+        },
+      ),
+      model(
+        "exciter155vva",
+        "Exciter155VVA",
+        [
+          ["standard", "Standard"],
+          ["gp", "GP"],
+        ],
+        95000,
+        {
+          carTypeByDoors: { "": "sport" },
+          transmissions: ["manual"],
+          bodyTypes: ["sport"],
+        },
+      ),
     ]),
     brand("suzuki", "Suzuki", [
       model("smash", "Smash", [["standard", "Standard"]], 45000, {
@@ -489,14 +665,20 @@ export const vehicleCatalogByCollateralType: Record<
       }),
     ]),
     brand("kawasaki", "Kawasaki", [
-      model("ninja250", "Ninja250", [
-        ["standard", "Standard"],
-        ["se", "SE"],
-      ], 170000, {
-        carTypeByDoors: { "": "big-bike" },
-        transmissions: ["manual"],
-        bodyTypes: ["sport"],
-      }),
+      model(
+        "ninja250",
+        "Ninja250",
+        [
+          ["standard", "Standard"],
+          ["se", "SE"],
+        ],
+        170000,
+        {
+          carTypeByDoors: { "": "big-bike" },
+          transmissions: ["manual"],
+          bodyTypes: ["sport"],
+        },
+      ),
       model("z250", "Z250", [["standard", "Standard"]], 160000, {
         carTypeByDoors: { "": "big-bike" },
         transmissions: ["manual"],
@@ -509,11 +691,17 @@ export const vehicleCatalogByCollateralType: Record<
       }),
     ]),
     brand("vespa", "Vespa", [
-      model("primavera150", "Primavera150", [["standard", "Standard"]], 150000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
+      model(
+        "primavera150",
+        "Primavera150",
+        [["standard", "Standard"]],
+        150000,
+        {
+          carTypeByDoors: { "": "scooter" },
+          transmissions: ["auto"],
+          bodyTypes: ["scooter"],
+        },
+      ),
       model("sprint150", "Sprint150", [["standard", "Standard"]], 150000, {
         carTypeByDoors: { "": "scooter" },
         transmissions: ["auto"],
@@ -540,22 +728,34 @@ export const vehicleCatalogByCollateralType: Record<
   ],
   truck: [
     brand("isuzu", "Isuzu", [
-      model("ftr", "FTR", [
-        ["4x2", "4x2"],
-        ["6x2", "6x2"],
-      ], 2200000, {
-        carTypeByDoors: { "2": "6-wheel" },
-        transmissions: ["manual"],
-        bodyTypes: ["cab-chassis", "flatbed", "box"],
-      }),
-      model("fvr", "FVR", [
-        ["6x2", "6x2"],
-        ["6x4", "6x4"],
-      ], 2800000, {
-        carTypeByDoors: { "2": "10-wheel" },
-        transmissions: ["manual"],
-        bodyTypes: ["cab-chassis", "flatbed", "box"],
-      }),
+      model(
+        "ftr",
+        "FTR",
+        [
+          ["4x2", "4x2"],
+          ["6x2", "6x2"],
+        ],
+        2200000,
+        {
+          carTypeByDoors: { "2": "6-wheel" },
+          transmissions: ["manual"],
+          bodyTypes: ["cab-chassis", "flatbed", "box"],
+        },
+      ),
+      model(
+        "fvr",
+        "FVR",
+        [
+          ["6x2", "6x2"],
+          ["6x4", "6x4"],
+        ],
+        2800000,
+        {
+          carTypeByDoors: { "2": "10-wheel" },
+          transmissions: ["manual"],
+          bodyTypes: ["cab-chassis", "flatbed", "box"],
+        },
+      ),
       model("elf", "ELF", [["standard", "Standard"]], 1400000, {
         carTypeByDoors: { "2": "4-wheel" },
         transmissions: ["manual"],
@@ -563,22 +763,34 @@ export const vehicleCatalogByCollateralType: Record<
       }),
     ]),
     brand("hino", "Hino", [
-      model("300-series", "300 Series", [
-        ["standard", "Standard"],
-        ["wide-cab", "Wide Cab"],
-      ], 1600000, {
-        carTypeByDoors: { "2": "4-wheel" },
-        transmissions: ["manual"],
-        bodyTypes: ["cab-chassis", "box"],
-      }),
-      model("500-series", "500 Series", [
-        ["4x2", "4x2"],
-        ["6x2", "6x2"],
-      ], 2900000, {
-        carTypeByDoors: { "2": "6-wheel" },
-        transmissions: ["manual"],
-        bodyTypes: ["cab-chassis", "flatbed", "box"],
-      }),
+      model(
+        "300-series",
+        "300 Series",
+        [
+          ["standard", "Standard"],
+          ["wide-cab", "Wide Cab"],
+        ],
+        1600000,
+        {
+          carTypeByDoors: { "2": "4-wheel" },
+          transmissions: ["manual"],
+          bodyTypes: ["cab-chassis", "box"],
+        },
+      ),
+      model(
+        "500-series",
+        "500 Series",
+        [
+          ["4x2", "4x2"],
+          ["6x2", "6x2"],
+        ],
+        2900000,
+        {
+          carTypeByDoors: { "2": "6-wheel" },
+          transmissions: ["manual"],
+          bodyTypes: ["cab-chassis", "flatbed", "box"],
+        },
+      ),
       model("700-series", "700 Series", [["6x4", "6x4"]], 4500000, {
         carTypeByDoors: { "2": "10-wheel" },
         transmissions: ["manual"],
@@ -598,14 +810,20 @@ export const vehicleCatalogByCollateralType: Record<
       }),
     ]),
     brand("volvo", "Volvo Trucks", [
-      model("fm", "FM", [
-        ["4x2", "4x2"],
-        ["6x4", "6x4"],
-      ], 4800000, {
-        carTypeByDoors: { "2": "10-wheel" },
-        transmissions: ["auto"],
-        bodyTypes: ["flatbed", "tanker"],
-      }),
+      model(
+        "fm",
+        "FM",
+        [
+          ["4x2", "4x2"],
+          ["6x4", "6x4"],
+        ],
+        4800000,
+        {
+          carTypeByDoors: { "2": "10-wheel" },
+          transmissions: ["auto"],
+          bodyTypes: ["flatbed", "tanker"],
+        },
+      ),
       model("fh", "FH", [["6x4", "6x4"]], 5500000, {
         carTypeByDoors: { "2": "trailer" },
         transmissions: ["auto"],
@@ -649,7 +867,7 @@ export const vehicleCatalogByCollateralType: Record<
       }),
     ]),
   ],
-}
+};
 
 export const carTypeOptionsByCollateralType: Record<
   VehicleCollateralType,
@@ -674,7 +892,7 @@ export const carTypeOptionsByCollateralType: Record<
     { value: "big-bike", label: "บิ๊กไบค์" },
     { value: "adv", label: "ADV/Adventure" },
   ],
-}
+};
 
 export const carBodyTypeOptionsByCollateralType: Record<
   VehicleCollateralType,
@@ -701,7 +919,7 @@ export const carBodyTypeOptionsByCollateralType: Record<
     { value: "cruiser", label: "ครุยเซอร์" },
     { value: "adventure", label: "แอดเวนเจอร์" },
   ],
-}
+};
 
 export const carEngineCcOptionsByCollateralType: Record<
   VehicleCollateralType,
@@ -734,20 +952,22 @@ export const carEngineCcOptionsByCollateralType: Record<
     { value: "300", label: "300 ซีซี" },
     { value: "400", label: "400 ซีซี" },
   ],
-}
+};
 
 export function toVehicleCollateralType(
   collateralType?: CollateralType | null,
 ): VehicleCollateralType {
   return collateralType === "motorcycle" || collateralType === "truck"
     ? collateralType
-    : "car"
+    : "car";
 }
 
 export function getVehicleBrands(
   collateralType?: CollateralType | null,
 ): VehicleBrandOption[] {
-  return vehicleCatalogByCollateralType[toVehicleCollateralType(collateralType)]
+  return vehicleCatalogByCollateralType[
+    toVehicleCollateralType(collateralType)
+  ];
 }
 
 export function getVehicleModels(
@@ -755,9 +975,10 @@ export function getVehicleModels(
   brandValue?: string,
 ): VehicleModelOption[] {
   return (
-    getVehicleBrands(collateralType).find((option) => option.value === brandValue)
-      ?.models ?? []
-  )
+    getVehicleBrands(collateralType).find(
+      (option) => option.value === brandValue,
+    )?.models ?? []
+  );
 }
 
 export function getVehicleSubModels(
@@ -769,7 +990,7 @@ export function getVehicleSubModels(
     getVehicleModels(collateralType, brandValue).find(
       (option) => option.value === modelValue,
     )?.subModels ?? []
-  )
+  );
 }
 
 export function getVehicleModelSpec(
@@ -779,7 +1000,7 @@ export function getVehicleModelSpec(
 ): VehicleModelSpec | undefined {
   return getVehicleModels(collateralType, brandValue).find(
     (option) => option.value === modelValue,
-  )
+  );
 }
 
 // จำนวนประตู is narrowed to what the chosen รุ่น actually comes in, so the ประเภทรถ below can
@@ -791,8 +1012,9 @@ export function getVehicleDoorsOptions(
   modelValue?: string,
 ): { value: string; label: string }[] {
   const carTypeByDoors =
-    getVehicleModelSpec(collateralType, brandValue, modelValue)?.carTypeByDoors ?? {}
-  return carDoorsOptions.filter((option) => option.value in carTypeByDoors)
+    getVehicleModelSpec(collateralType, brandValue, modelValue)
+      ?.carTypeByDoors ?? {};
+  return carDoorsOptions.filter((option) => option.value in carTypeByDoors);
 }
 
 // ประเภทรถ is a fact about the vehicle, not a question for the user: the รุ่น's own
@@ -803,9 +1025,8 @@ export function getVehicleCarType(
   modelValue?: string,
   doors?: string,
 ): string | undefined {
-  return getVehicleModelSpec(collateralType, brandValue, modelValue)?.carTypeByDoors[
-    doors ?? ""
-  ]
+  return getVehicleModelSpec(collateralType, brandValue, modelValue)
+    ?.carTypeByDoors[doors ?? ""];
 }
 
 export function getVehicleBrandLabel(
@@ -813,9 +1034,10 @@ export function getVehicleBrandLabel(
   brandValue?: string,
 ): string {
   return (
-    getVehicleBrands(collateralType).find((option) => option.value === brandValue)
-      ?.label ?? "-"
-  )
+    getVehicleBrands(collateralType).find(
+      (option) => option.value === brandValue,
+    )?.label ?? "-"
+  );
 }
 
 export function getVehicleModelLabel(
@@ -827,7 +1049,7 @@ export function getVehicleModelLabel(
     getVehicleModels(collateralType, brandValue).find(
       (option) => option.value === modelValue,
     )?.label ?? "-"
-  )
+  );
 }
 
 export function getVehicleModelBasePrice(
@@ -839,7 +1061,7 @@ export function getVehicleModelBasePrice(
     getVehicleModels(collateralType, brandValue).find(
       (option) => option.value === modelValue,
     )?.basePrice ?? 300000
-  )
+  );
 }
 
 export function getVehicleSubModelLabel(
@@ -852,51 +1074,51 @@ export function getVehicleSubModelLabel(
     getVehicleSubModels(collateralType, brandValue, modelValue).find(
       (option) => option.value === subModelValue,
     )?.label ?? "-"
-  )
+  );
 }
 
 export const carYearOptions: { value: string; label: string }[] = Array.from(
   { length: 15 },
   (_, index) => {
-    const year = 2024 - index
-    return { value: String(year), label: String(year) }
+    const year = 2024 - index;
+    return { value: String(year), label: String(year) };
   },
-)
+);
 
 export const carConditionOptions: { value: string; label: string }[] = [
   { value: "excellent", label: "ดีเยี่ยม" },
   { value: "good", label: "ดี" },
   { value: "fair", label: "พอใช้" },
   { value: "needs-repair", label: "ต้องซ่อมแซม" },
-]
+];
 
 export const carDoorsOptions: { value: string; label: string }[] = [
   { value: "2", label: "2 ประตู" },
   { value: "4", label: "4 ประตู" },
   { value: "5", label: "5 ประตู" },
-]
+];
 
 export const carTransmissionOptions: { value: string; label: string }[] = [
   { value: "manual", label: "เกียร์ธรรมดา" },
   { value: "auto", label: "เกียร์อัตโนมัติ" },
-]
+];
 
 export const mockCardCustomer: CardCustomerData = {
   name: "สดใส สะอาดเอี่ยม",
   idCardNumber: "1-2345-67890-12-3",
   gender: "male",
   birthDate: "1990-05-20",
-}
+};
 
 export const genderOptions: { value: Gender; label: string }[] = [
   { value: "male", label: "ชาย" },
   { value: "female", label: "หญิง" },
-]
+];
 
 export const GENDER_LABELS: Record<Gender, string> = {
   male: "ชาย",
   female: "หญิง",
-}
+};
 
 export const performanceStats: PerformanceStat[] = [
   {
@@ -923,25 +1145,25 @@ export const performanceStats: PerformanceStat[] = [
     changeLabel: "8.7%",
     trend: "up",
   },
-]
+];
 
 const CONDITION_MULTIPLIERS: Record<string, number> = {
   excellent: 1,
   good: 0.93,
   fair: 0.83,
   "needs-repair": 0.65,
-}
+};
 
-const DEPRECIATION_RATE_PER_YEAR = 0.1
-const MIN_DEPRECIATION_FACTOR = 0.2
+const DEPRECIATION_RATE_PER_YEAR = 0.1;
+const MIN_DEPRECIATION_FACTOR = 0.2;
 
 function depreciationFactor(ageInYears: number): number {
-  const factor = (1 - DEPRECIATION_RATE_PER_YEAR) ** Math.max(ageInYears, 0)
-  return Math.max(factor, MIN_DEPRECIATION_FACTOR)
+  const factor = (1 - DEPRECIATION_RATE_PER_YEAR) ** Math.max(ageInYears, 0);
+  return Math.max(factor, MIN_DEPRECIATION_FACTOR);
 }
 
 function roundToNearestThousand(amount: number): number {
-  return Math.round(amount / 1000) * 1000
+  return Math.round(amount / 1000) * 1000;
 }
 
 export function getProductGuideData(
@@ -952,16 +1174,18 @@ export function getProductGuideData(
     collateralType,
     carInfo.brand,
     carInfo.model,
-  )
+  );
   const latestCatalogYear = Math.max(
     ...carYearOptions.map((option) => Number(option.value)),
-  )
-  const ageInYears = latestCatalogYear - Number(carInfo.year ?? latestCatalogYear)
-  const conditionMultiplier = CONDITION_MULTIPLIERS[carInfo.condition ?? ""] ?? 1
+  );
+  const ageInYears =
+    latestCatalogYear - Number(carInfo.year ?? latestCatalogYear);
+  const conditionMultiplier =
+    CONDITION_MULTIPLIERS[carInfo.condition ?? ""] ?? 1;
 
   const appraisalPrice = roundToNearestThousand(
     basePrice * depreciationFactor(ageInYears) * conditionMultiplier,
-  )
+  );
 
   return {
     appraisalPrice,
@@ -993,30 +1217,32 @@ export function getProductGuideData(
         bullets: ["NCB A01-A02", "เอกสารแสดงรายได้", "งานนอกอำนาจ"],
       },
     ],
-  }
+  };
 }
 
 /** A single value, or a low-high band rendered as "low - high". */
-type NumberOrRange = number | { min: number; max: number }
+type NumberOrRange = number | { min: number; max: number };
 
 type ProductRule = {
-  id: string
-  title: string
-  tags: ProductCatalogTag[]
+  id: string;
+  title: string;
+  tags: ProductCatalogTag[];
   /** Percent of the appraisal price; also what the approved amount is derived from. */
-  ltv: NumberOrRange
+  ltv: NumberOrRange;
   /** Percent per month. */
-  monthlyRate: NumberOrRange
+  monthlyRate: NumberOrRange;
   /** ลดต้นลดดอก, percent per year. */
-  annualReduction: NumberOrRange
-  ncbGradeLabel: string
-  ncbGradeTone: ProductCatalogItem["ncbGradeTone"]
-  bookStatusLabel: string
-  primaryActionLabel: string
-  primaryActionVariant: ProductCatalogItem["primaryActionVariant"]
-  minAppraisalPrice?: number
-  requiresTopTierBrand?: boolean
-}
+  annualReduction: NumberOrRange;
+  /** CSV "Interest Type". Flat products are labelled ดอกเบี้ยคงที่, not ลดต้นลดดอก. */
+  interestType?: "effective" | "flat";
+  ncbGradeLabel: string;
+  ncbGradeTone: ProductCatalogItem["ncbGradeTone"];
+  bookStatusLabel: string;
+  primaryActionLabel: string;
+  primaryActionVariant: ProductCatalogItem["primaryActionVariant"];
+  minAppraisalPrice?: number;
+  requiresTopTierBrand?: boolean;
+};
 
 // Brands whose resale value is strong enough for the premium products. Everything
 // else in the catalog only qualifies for that collateral type's baseline product.
@@ -1024,12 +1250,37 @@ const topTierBrandsByCollateralType: Record<VehicleCollateralType, string[]> = {
   car: ["toyota", "honda", "isuzu"],
   motorcycle: ["honda", "yamaha"],
   truck: ["isuzu", "hino", "fuso"],
-}
+};
 
-// The last rule of every set is the baseline: no eligibility conditions, so the
-// catalog is never empty. Rates are %/month and stay within the ~24%/yr ceiling
-// that Thai title loans are capped at.
-const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]> = {
+// Product programs transcribed from csv/List product program_140726(Car|MC|Truck|Land).csv.
+// Rows kept: Program status = Normalized, plus the two Car TEST programs the prototype
+// already shipped (วงเงินสูง 80–130%, อนุมัติง่าย 70%) so saved selections still resolve.
+// ltv ← Min/Max %LTV · monthlyRate ← Min/Max Interest (Month) · annualReduction ←
+// Min/Max Interest (Year) · bookStatusLabel ← Sub category ("… Loan" = ไม่โอนเล่ม,
+// "… HP" = โอนเล่ม) · interestType ← Interest Type.
+//
+// minAppraisalPrice and requiresTopTierBrand have no CSV counterpart (Car Brand is "All"
+// on nearly every row). They stay hand-tuned so the catalog still narrows as the vehicle
+// is filled in; deriving them from Min Amount ÷ Max %LTV would put every gate under
+// ~10,000 baht and show every card at all times.
+//
+// The CSV Tag column is only filled in for Car (13 of 55 rows) and empty for MC, Truck and
+// Land, so tags below follow one derivation table, using the app's existing wording:
+//
+//   ดอกเบี้ยถูก     green   Min Interest (Year) in the type's cheapest band
+//                           (Car ≤13%, MC ≤13.44%, Truck ≤15%, Land ≤9%)   [CSV "ดอกถูก"]
+//   นอกอำนาจ        red     NCB Grade limited to A01/A02 AND Required Income Document = Yes
+//   ใช้เอกสารรายได้  purple  Required Income Document = Yes
+//   รับทุกเกรด      purple  NCB Grade = All                             [CSV "รับทุก Grade"]
+//   อนุมัติไว        amber   name contains "อนุมัติง่าย", or no income doc and no guarantor
+//   <n>% LTV        pink    Max %LTV ≤ 80                            [CSV "LTV 60%/70%"]
+//   วงเงินสูง        amber   Max %LTV ≥ 130
+//   ดอกเบี้ยคงที่    pink    Interest Type = Flat
+//   ไม่ต้องค้ำ       green   Required Guarantor = No on a program that normally needs one
+//   ต้องมีผู้ค้ำ      red     Required Guarantor = Yes
+//   ผ่อนนาน         purple  Max Tenor ≥ 72
+//   รถมือสอง        amber   Program Type = Dealer (Used)
+const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
   car: [
     {
       id: "no-transfer-low-risk",
@@ -1051,11 +1302,27 @@ const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]>
       requiresTopTierBrand: true,
     },
     {
-      id: "high-limit-normal-risk",
-      title: "โครงการวงเงินสูง ความเสี่ยงปกติ เก่ง กระบะ",
+      id: "no-transfer-normal-risk",
+      title: "ผลิตภัณฑ์ไม่โอนเล่ม ความเสี่ยงปกติ",
       tags: [{ label: "รับทุกเกรด", tone: "purple" }],
+      ltv: 80,
+      monthlyRate: { min: 0.94, max: 1.13 },
+      annualReduction: { min: 20, max: 24 },
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "high-limit-normal-risk",
+      title: "โครงการวงเงินสูง ความเสี่ยงปกติ เก๋ง กระบะ",
+      tags: [
+        { label: "รับทุกเกรด", tone: "purple" },
+        { label: "วงเงินสูง", tone: "amber" },
+      ],
       ltv: { min: 80, max: 130 },
-      monthlyRate: { min: 0.6, max: 0.84 },
+      monthlyRate: { min: 0.94, max: 1.13 },
       annualReduction: { min: 20, max: 24 },
       ncbGradeLabel: "ทุกเกรด",
       ncbGradeTone: "green",
@@ -1067,7 +1334,7 @@ const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]>
     },
     {
       id: "easy-approval-low-ltv",
-      title: "โครงการอนุมัติง่าย LTV ต่ำ เก่ง กระบะ",
+      title: "โครงการอนุมัติง่าย LTV ต่ำ เก๋ง กระบะ",
       tags: [
         { label: "อนุมัติไว", tone: "amber" },
         { label: "70% LTV", tone: "pink" },
@@ -1077,37 +1344,70 @@ const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]>
       annualReduction: { min: 20, max: 24 },
       ncbGradeLabel: "A01 - A03",
       ncbGradeTone: "blue",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "easy-approval-non-a",
+      title: "โครงการอนุมัติง่าย LTV ต่ำ เก๋ง กระบะ",
+      tags: [
+        { label: "อนุมัติไว", tone: "amber" },
+        { label: "60% LTV", tone: "pink" },
+      ],
+      ltv: 60,
+      monthlyRate: { min: 0.98, max: 1.13 },
+      annualReduction: { min: 21, max: 24 },
+      ncbGradeLabel: "Non A01-A03",
+      ncbGradeTone: "green",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "transfer-book",
+      title: "ผลิตภัณฑ์แบบโอนเล่ม เก๋ง กระบะ",
+      tags: [
+        { label: "วงเงินสูง", tone: "amber" },
+        { label: "รับทุกเกรด", tone: "purple" },
+        { label: "ดอกเบี้ยคงที่", tone: "pink" },
+      ],
+      ltv: 130,
+      monthlyRate: { min: 0.65, max: 2.05 },
+      annualReduction: { min: 7.8, max: 24.6 },
+      interestType: "flat",
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
       bookStatusLabel: "โอนเล่ม",
       primaryActionLabel: "เลือก",
       primaryActionVariant: "filled",
+      minAppraisalPrice: 200000,
     },
   ],
   motorcycle: [
     {
       id: "mc-no-transfer",
-      title: "ผลิตภัณฑ์ไม่โอนเล่ม มอเตอร์ไซค์ ความเสี่ยงต่ำ",
-      tags: [
-        { label: "ดอกเบี้ยถูก", tone: "green" },
-        { label: "ใช้เอกสารรายได้", tone: "purple" },
-      ],
-      ltv: 80,
-      monthlyRate: 1.25,
-      annualReduction: 15,
-      ncbGradeLabel: "A01, A02",
-      ncbGradeTone: "blue",
+      title: "ผลิตภัณฑ์ไม่โอนเล่ม สำหรับกลุ่มบัตรขึ้นต้น 0, 6",
+      tags: [{ label: "รับทุกเกรด", tone: "purple" }],
+      ltv: 100,
+      monthlyRate: 1.13,
+      annualReduction: 24,
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
       bookStatusLabel: "ไม่โอนเล่ม",
       primaryActionLabel: "ตรวจ eNCB",
       primaryActionVariant: "outline",
-      minAppraisalPrice: 40000,
-      requiresTopTierBrand: true,
     },
     {
       id: "mc-high-limit",
-      title: "โครงการวงเงินสูง มอเตอร์ไซค์ บิ๊กไบค์",
-      tags: [{ label: "รับทุกเกรด", tone: "purple" }],
-      ltv: { min: 70, max: 110 },
-      monthlyRate: { min: 1.25, max: 1.75 },
-      annualReduction: { min: 20, max: 24 },
+      title: "โครงการวงเงินสูง สำหรับลูกค้าเกรดดี",
+      tags: [
+        { label: "วงเงินสูง", tone: "amber" },
+        { label: "รับทุกเกรด", tone: "purple" },
+      ],
+      ltv: 130,
+      monthlyRate: 1.13,
+      annualReduction: 24,
       ncbGradeLabel: "ทุกเกรด",
       ncbGradeTone: "green",
       bookStatusLabel: "ไม่โอนเล่ม",
@@ -1118,32 +1418,76 @@ const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]>
     },
     {
       id: "mc-easy-approval",
-      title: "โครงการอนุมัติง่าย LTV ต่ำ มอเตอร์ไซค์",
+      title: "โครงการอนุมัติง่าย LTV ต่ำ",
       tags: [
         { label: "อนุมัติไว", tone: "amber" },
         { label: "60% LTV", tone: "pink" },
+        { label: "รับทุกเกรด", tone: "purple" },
       ],
       ltv: 60,
-      monthlyRate: { min: 1.75, max: 2 },
-      annualReduction: { min: 20, max: 24 },
-      ncbGradeLabel: "A01 - A03",
-      ncbGradeTone: "blue",
+      monthlyRate: 1.13,
+      annualReduction: 24,
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    // Motorcycle HP. LoanCalBar pins the motorcycle book status to โอนเล่ม, so at least
+    // one of these has to survive isRuleEligible or the matched list renders empty.
+    {
+      id: "mc-transfer-book",
+      title: "สินเชื่อทะเบียนรถจักรยานยนต์ แบบโอนเล่ม",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "รับทุกเกรด", tone: "purple" },
+        { label: "ดอกเบี้ยคงที่", tone: "pink" },
+      ],
+      ltv: 100,
+      monthlyRate: { min: 1.06, max: 1.12 },
+      annualReduction: { min: 12.72, max: 13.44 },
+      interestType: "flat",
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
       bookStatusLabel: "โอนเล่ม",
       primaryActionLabel: "เลือก",
       primaryActionVariant: "filled",
+    },
+    {
+      id: "mc-dealer-used",
+      title: "โครงการรถซื้อขายมือ2 (M Dealer)",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "รถมือสอง", tone: "amber" },
+        { label: "ดอกเบี้ยคงที่", tone: "pink" },
+      ],
+      ltv: 110,
+      monthlyRate: { min: 1.06, max: 1.12 },
+      annualReduction: { min: 12.72, max: 13.44 },
+      interestType: "flat",
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
+      bookStatusLabel: "โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+      minAppraisalPrice: 40000,
+      // CSV Car Brand on the M Dealer rows is "Honda, Yamaha" — the one place the brand
+      // gate is actually in the data.
+      requiresTopTierBrand: true,
     },
   ],
   truck: [
     {
       id: "truck-no-transfer",
-      title: "ผลิตภัณฑ์ไม่โอนเล่ม รถบรรทุก ความเสี่ยงต่ำ",
+      title: "สินเชื่อทะเบียนรถบรรทุก เป้า D",
       tags: [
-        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "นอกอำนาจ", tone: "red" },
         { label: "ใช้เอกสารรายได้", tone: "purple" },
+        { label: "วงเงินสูง", tone: "amber" },
       ],
-      ltv: 75,
-      monthlyRate: 1.09,
-      annualReduction: 15,
+      ltv: 120,
+      monthlyRate: 0.89,
+      annualReduction: 18,
       ncbGradeLabel: "A01, A02",
       ncbGradeTone: "blue",
       bookStatusLabel: "ไม่โอนเล่ม",
@@ -1153,14 +1497,31 @@ const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]>
       requiresTopTierBrand: true,
     },
     {
-      id: "truck-high-limit",
-      title: "โครงการวงเงินสูง ความเสี่ยงปกติ รถบรรทุก",
-      tags: [{ label: "รับทุกเกรด", tone: "purple" }],
-      ltv: { min: 70, max: 100 },
-      monthlyRate: { min: 1.09, max: 1.35 },
-      annualReduction: { min: 20, max: 24 },
-      ncbGradeLabel: "ทุกเกรด",
+      id: "truck-target-e",
+      title: "สินเชื่อทะเบียนรถบรรทุก เป้า E",
+      tags: [{ label: "ใช้เอกสารรายได้", tone: "purple" }],
+      ltv: 100,
+      monthlyRate: { min: 0.98, max: 1.03 },
+      annualReduction: { min: 21, max: 22 },
+      ncbGradeLabel: "Non A01-A02",
       ncbGradeTone: "green",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "truck-high-limit",
+      title: "สินเชื่อทะเบียนรถบรรทุก เป้า D (วงเงิน 2 ล้านขึ้นไป)",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "วงเงินสูง", tone: "amber" },
+        { label: "ใช้เอกสารรายได้", tone: "purple" },
+      ],
+      ltv: 150,
+      monthlyRate: { min: 0.42, max: 0.7 },
+      annualReduction: { min: 9, max: 15 },
+      ncbGradeLabel: "A01, A02",
+      ncbGradeTone: "blue",
       bookStatusLabel: "ไม่โอนเล่ม",
       primaryActionLabel: "เลือก",
       primaryActionVariant: "filled",
@@ -1169,22 +1530,118 @@ const productRulesByCollateralType: Record<VehicleCollateralType, ProductRule[]>
     },
     {
       id: "truck-easy-approval",
-      title: "โครงการอนุมัติง่าย LTV ต่ำ รถบรรทุก",
+      title: "สินเชื่อทะเบียนรถบรรทุก เป้า E PAWNSHOP",
       tags: [
-        { label: "อนุมัติไว", tone: "amber" },
-        { label: "60% LTV", tone: "pink" },
+        { label: "รับทุกเกรด", tone: "purple" },
+        { label: "80% LTV", tone: "pink" },
       ],
-      ltv: 60,
-      monthlyRate: { min: 1.35, max: 1.6 },
-      annualReduction: { min: 20, max: 24 },
-      ncbGradeLabel: "A01 - A03",
+      ltv: 80,
+      monthlyRate: { min: 1.03, max: 1.13 },
+      annualReduction: { min: 22, max: 24 },
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
+      bookStatusLabel: "ไม่โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "truck-transfer-book",
+      title: "สินเชื่อทะเบียนรถบรรทุก เป้า D - แบบโอนเล่ม",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "ใช้เอกสารรายได้", tone: "purple" },
+        { label: "ดอกเบี้ยคงที่", tone: "pink" },
+      ],
+      ltv: 120,
+      monthlyRate: 0.8,
+      annualReduction: 9.6,
+      interestType: "flat",
+      ncbGradeLabel: "A01, A02",
       ncbGradeTone: "blue",
       bookStatusLabel: "โอนเล่ม",
       primaryActionLabel: "เลือก",
       primaryActionVariant: "filled",
     },
+    {
+      id: "truck-c2c",
+      title: "รถบรรทุกซื้อขาย R Dealer",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "รับทุกเกรด", tone: "purple" },
+        { label: "ต้องมีผู้ค้ำ", tone: "red" },
+        { label: "ผ่อนนาน", tone: "purple" },
+      ],
+      ltv: 100,
+      monthlyRate: { min: 0.54, max: 1.04 },
+      annualReduction: { min: 6.48, max: 12.48 },
+      interestType: "flat",
+      ncbGradeLabel: "ทุกเกรด",
+      ncbGradeTone: "green",
+      bookStatusLabel: "โอนเล่ม",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+      minAppraisalPrice: 200000,
+    },
   ],
-}
+  // Land has no brand/model, so no requiresTopTierBrand gates. bookStatusLabel carries
+  // จำนำ / จำนอง instead of a book transfer, which keeps LoanCalBar on the effective-rate
+  // branch — matching Interest Type = Effective on every Land row.
+  land: [
+    {
+      id: "land-pawn",
+      title: "สินเชื่อเพื่อคนมีที่ดิน (จำนำ)",
+      tags: [
+        { label: "อนุมัติไว", tone: "amber" },
+        { label: "ไม่ต้องค้ำ", tone: "green" },
+        { label: "70% LTV", tone: "pink" },
+      ],
+      ltv: 70,
+      monthlyRate: 0.7,
+      annualReduction: 15,
+      ncbGradeLabel: "ยกเว้น L05",
+      ncbGradeTone: "green",
+      bookStatusLabel: "จำนำ",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "land-mortgage",
+      title: "สินเชื่อเพื่อคนมีที่ดิน (จำนอง)",
+      tags: [
+        { label: "อนุมัติไว", tone: "amber" },
+        { label: "ไม่ต้องค้ำ", tone: "green" },
+        { label: "ผ่อนนาน", tone: "purple" },
+      ],
+      ltv: 70,
+      monthlyRate: 0.7,
+      annualReduction: 15,
+      ncbGradeLabel: "ยกเว้น L05",
+      ncbGradeTone: "green",
+      bookStatusLabel: "จำนอง",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+    },
+    {
+      id: "land-mortgage-high",
+      title: "สินเชื่อเพื่อคนมีที่ดิน (จำนอง) วงเงินสูง",
+      tags: [
+        { label: "ดอกเบี้ยถูก", tone: "green" },
+        { label: "ใช้เอกสารรายได้", tone: "purple" },
+        { label: "ต้องมีผู้ค้ำ", tone: "red" },
+        { label: "ผ่อนนาน", tone: "purple" },
+      ],
+      ltv: { min: 50, max: 95 },
+      monthlyRate: { min: 0.42, max: 0.7 },
+      annualReduction: { min: 9, max: 15 },
+      ncbGradeLabel: "ยกเว้น L05, U05",
+      ncbGradeTone: "blue",
+      bookStatusLabel: "จำนอง",
+      primaryActionLabel: "เลือก",
+      primaryActionVariant: "filled",
+      minAppraisalPrice: 210000,
+    },
+  ],
+};
 
 // Latin digits and comma grouping only: LeadLoanInfoCard regex-parses these strings
 // back into numbers (approvedAmount takes the LAST match, interestRateLabel the FIRST).
@@ -1194,43 +1651,48 @@ function formatRange(
 ): string {
   return typeof spec === "number"
     ? format(spec)
-    : `${format(spec.min)} - ${format(spec.max)}`
+    : `${format(spec.min)} - ${format(spec.max)}`;
 }
 
 export type ProductCatalogContext = {
-  carInfo: CarInfo
-  collateralType?: CollateralType | null
-  loanPurpose?: LoanPurpose | null
-  refinanceStatus?: RefinanceStatus | null
-  appraisalPrice: number
-}
+  carInfo: CarInfo;
+  collateralType?: CollateralType | null;
+  loanPurpose?: LoanPurpose | null;
+  refinanceStatus?: RefinanceStatus | null;
+  appraisalPrice: number;
+};
 
 function isTopTierBrand(
   collateralType: CollateralType | null | undefined,
   brandValue?: string,
 ): boolean {
+  // Land collateral has no brand to judge, so a brand gate can never exclude it.
+  if (collateralType === "land") return true;
   return topTierBrandsByCollateralType[
     toVehicleCollateralType(collateralType)
-  ].includes(brandValue ?? "")
+  ].includes(brandValue ?? "");
 }
 
-function isRuleEligible(rule: ProductRule, context: ProductCatalogContext): boolean {
+function isRuleEligible(
+  rule: ProductRule,
+  context: ProductCatalogContext,
+): boolean {
   if (
     rule.minAppraisalPrice != null &&
     context.appraisalPrice < rule.minAppraisalPrice
   ) {
-    return false
+    return false;
   }
   if (
     rule.requiresTopTierBrand &&
     !isTopTierBrand(context.collateralType, context.carInfo.brand)
   ) {
-    return false
+    return false;
   }
-  return true
+  return true;
 }
 
-const ALL_NCB_GRADES_LABEL = "ทุกเกรด"
+const ALL_NCB_GRADES_LABEL = "ทุกเกรด";
 
 const allGradeLtvGroups: ProductCatalogLtvGroup[] = [
   {
@@ -1258,14 +1720,14 @@ const allGradeLtvGroups: ProductCatalogLtvGroup[] = [
       { holdingPeriod: "90 - 179 วัน", limit: "80%LTV" },
     ],
   },
-]
+];
 
 const allGradeInterestRows: ProductCatalogInterestRow[] = [
   { ncbGrade: "A01 - A03", rates: ["20.00%", "21.00%", "22.00%"] },
   { ncbGrade: "A04 - A05", rates: ["21.00%", "22.00%", "24.00%"] },
   { ncbGrade: "U01 - U05", rates: ["23.00%", "23.00%", "24.00%"] },
   { ncbGrade: "L01, L05", rates: ["23.00%", "23.00%", "24.00%"] },
-]
+];
 
 // Mock: both condition blocks are the same for every product for now.
 const productDetailTemplate: Pick<
@@ -1286,11 +1748,11 @@ const productDetailTemplate: Pick<
     { label: "ระยะอาศัยที่อยู่ปัจจุบัน", value: "1- 99 ปี" },
     { label: "ผู้ค้ำประกัน", value: "ไม่จำเป็น", tone: "success" },
   ],
-}
+};
 
 function toProductDetail(rule: ProductRule): ProductCatalogDetail {
-  const maxLtv = typeof rule.ltv === "number" ? rule.ltv : rule.ltv.max
-  const isAllGrades = rule.ncbGradeLabel === ALL_NCB_GRADES_LABEL
+  const maxLtv = typeof rule.ltv === "number" ? rule.ltv : rule.ltv.max;
+  const isAllGrades = rule.ncbGradeLabel === ALL_NCB_GRADES_LABEL;
   return {
     ...productDetailTemplate,
     ltvGroups: isAllGrades
@@ -1304,8 +1766,13 @@ function toProductDetail(rule: ProductRule): ProductCatalogDetail {
     // Mock: a single-grade product reuses the A01 - A03 rates.
     interestRows: isAllGrades
       ? allGradeInterestRows
-      : [{ ncbGrade: rule.ncbGradeLabel, rates: allGradeInterestRows[0].rates }],
-  }
+      : [
+          {
+            ncbGrade: rule.ncbGradeLabel,
+            rates: allGradeInterestRows[0].rates,
+          },
+        ],
+  };
 }
 
 function toCatalogItem(
@@ -1327,31 +1794,31 @@ function toCatalogItem(
       rule.monthlyRate,
       (value) => `${value.toFixed(2)}%`,
     )} ต่อเดือน)`,
-    interestReductionLabel: `ลดต้นลดดอก ${formatRange(
-      rule.annualReduction,
-      (value) => `${value}%`,
-    )} ต่อปี`,
+    interestReductionLabel: `${
+      rule.interestType === "flat" ? "ดอกเบี้ยคงที่" : "ลดต้นลดดอก"
+    } ${formatRange(rule.annualReduction, (value) => `${value}%`)} ต่อปี`,
     primaryActionLabel: rule.primaryActionLabel,
     primaryActionVariant: rule.primaryActionVariant,
     detail: toProductDetail(rule),
-  }
+  };
 }
 
 function getVehicleTypeChip(context: ProductCatalogContext): string {
-  const vehicleCollateralType = toVehicleCollateralType(context.collateralType)
-  if (vehicleCollateralType === "motorcycle") return "มอเตอร์ไซค์"
-  if (vehicleCollateralType === "truck") return "รถบรรทุก"
+  if (context.collateralType === "land") return "ที่ดิน";
+  const vehicleCollateralType = toVehicleCollateralType(context.collateralType);
+  if (vehicleCollateralType === "motorcycle") return "มอเตอร์ไซค์";
+  if (vehicleCollateralType === "truck") return "รถบรรทุก";
   const doorsLabel = carDoorsOptions.find(
     (option) => option.value === context.carInfo.doors,
-  )?.label
-  return doorsLabel ? `รถเก๋ง กระบะ ${doorsLabel}` : "รถเก๋ง กระบะ ตู้"
+  )?.label;
+  return doorsLabel ? `รถเก๋ง กระบะ ${doorsLabel}` : "รถเก๋ง กระบะ ตู้";
 }
 
 export function getProductCatalogData(
   context: ProductCatalogContext,
 ): ProductCatalogData {
-  const rules =
-    productRulesByCollateralType[toVehicleCollateralType(context.collateralType)]
+  // Keyed on the full CollateralType, not toVehicleCollateralType — land has its own set.
+  const rules = productRulesByCollateralType[context.collateralType ?? "car"];
 
   return {
     filterChips: [
@@ -1368,7 +1835,7 @@ export function getProductCatalogData(
     items: rules
       .filter((rule) => isRuleEligible(rule, context))
       .map((rule) => toCatalogItem(rule, context.appraisalPrice)),
-  }
+  };
 }
 
 /**
@@ -1380,16 +1847,16 @@ export function findProductCatalogItemById(
   context: ProductCatalogContext,
 ): ProductCatalogItem | null {
   const rule = productRulesByCollateralType[
-    toVehicleCollateralType(context.collateralType)
-  ].find((candidate) => candidate.id === productId)
-  return rule ? toCatalogItem(rule, context.appraisalPrice) : null
+    context.collateralType ?? "car"
+  ].find((candidate) => candidate.id === productId);
+  return rule ? toCatalogItem(rule, context.appraisalPrice) : null;
 }
 
 export const insuranceCompanyOptions: { value: string; label: string }[] = [
   { value: "viriyah", label: "วิริยะประกันภัย" },
   { value: "thipya", label: "ทิพยประกันภัย" },
   { value: "bkk-insurance", label: "กรุงเทพประกันภัย" },
-]
+];
 
 export const followUpTimelineMock: FollowUpEntry[] = [
   {
@@ -1420,4 +1887,4 @@ export const followUpTimelineMock: FollowUpEntry[] = [
     actor: "โดย กรรณิการ์ ส่งจิต (CF108645)",
     actionBadge: "สร้าง Lead",
   },
-]
+];
