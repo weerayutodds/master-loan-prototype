@@ -9,6 +9,7 @@ import { Toast } from "@/components/molecules/Toast";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
 import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
 import { NcbCheckControl } from "@/components/organisms/NcbCheckControl";
+import { NcbCheckModal } from "@/components/organisms/NcbCheckModal";
 import { PhoneNumberModal } from "@/components/organisms/PhoneNumberModal";
 import {
   createCustomerLeadOpportunity,
