@@ -253,13 +253,6 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
         tags={tags}
         carInfo={carInfo}
         collateralType={collateralType}
-        showCarInfo={showCarInfo}
-        setShowCarInfo={(value: boolean) => {
-          setShowCarInfo(value);
-          // Reopening the collateral questions is an intent to edit — drop the
-          // appraisal shown against the old answers, same as any car-info edit.
-          if (!value) setShowProductGuide(false);
-        }}
         hasSelectedProduct={selectedProduct !== null}
         loanInfo={loanInfo}
         carInsuranceInfo={carInsuranceInfo}

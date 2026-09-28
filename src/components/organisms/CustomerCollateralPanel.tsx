@@ -42,8 +42,6 @@ type CustomerCollateralPanelProps = {
   tags: string[];
   carInfo: CarInfo;
   collateralType: CollateralType | null;
-  showCarInfo: boolean;
-  setShowCarInfo: (value: boolean) => void;
   hasSelectedProduct?: boolean;
   loanInfo?: LoanInfo;
   carInsuranceInfo?: CarInsuranceInfo;
@@ -97,8 +95,6 @@ export function CustomerCollateralPanel({
   tags,
   carInfo,
   collateralType,
-  showCarInfo,
-  setShowCarInfo,
   hasSelectedProduct = false,
   loanInfo,
   carInsuranceInfo,
@@ -253,15 +249,6 @@ export function CustomerCollateralPanel({
 
       <div className="flex items-center justify-between h-6">
         <span className="text-sm text-foreground">ข้อมูลหลักประกัน</span>
-        {showCarInfo ? (
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => setShowCarInfo(false)}
-          >
-            เพิ่ม/แก้ไข
-          </Button>
-        ) : null}
       </div>
 
       {collateralType && collateralType !== "land" ? (
