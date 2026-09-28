@@ -2,6 +2,7 @@
 
 import { Icon } from "@/components/atoms/Icon";
 import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
+import { ProductDetailDrawer } from "@/components/organisms/ProductDetailDrawer";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
 import type {
   ProductCatalogData,
@@ -46,13 +47,20 @@ function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): 
 export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatalogProps) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const selectedItem = data.items.find((item) => item.id === selectedItemId) ?? null;
+  const [detailItemId, setDetailItemId] = useState<string | null>(null);
+  const detailItem = data.items.find((item) => item.id === detailItemId) ?? null;
 
   const matchedItems = filter ? data.items.filter((item) => matchesFilter(item, filter)) : data.items;
   const otherItems = filter ? data.items.filter((item) => !matchesFilter(item, filter)) : [];
 
   function renderCards(items: ProductCatalogItem[]) {
     return items.map((item) => (
-      <ProductCatalogCard key={item.id} item={item} onSelect={() => setSelectedItemId(item.id)} />
+      <ProductCatalogCard
+        key={item.id}
+        item={item}
+        onSelect={() => setSelectedItemId(item.id)}
+        onViewDetail={() => setDetailItemId(item.id)}
+      />
     ));
   }
 
@@ -104,12 +112,19 @@ export function ProductCatalog({ data, filter, onSelectConfirmed }: ProductCatal
         </>
       ) : null}
 
+      <ProductDetailDrawer
+        item={detailItem}
+        onClose={() => setDetailItemId(null)}
+        onSelect={() => setSelectedItemId(detailItemId)}
+      />
+
       <SelectProductConfirmModal
         open={selectedItemId !== null}
         onCancel={() => setSelectedItemId(null)}
         onConfirm={() => {
           if (selectedItem) onSelectConfirmed?.(selectedItem);
           setSelectedItemId(null);
+          setDetailItemId(null);
         }}
       />
     </div>

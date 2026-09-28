@@ -19,9 +19,10 @@ const NCB_GRADE_TONE_CLASSNAMES: Record<ProductCatalogItem["ncbGradeTone"], stri
 type ProductCatalogCardProps = {
   item: ProductCatalogItem;
   onSelect?: () => void;
+  onViewDetail?: () => void;
 };
 
-export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) {
+export function ProductCatalogCard({ item, onSelect, onViewDetail }: ProductCatalogCardProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-card-border bg-catalog-card-bg shadow-primary-xs">
       <div className="flex flex-wrap items-center gap-2 px-4 py-2.5">
@@ -54,12 +55,6 @@ export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) 
 
         <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:gap-8">
           <div>
-            <p className="text-muted-foreground">เฉพาะ NCB</p>
-            <p className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}>
-              {item.ncbGradeLabel}
-            </p>
-          </div>
-          <div>
             <p className="text-muted-foreground">เล่มทะเบียน</p>
             <p className="font-medium text-foreground">{item.bookStatusLabel}</p>
           </div>
@@ -67,6 +62,12 @@ export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) 
             <p className="text-muted-foreground">อัตราดอกเบี้ย</p>
             <p className="font-medium text-foreground">{item.interestRateLabel}</p>
             <p className="text-primary-to">{item.interestReductionLabel}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">เฉพาะ NCB</p>
+            <p className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}>
+              {item.ncbGradeLabel}
+            </p>
           </div>
         </div>
 
@@ -78,7 +79,7 @@ export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) 
           >
             {item.primaryActionLabel}
           </Button>
-          <Button variant="secondary" size="sm">
+          <Button variant="secondary" size="sm" onClick={onViewDetail}>
             ดูรายละเอียด
           </Button>
         </div>
