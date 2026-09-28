@@ -301,7 +301,7 @@ export function RatebookForm({
     window.scrollTo({top: 0, behavior: "instant"})
     const nextLoanInfo: LoanInfo = {
       ...loanInfo,
-      requestedAmount: loanInfo.requestedAmount ?? getMaxApprovedAmount(item),
+      requestedAmount: loanInfo.requestedAmount || getMaxApprovedAmount(item),
     }
     setLoanInfo(nextLoanInfo)
 
@@ -469,6 +469,13 @@ export function RatebookForm({
                 customer={customer}
                 opportunityId={opportunityId}
                 refinanceStatus={refinanceStatus}
+                requestedAmount={loanInfo.requestedAmount ?? 0}
+                onRequestedAmountChange={(amount) =>
+                  setLoanInfo((current) => ({
+                    ...current,
+                    requestedAmount: amount,
+                  }))
+                }
                 onCustomerChange={setCustomer}
                 onFilterChange={setProductFilter}
               />

@@ -107,6 +107,9 @@ type LoanCalBarProps = {
   customer: CustomerInfo | null;
   opportunityId: string | null;
   refinanceStatus: RefinanceStatus | null;
+  /** Lives on `RatebookForm`'s `loanInfo` so the Lead Form's วงเงินที่ต้องการ can't drift from it. */
+  requestedAmount: number;
+  onRequestedAmountChange: (amount: number) => void;
   onCustomerChange: (value: CustomerInfo) => void;
   onFilterChange: (filter: ProductCatalogFilter) => void;
 };
@@ -118,6 +121,8 @@ export function LoanCalBar({
   customer,
   opportunityId,
   refinanceStatus,
+  requestedAmount,
+  onRequestedAmountChange,
   onCustomerChange,
   onFilterChange,
 }: LoanCalBarProps) {
@@ -141,8 +146,9 @@ export function LoanCalBar({
   const [bookStatus, setBookStatus] = useState(
     bookStatusOptions[0]?.label ?? "",
   );
-  const [requestedAmount, setRequestedAmount] = useState(0);
-  const [requestedLtvPercent, setRequestedLtvPercent] = useState(0);
+  const [requestedLtvPercent, setRequestedLtvPercent] = useState(() =>
+    calculateLtvPercent(requestedAmount, appraisalPrice),
+  );
   const [payoffAmount, setPayoffAmount] = useState(0);
   const [cashBackAmount, setCashBackAmount] = useState(0);
   const [isTLC, setIsTLC] = useState(
@@ -186,7 +192,7 @@ export function LoanCalBar({
   }
 
   function handleRequestedAmountChange(amount: number) {
-    setRequestedAmount(amount);
+    onRequestedAmountChange(amount);
     setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
     syncCashBack(amount, payoffAmount);
   }
@@ -194,7 +200,7 @@ export function LoanCalBar({
   function handleRequestedLtvChange(ltvPercent: number) {
     const amount = calculateAmountFromLtv(ltvPercent, appraisalPrice);
     setRequestedLtvPercent(ltvPercent);
-    setRequestedAmount(amount);
+    onRequestedAmountChange(amount);
     syncCashBack(amount, payoffAmount);
   }
 
@@ -206,7 +212,7 @@ export function LoanCalBar({
   function handleCashBackChange(cashBack: number) {
     const amount = payoffAmount + cashBack;
     setCashBackAmount(cashBack);
-    setRequestedAmount(amount);
+    onRequestedAmountChange(amount);
     setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
   }
 
