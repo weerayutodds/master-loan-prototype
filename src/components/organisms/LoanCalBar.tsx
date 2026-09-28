@@ -179,13 +179,13 @@ export function LoanCalBar({
     });
   }
 
-  function handleRefinanceAmountChange(
-    nextPayoffAmount: number,
-    nextCashBackAmount: number,
-  ) {
-    const amount = nextPayoffAmount + nextCashBackAmount;
+  // ยอดปิดไฟแนนซ์เดิม + เงินรับกลับบ้าน = วงเงินที่ขอ, applied only on blur so typing doesn't move other fields.
+  function handleRefinanceAmountBlur() {
+    const amount = payoffAmount + cashBackAmount;
+    const ltvPercent = calculateLtvPercent(amount, appraisalPrice);
     setRequestedAmount(amount);
-    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
+    setRequestedLtvPercent(ltvPercent);
+    commitFilter({ requestedAmount: amount, requestedLtvPercent: ltvPercent });
   }
 
   function handleBookStatusChange(value: string) {
@@ -333,9 +333,8 @@ export function LoanCalBar({
                       const amount =
                         Number(e.target.value.replace(/\D/g, "")) || 0;
                       setPayoffAmount(amount);
-                      handleRefinanceAmountChange(amount, cashBackAmount);
                     }}
-                    onBlur={() => commitFilter()}
+                    onBlur={handleRefinanceAmountBlur}
                     className="w-full text-sm text-foreground outline-none"
                   />
                   <span className="shrink-0 text-xs text-muted-foreground">
@@ -362,9 +361,8 @@ export function LoanCalBar({
                       const amount =
                         Number(e.target.value.replace(/\D/g, "")) || 0;
                       setCashBackAmount(amount);
-                      handleRefinanceAmountChange(payoffAmount, amount);
                     }}
-                    onBlur={() => commitFilter()}
+                    onBlur={handleRefinanceAmountBlur}
                     className="w-full text-sm text-foreground outline-none"
                   />
                   <span className="shrink-0 text-xs text-muted-foreground">
@@ -395,9 +393,6 @@ export function LoanCalBar({
                     setRequestedLtvPercent(
                       calculateLtvPercent(amount, appraisalPrice),
                     );
-                    if (isRefinance) {
-                      setPayoffAmount(Math.max(0, amount - cashBackAmount));
-                    }
                   }}
                   onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"

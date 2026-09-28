@@ -3,7 +3,6 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
-import { ProgressRing } from "@/components/atoms/ProgressRing";
 import { Card } from "@/components/molecules/Card";
 import { Toast } from "@/components/molecules/Toast";
 import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
@@ -42,8 +41,6 @@ import type {
 } from "@/types/ratebook";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-const TOTAL_SECTIONS = 4;
 
 type CustomerCollateralPanelProps = {
   initialOpportunity?: CustomerLeadOpportunity | null;
@@ -216,14 +213,6 @@ export function CustomerCollateralPanel({
     collateralType,
   );
 
-  const filledSections = [
-    Boolean(customer?.firstName && customer?.lastName),
-    Boolean(customer?.phone),
-    collateralIdentifier !== null,
-    brandModelDisplay !== "",
-  ];
-  const filledSectionCount = filledSections.filter(Boolean).length;
-
   return (
     <Card className="space-y-4 border-2">
       {customer ? (
@@ -252,7 +241,6 @@ export function CustomerCollateralPanel({
               ) : null}
             </div>
           </div>
-          <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
         </div>
       ) : (
         <div className="flex items-center justify-between">
