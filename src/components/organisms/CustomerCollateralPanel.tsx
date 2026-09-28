@@ -1,16 +1,15 @@
-"use client"
+"use client";
 
-import {Badge} from "@/components/atoms/Badge"
-import {Button} from "@/components/atoms/Button"
-import {Icon} from "@/components/atoms/Icon"
-import {ProgressRing} from "@/components/atoms/ProgressRing"
-import {Card} from "@/components/molecules/Card"
-import {LeadProgressTooltip} from "@/components/molecules/LeadProgressTooltip"
-import {Toast} from "@/components/molecules/Toast"
-import {CollateralDetailModal} from "@/components/organisms/CollateralDetailModal"
-import {CustomerInfoModal} from "@/components/organisms/CustomerInfoModal"
-import {NcbCheckControl} from "@/components/organisms/NcbCheckControl"
-import {PhoneNumberModal} from "@/components/organisms/PhoneNumberModal"
+import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
+import { Icon } from "@/components/atoms/Icon";
+import { ProgressRing } from "@/components/atoms/ProgressRing";
+import { Card } from "@/components/molecules/Card";
+import { Toast } from "@/components/molecules/Toast";
+import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
+import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
+import { NcbCheckControl } from "@/components/organisms/NcbCheckControl";
+import { PhoneNumberModal } from "@/components/organisms/PhoneNumberModal";
 import {
   createCustomerLeadOpportunity,
   updateOpportunityCarInfo,
@@ -20,16 +19,16 @@ import {
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
   updateOpportunitySelectedProduct,
-} from "@/lib/actions/customer-lead-opportunity"
-import {calculateAge, maskIdCardNumber} from "@/lib/format"
+} from "@/lib/actions/customer-lead-opportunity";
+import { calculateAge, maskIdCardNumber } from "@/lib/format";
 import {
   getVehicleBrandLabel,
   getVehicleModelLabel,
   provinceOptions,
-} from "@/lib/mock"
-import type {VerificationMethod} from "@/types/customer-form"
-import type {NcbGrade} from "@/types/customer-lead"
-import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
+} from "@/lib/mock";
+import type { VerificationMethod } from "@/types/customer-form";
+import type { NcbGrade } from "@/types/customer-lead";
+import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type {
   CarInfo,
   CarInsuranceInfo,
@@ -39,43 +38,43 @@ import type {
   LoanInfo,
   LoanPurpose,
   RefinanceStatus,
-} from "@/types/ratebook"
-import {useRouter} from "next/navigation"
-import {useState} from "react"
+} from "@/types/ratebook";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const TOTAL_SECTIONS = 4
+const TOTAL_SECTIONS = 4;
 
 type CustomerCollateralPanelProps = {
-  initialOpportunity?: CustomerLeadOpportunity | null
-  opportunityId: string | null
-  leadId: string | null
-  tags: string[]
-  carInfo: CarInfo
-  collateralType: CollateralType | null
-  loanPurpose: LoanPurpose | null
-  refinanceStatus: RefinanceStatus | null
-  existingFinance: string | null
-  selectedProductId: string | null
-  hasSelectedProduct?: boolean
-  loanInfo?: LoanInfo
-  carInsuranceInfo?: CarInsuranceInfo
-  customer: CustomerInfo | null
-  onCustomerChange: (value: CustomerInfo) => void
-  ncbGrade: NcbGrade | null
-  idCardNumber: string
-  verificationMethod: VerificationMethod | null
-  onNcbChecked: (value: NcbGrade) => unknown
-}
+  initialOpportunity?: CustomerLeadOpportunity | null;
+  opportunityId: string | null;
+  leadId: string | null;
+  tags: string[];
+  carInfo: CarInfo;
+  collateralType: CollateralType | null;
+  loanPurpose: LoanPurpose | null;
+  refinanceStatus: RefinanceStatus | null;
+  existingFinance: string | null;
+  selectedProductId: string | null;
+  hasSelectedProduct?: boolean;
+  loanInfo?: LoanInfo;
+  carInsuranceInfo?: CarInsuranceInfo;
+  customer: CustomerInfo | null;
+  onCustomerChange: (value: CustomerInfo) => void;
+  ncbGrade: NcbGrade | null;
+  idCardNumber: string;
+  verificationMethod: VerificationMethod | null;
+  onNcbChecked: (value: NcbGrade) => unknown;
+};
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
   const province = provinceOptions.find(
     (option) => option.value === identifier.licensePlateProvince,
-  )
+  );
   const licensePlate =
     identifier.licensePlateNumber && province
       ? `${identifier.licensePlateNumber} ${province.label}`
-      : undefined
-  return [licensePlate, identifier.chassisNumber].filter(Boolean).join(" · ")
+      : undefined;
+  return [licensePlate, identifier.chassisNumber].filter(Boolean).join(" · ");
 }
 
 function formatBrandModelYear(
@@ -83,25 +82,25 @@ function formatBrandModelYear(
   opportunity: CustomerLeadOpportunity | null,
   collateralType: CollateralType | null,
 ): string {
-  const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined
-  const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined
-  const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined
+  const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined;
+  const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined;
+  const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined;
 
-  const brandLabel = getVehicleBrandLabel(collateralType, brandValue)
+  const brandLabel = getVehicleBrandLabel(collateralType, brandValue);
   const modelLabel = getVehicleModelLabel(
     collateralType,
     brandValue,
     modelValue,
-  )
+  );
   const parts = [
     brandLabel === "-" ? undefined : brandLabel.toUpperCase(),
     modelLabel === "-" ? undefined : modelLabel.toUpperCase(),
-  ].filter((part): part is string => Boolean(part))
+  ].filter((part): part is string => Boolean(part));
   if (yearValue) {
-    const buddhistYear = Number(yearValue) + 543
-    parts.push(`${yearValue} (${buddhistYear})`)
+    const buddhistYear = Number(yearValue) + 543;
+    parts.push(`${yearValue} (${buddhistYear})`);
   }
-  return parts.join(" • ")
+  return parts.join(" • ");
 }
 
 export function CustomerCollateralPanel({
@@ -125,8 +124,8 @@ export function CustomerCollateralPanel({
   verificationMethod,
   onNcbChecked,
 }: CustomerCollateralPanelProps) {
-  const router = useRouter()
-  const [modalOpen, setModalOpen] = useState(false)
+  const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
   const [collateralIdentifier, setCollateralIdentifier] =
     useState<CollateralIdentifier | null>(
       initialOpportunity &&
@@ -140,29 +139,29 @@ export function CustomerCollateralPanel({
             chassisNumber: initialOpportunity.chassisNumber ?? undefined,
           }
         : null,
-    )
-  const [collateralModalOpen, setCollateralModalOpen] = useState(false)
-  const [phoneModalOpen, setPhoneModalOpen] = useState(false)
+    );
+  const [collateralModalOpen, setCollateralModalOpen] = useState(false);
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false);
   const [brandModel, setBrandModel] = useState(
     initialOpportunity?.brandModel ?? "",
-  )
-  const [editingBrandModel, setEditingBrandModel] = useState(false)
-  const [savedToastOpen, setSavedToastOpen] = useState(false)
+  );
+  const [editingBrandModel, setEditingBrandModel] = useState(false);
+  const [savedToastOpen, setSavedToastOpen] = useState(false);
 
   async function handleSaveLead() {
-    if (!customer) return
+    if (!customer) return;
     try {
-      let currentOpportunityId = opportunityId
+      let currentOpportunityId = opportunityId;
       if (!currentOpportunityId) {
-        if (!leadId) return
-        const created = await createCustomerLeadOpportunity(leadId)
-        currentOpportunityId = created.id
+        if (!leadId) return;
+        const created = await createCustomerLeadOpportunity(leadId);
+        currentOpportunityId = created.id;
       }
 
       const financeAnswered =
-        refinanceStatus === "still-paying" ? Boolean(existingFinance) : true
+        refinanceStatus === "still-paying" ? Boolean(existingFinance) : true;
       const loanQuestionsAnswered =
-        loanPurpose && collateralType && refinanceStatus && financeAnswered
+        loanPurpose && collateralType && refinanceStatus && financeAnswered;
 
       await Promise.all([
         updateOpportunityCustomerInfo(currentOpportunityId, customer),
@@ -196,14 +195,14 @@ export function CustomerCollateralPanel({
               selectedProductId,
             )
           : null,
-      ])
+      ]);
 
       if (currentOpportunityId !== opportunityId) {
-        router.replace(`/ratebook?opportunityId=${currentOpportunityId}`)
+        router.replace(`/ratebook?opportunityId=${currentOpportunityId}`);
       }
-      setSavedToastOpen(true)
+      setSavedToastOpen(true);
     } catch (error) {
-      console.error("Failed to save lead", error)
+      console.error("Failed to save lead", error);
     }
   }
 
@@ -211,18 +210,15 @@ export function CustomerCollateralPanel({
     carInfo,
     initialOpportunity,
     collateralType,
-  )
+  );
 
-  const progressItems = [
-    {
-      label: "ชื่อ นามสกุล",
-      filled: Boolean(customer?.firstName && customer?.lastName),
-    },
-    {label: "เบอร์มือถือ", filled: Boolean(customer?.phone)},
-    {label: "เลขทะเบียน / เลขตัวถัง", filled: collateralIdentifier !== null},
-    {label: "ยี่ห้อ / รุ่น", filled: brandModelDisplay !== ""},
-  ]
-  const filledSectionCount = progressItems.filter((item) => item.filled).length
+  const filledSections = [
+    Boolean(customer?.firstName && customer?.lastName),
+    Boolean(customer?.phone),
+    collateralIdentifier !== null,
+    brandModelDisplay !== "",
+  ];
+  const filledSectionCount = filledSections.filter(Boolean).length;
 
   return (
     <Card className="space-y-4 border-2">
@@ -252,14 +248,7 @@ export function CustomerCollateralPanel({
               ) : null}
             </div>
           </div>
-          <div className="group/progress relative shrink-0">
-            <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
-            <LeadProgressTooltip
-              filledCount={filledSectionCount}
-              total={TOTAL_SECTIONS}
-              items={progressItems}
-            />
-          </div>
+          <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
         </div>
       ) : (
         <div className="flex items-center justify-between">
@@ -397,8 +386,8 @@ export function CustomerCollateralPanel({
         initialValue={customer ?? undefined}
         onClose={() => setModalOpen(false)}
         onSave={(info) => {
-          onCustomerChange({...customer, ...info})
-          setModalOpen(false)
+          onCustomerChange({ ...customer, ...info });
+          setModalOpen(false);
         }}
       />
 
@@ -407,8 +396,8 @@ export function CustomerCollateralPanel({
         initialValue={collateralIdentifier ?? undefined}
         onClose={() => setCollateralModalOpen(false)}
         onSave={(value) => {
-          setCollateralIdentifier(value)
-          setCollateralModalOpen(false)
+          setCollateralIdentifier(value);
+          setCollateralModalOpen(false);
         }}
       />
 
@@ -417,10 +406,10 @@ export function CustomerCollateralPanel({
         initialValue={customer?.phone}
         onClose={() => setPhoneModalOpen(false)}
         onSave={(phone) => {
-          if (customer) onCustomerChange({...customer, phone})
-          setPhoneModalOpen(false)
+          if (customer) onCustomerChange({ ...customer, phone });
+          setPhoneModalOpen(false);
         }}
       />
     </Card>
-  )
+  );
 }
