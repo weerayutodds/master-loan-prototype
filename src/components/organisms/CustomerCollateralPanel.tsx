@@ -64,6 +64,7 @@ type CustomerCollateralPanelProps = {
   idCardNumber: string;
   verificationMethod: VerificationMethod | null;
   onNcbChecked: (value: NcbGrade) => unknown;
+  onDipchipRead: () => unknown;
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -123,6 +124,7 @@ export function CustomerCollateralPanel({
   idCardNumber,
   verificationMethod,
   onNcbChecked,
+  onDipchipRead,
 }: CustomerCollateralPanelProps) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
@@ -142,6 +144,7 @@ export function CustomerCollateralPanel({
     );
   const [collateralModalOpen, setCollateralModalOpen] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [dipchipChecking, setDipchipChecking] = useState(false);
   const [brandModel, setBrandModel] = useState(
     initialOpportunity?.brandModel ?? "",
   );
@@ -277,17 +280,28 @@ export function CustomerCollateralPanel({
             <Button
               variant="outline"
               size="xs"
-              onClick={() => router.push("/customer-form")}
+              onClick={() => setDipchipChecking(true)}
             >
               Dipchip
             </Button>
           ) : null}
+          <NcbCheckModal
+            open={dipchipChecking}
+            onComplete={async () => {
+              await onDipchipRead();
+              setDipchipChecking(false);
+            }}
+          />
         </div>
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">NCB เกรด</span>
-        <NcbCheckControl ncbGrade={ncbGrade} onChecked={onNcbChecked} />
+        <NcbCheckControl
+          ncbGrade={ncbGrade}
+          onChecked={onNcbChecked}
+          awaitingResult={verificationMethod === "card"}
+        />
       </div>
 
       <div className="border-t border-dashed border-secondary-border" />

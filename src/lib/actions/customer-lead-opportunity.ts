@@ -148,6 +148,23 @@ export async function updateOpportunityCustomerInfo(
   return mapRow(row);
 }
 
+/** Same as `updateCustomerLeadCardVerified`, on the opportunity's snapshot. */
+export async function updateOpportunityCardVerified(
+  opportunityId: string,
+  idCardNumber: string = mockCardCustomer.idCardNumber,
+): Promise<void> {
+  await sql`
+    update customer_lead_opportunity
+    set
+      verification_method = 'card',
+      id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber}),
+      updated_at = now()
+    where id = ${opportunityId}
+  `;
+
+  revalidatePath("/customer-lead-list");
+}
+
 /** Same card-verified side effect as `updateCustomerLeadNcbGrade`, on the opportunity's snapshot. */
 export async function updateOpportunityNcbGrade(
   opportunityId: string,

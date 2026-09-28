@@ -8,9 +8,13 @@ import {LoanCalBar} from "@/components/organisms/LoanCalBar"
 import {LoanQuestionsPanel} from "@/components/organisms/LoanQuestionsPanel"
 import {ProductCatalog} from "@/components/organisms/ProductCatalog"
 import {ProductGuide} from "@/components/organisms/ProductGuide"
-import {updateCustomerLeadNcbGrade} from "@/lib/actions/customer-lead"
+import {
+  updateCustomerLeadCardVerified,
+  updateCustomerLeadNcbGrade,
+} from "@/lib/actions/customer-lead"
 import {
   createCustomerLeadOpportunity,
+  updateOpportunityCardVerified,
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
   updateOpportunityNcbGrade,
@@ -247,11 +251,8 @@ export function RatebookForm({
 
   usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
 
-  // Shared by the sidebar's and the product cards' "ตรวจ eNCB" buttons.
-  async function handleNcbChecked(nextGrade: NcbGrade) {
-    setNcbGrade(nextGrade)
-    // The eNCB check reads the ID card, which counts as a Dipchip. The first
-    // time this happens, the customer's own info is filled in from the card too.
+  // The first card read (Dipchip or eNCB) fills the customer's own info from the card too.
+  function applyCardRead(): string {
     const cardIdNumber = idCardNumber || mockCardCustomer.idCardNumber
     if (verificationMethod !== "card") {
       const [firstName, ...rest] = mockCardCustomer.name.split(" ")
@@ -265,6 +266,25 @@ export function RatebookForm({
     }
     setIdCardNumber(cardIdNumber)
     setVerificationMethod("card")
+    return cardIdNumber
+  }
+
+  // Dipchip only verifies identity; NCB เกรด stays pending until "รีเฟรช" runs the eNCB check.
+  async function handleDipchipRead() {
+    const cardIdNumber = applyCardRead()
+    if (leadId) {
+      await updateCustomerLeadCardVerified(leadId, cardIdNumber)
+    }
+    if (opportunityId) {
+      await updateOpportunityCardVerified(opportunityId, cardIdNumber)
+    }
+  }
+
+  // Shared by the sidebar's and the product cards' "ตรวจ eNCB" buttons.
+  async function handleNcbChecked(nextGrade: NcbGrade) {
+    setNcbGrade(nextGrade)
+    // The eNCB check reads the ID card, which counts as a Dipchip.
+    const cardIdNumber = applyCardRead()
     // customer_lead.ncb_grade is the single source of truth for the
     // customer, so it's written there regardless of opportunity state;
     // the opportunity's own copy is also kept in sync when one exists.
@@ -386,6 +406,7 @@ export function RatebookForm({
           idCardNumber={idCardNumber}
           verificationMethod={verificationMethod}
           onNcbChecked={handleNcbChecked}
+          onDipchipRead={handleDipchipRead}
         />
       </div>
       {selectedProduct && initialOpportunity ? (

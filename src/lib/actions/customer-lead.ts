@@ -52,6 +52,22 @@ export async function createCustomerLead(
   };
 }
 
+/** A Dipchip read on its own: card-verifies the lead but leaves `ncb_grade` for a later eNCB check. */
+export async function updateCustomerLeadCardVerified(
+  leadId: string,
+  idCardNumber: string = mockCardCustomer.idCardNumber,
+): Promise<void> {
+  await sql`
+    update customer_lead
+    set
+      verification_method = 'card',
+      id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber})
+    where id = ${leadId}
+  `;
+
+  revalidatePath("/customer-lead-list");
+}
+
 /**
  * The eNCB check reads the ID card, so it also marks the lead as card-verified;
  * an ID number already on file is kept, otherwise the one read from the card is stored.
