@@ -18,6 +18,7 @@ import {
   findProductCatalogItemById,
   getProductCatalogData,
   getProductGuideData,
+  getVehicleCarType,
   loanPurposeOptions,
   refinanceStatusOptions,
 } from "@/lib/mock";
@@ -107,7 +108,14 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
           year: initialOpportunity.carYear ?? undefined,
           condition: initialOpportunity.carCondition ?? undefined,
           doors: initialOpportunity.carDoors ?? undefined,
-          carType: initialOpportunity.carType ?? undefined,
+          // ประเภทรถ is system-derived — CarInfoForm never lets it be answered — so it is re-derived
+          // from the saved รุ่น/ประตู rather than trusting a value stored before that rule existed.
+          carType: getVehicleCarType(
+            initialOpportunity.collateralType,
+            initialOpportunity.carBrand ?? undefined,
+            initialOpportunity.carModel ?? undefined,
+            initialOpportunity.carDoors ?? undefined,
+          ),
           engineCc: initialOpportunity.carEngineCc ?? undefined,
           transmission: initialOpportunity.carTransmission ?? undefined,
           bodyType: initialOpportunity.carBodyType ?? undefined,

@@ -11,7 +11,19 @@ export type VehicleCollateralType = Extract<
 >;
 
 export type VehicleSubModelOption = { value: string; label: string };
-export type VehicleModelOption = {
+
+// The vehicle facts the car form derives instead of asking for.
+export type VehicleModelSpec = {
+  // ประเภทรถ keyed by จำนวนประตู — the single source of both the จำนวนประตู option list and the
+  // system-chosen ประเภทรถ. Vehicles with no doors (มอเตอร์ไซค์) key their one entry off "".
+  carTypeByDoors: Record<string, string>;
+  // carTransmissionOptions values this รุ่น comes in; exactly one means the form fills it in.
+  transmissions: string[];
+  // carBodyTypeOptionsByCollateralType values for this รุ่น; exactly one means the form fills it in.
+  bodyTypes: string[];
+};
+
+export type VehicleModelOption = VehicleModelSpec & {
   value: string;
   label: string;
   subModels: VehicleSubModelOption[];

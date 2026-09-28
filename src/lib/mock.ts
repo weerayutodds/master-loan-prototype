@@ -14,6 +14,7 @@ import type {
   VehicleBrandOption,
   VehicleCollateralType,
   VehicleModelOption,
+  VehicleModelSpec,
   VehicleSubModelOption,
 } from "@/types/ratebook"
 import type {
@@ -192,8 +193,9 @@ function model(
   label: string,
   entries: [string, string][],
   basePrice: number,
+  spec: VehicleModelSpec,
 ): VehicleModelOption {
-  return {value, label, subModels: subModels(entries), basePrice}
+  return {value, label, subModels: subModels(entries), basePrice, ...spec}
 }
 
 function brand(
@@ -214,106 +216,186 @@ export const vehicleCatalogByCollateralType: Record<
         ["1.5-j", "1.5 J"],
         ["1.5-e", "1.5 E"],
         ["1.5-g", "1.5 G"],
-      ], 600000),
+      ], 600000, {
+        carTypeByDoors: {"4": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan"],
+      }),
       model("yaris", "Yaris", [
         ["entry", "1.2 Entry"],
         ["sport", "1.2 Sport"],
         ["premium", "1.2 Premium"],
-      ], 580000),
+      ], 580000, {
+        carTypeByDoors: {"4": "sedan", "5": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan", "hatchback"],
+      }),
       model("fortuner", "Fortuner", [
         ["standard", "2.4 Standard"],
         ["legender", "2.8 Legender"],
-      ], 1350000),
+      ], 1350000, {
+        carTypeByDoors: {"5": "suv"},
+        transmissions: ["auto"],
+        bodyTypes: ["suv"],
+      }),
       model("hilux-revo", "Hilux Revo", [
         ["standard-cab", "Standard Cab"],
         ["smart-cab", "Smart Cab"],
         ["double-cab", "Double Cab"],
-      ], 700000),
+      ], 700000, {
+        carTypeByDoors: {"2": "pickup", "4": "pickup"},
+        transmissions: ["manual", "auto"],
+        bodyTypes: ["pickup"],
+      }),
     ]),
     brand("honda", "Honda", [
       model("city", "City", [
         ["s", "S"],
         ["v", "V"],
         ["sv", "SV"],
-      ], 650000),
+      ], 650000, {
+        carTypeByDoors: {"4": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan"],
+      }),
       model("civic", "Civic", [
         ["el", "EL"],
         ["rs", "RS"],
         ["hatchback-rs", "Hatchback RS"],
-      ], 950000),
+      ], 950000, {
+        carTypeByDoors: {"4": "sedan", "5": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan", "hatchback"],
+      }),
       model("cr-v", "CR-V", [
         ["e", "E"],
         ["el", "EL"],
         ["se", "SE"],
-      ], 1300000),
+      ], 1300000, {
+        carTypeByDoors: {"5": "suv"},
+        transmissions: ["auto"],
+        bodyTypes: ["suv"],
+      }),
     ]),
     brand("isuzu", "Isuzu", [
       model("d-max", "D-Max", [
         ["spark", "Spark"],
         ["hi-lander", "Hi-Lander"],
         ["v-cross", "V-Cross"],
-      ], 650000),
+      ], 650000, {
+        carTypeByDoors: {"2": "pickup", "4": "pickup"},
+        transmissions: ["manual", "auto"],
+        bodyTypes: ["pickup"],
+      }),
       model("mu-x", "MU-X", [
         ["standard", "Standard"],
         ["ultimate", "Ultimate"],
-      ], 1300000),
+      ], 1300000, {
+        carTypeByDoors: {"5": "suv"},
+        transmissions: ["auto"],
+        bodyTypes: ["suv"],
+      }),
     ]),
     brand("nissan", "Nissan", [
       model("almera", "Almera", [
         ["e", "E"],
         ["v", "V"],
         ["vl", "VL"],
-      ], 550000),
+      ], 550000, {
+        carTypeByDoors: {"4": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan"],
+      }),
       model("navara", "Navara", [
         ["calibre", "Calibre"],
         ["pro-4x", "Pro-4X"],
-      ], 700000),
+      ], 700000, {
+        carTypeByDoors: {"2": "pickup", "4": "pickup"},
+        transmissions: ["manual", "auto"],
+        bodyTypes: ["pickup"],
+      }),
     ]),
     brand("mazda", "Mazda", [
       model("mazda2", "Mazda2", [
         ["s", "S"],
         ["sports-high", "Sports High"],
-      ], 550000),
+      ], 550000, {
+        carTypeByDoors: {"4": "sedan", "5": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan", "hatchback"],
+      }),
       model("cx-5", "CX-5", [
         ["c", "C"],
         ["sp", "SP"],
-      ], 1200000),
+      ], 1200000, {
+        carTypeByDoors: {"5": "suv"},
+        transmissions: ["auto"],
+        bodyTypes: ["suv"],
+      }),
       model("bt-50", "BT-50", [
         ["standard-cab", "Standard Cab"],
         ["double-cab", "Double Cab"],
-      ], 700000),
+      ], 700000, {
+        carTypeByDoors: {"2": "pickup", "4": "pickup"},
+        transmissions: ["manual", "auto"],
+        bodyTypes: ["pickup"],
+      }),
     ]),
     brand("ford", "Ford", [
       model("ranger", "Ranger", [
         ["xl", "XL"],
         ["xlt", "XLT"],
         ["wildtrak", "Wildtrak"],
-      ], 750000),
+      ], 750000, {
+        carTypeByDoors: {"2": "pickup", "4": "pickup"},
+        transmissions: ["manual", "auto"],
+        bodyTypes: ["pickup"],
+      }),
       model("everest", "Everest", [
         ["ambiente", "Ambiente"],
         ["titanium", "Titanium"],
-      ], 1400000),
+      ], 1400000, {
+        carTypeByDoors: {"5": "suv"},
+        transmissions: ["auto"],
+        bodyTypes: ["suv"],
+      }),
     ]),
     brand("mitsubishi", "Mitsubishi", [
       model("triton", "Triton", [
         ["glx", "GLX"],
         ["gls", "GLS"],
         ["athlete", "Athlete"],
-      ], 650000),
+      ], 650000, {
+        carTypeByDoors: {"2": "pickup", "4": "pickup"},
+        transmissions: ["manual", "auto"],
+        bodyTypes: ["pickup"],
+      }),
       model("xpander", "Xpander", [
         ["gls", "GLS"],
         ["ultimate", "Ultimate"],
-      ], 800000),
+      ], 800000, {
+        carTypeByDoors: {"5": "van"},
+        transmissions: ["auto"],
+        bodyTypes: ["van"],
+      }),
     ]),
     brand("suzuki", "Suzuki", [
       model("swift", "Swift", [
         ["ga", "GA"],
         ["gl", "GL"],
-      ], 550000),
+      ], 550000, {
+        carTypeByDoors: {"5": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["hatchback"],
+      }),
       model("ciaz", "Ciaz", [
         ["gl", "GL"],
         ["glx", "GLX"],
-      ], 550000),
+      ], 550000, {
+        carTypeByDoors: {"4": "sedan"},
+        transmissions: ["auto"],
+        bodyTypes: ["sedan"],
+      }),
     ]),
   ],
   motorcycle: [
@@ -321,59 +403,135 @@ export const vehicleCatalogByCollateralType: Record<
       model("wave110i", "Wave110i", [
         ["standard", "Standard"],
         ["fi", "Fi"],
-      ], 45000),
+      ], 45000, {
+        carTypeByDoors: {"": "family"},
+        transmissions: ["manual"],
+        bodyTypes: ["standard"],
+      }),
       model("click160i", "Click160i", [
         ["standard", "Standard"],
         ["abs", "ABS"],
-      ], 75000),
+      ], 75000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
       model("pcx160", "PCX160", [
         ["standard", "Standard"],
         ["abs", "ABS"],
-      ], 100000),
+      ], 100000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
       model("cbr150r", "CBR150R", [
         ["standard", "Standard"],
         ["abs", "ABS"],
-      ], 105000),
+      ], 105000, {
+        carTypeByDoors: {"": "sport"},
+        transmissions: ["manual"],
+        bodyTypes: ["sport"],
+      }),
     ]),
     brand("yamaha", "Yamaha", [
       model("fino", "Fino", [
         ["standard", "Standard"],
         ["premium", "Premium"],
-      ], 48000),
+      ], 48000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
       model("aerox155", "Aerox155", [
         ["standard", "Standard"],
         ["abs", "ABS"],
-      ], 75000),
+      ], 75000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
       model("nmax", "NMAX", [
         ["standard", "Standard"],
         ["abs", "ABS"],
-      ], 90000),
+      ], 90000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
       model("exciter155vva", "Exciter155VVA", [
         ["standard", "Standard"],
         ["gp", "GP"],
-      ], 95000),
+      ], 95000, {
+        carTypeByDoors: {"": "sport"},
+        transmissions: ["manual"],
+        bodyTypes: ["sport"],
+      }),
     ]),
     brand("suzuki", "Suzuki", [
-      model("smash", "Smash", [["standard", "Standard"]], 45000),
-      model("address110", "Address110", [["standard", "Standard"]], 55000),
-      model("gsx-r150", "GSX-R150", [["standard", "Standard"]], 110000),
+      model("smash", "Smash", [["standard", "Standard"]], 45000, {
+        carTypeByDoors: {"": "family"},
+        transmissions: ["manual"],
+        bodyTypes: ["standard"],
+      }),
+      model("address110", "Address110", [["standard", "Standard"]], 55000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
+      model("gsx-r150", "GSX-R150", [["standard", "Standard"]], 110000, {
+        carTypeByDoors: {"": "sport"},
+        transmissions: ["manual"],
+        bodyTypes: ["sport"],
+      }),
     ]),
     brand("kawasaki", "Kawasaki", [
       model("ninja250", "Ninja250", [
         ["standard", "Standard"],
         ["se", "SE"],
-      ], 170000),
-      model("z250", "Z250", [["standard", "Standard"]], 160000),
-      model("klx150", "KLX150", [["standard", "Standard"]], 110000),
+      ], 170000, {
+        carTypeByDoors: {"": "big-bike"},
+        transmissions: ["manual"],
+        bodyTypes: ["sport"],
+      }),
+      model("z250", "Z250", [["standard", "Standard"]], 160000, {
+        carTypeByDoors: {"": "big-bike"},
+        transmissions: ["manual"],
+        bodyTypes: ["sport"],
+      }),
+      model("klx150", "KLX150", [["standard", "Standard"]], 110000, {
+        carTypeByDoors: {"": "adv"},
+        transmissions: ["manual"],
+        bodyTypes: ["adventure"],
+      }),
     ]),
     brand("vespa", "Vespa", [
-      model("primavera150", "Primavera150", [["standard", "Standard"]], 150000),
-      model("sprint150", "Sprint150", [["standard", "Standard"]], 150000),
-      model("gts300", "GTS300", [["standard", "Standard"]], 260000),
+      model("primavera150", "Primavera150", [["standard", "Standard"]], 150000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
+      model("sprint150", "Sprint150", [["standard", "Standard"]], 150000, {
+        carTypeByDoors: {"": "scooter"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
+      model("gts300", "GTS300", [["standard", "Standard"]], 260000, {
+        carTypeByDoors: {"": "big-bike"},
+        transmissions: ["auto"],
+        bodyTypes: ["scooter"],
+      }),
     ]),
     brand("gpx", "GPX", [
-      model("demon150gr", "Demon150GR", [["standard", "Standard"]], 65000),
-      model("legend250", "Legend250", [["standard", "Standard"]], 130000),
+      model("demon150gr", "Demon150GR", [["standard", "Standard"]], 65000, {
+        carTypeByDoors: {"": "sport"},
+        transmissions: ["manual"],
+        bodyTypes: ["sport"],
+      }),
+      model("legend250", "Legend250", [["standard", "Standard"]], 130000, {
+        carTypeByDoors: {"": "big-bike"},
+        transmissions: ["manual"],
+        bodyTypes: ["cruiser"],
+      }),
     ]),
   ],
   truck: [
@@ -381,46 +539,110 @@ export const vehicleCatalogByCollateralType: Record<
       model("ftr", "FTR", [
         ["4x2", "4x2"],
         ["6x2", "6x2"],
-      ], 2200000),
+      ], 2200000, {
+        carTypeByDoors: {"2": "6-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "flatbed", "box"],
+      }),
       model("fvr", "FVR", [
         ["6x2", "6x2"],
         ["6x4", "6x4"],
-      ], 2800000),
-      model("elf", "ELF", [["standard", "Standard"]], 1400000),
+      ], 2800000, {
+        carTypeByDoors: {"2": "10-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "flatbed", "box"],
+      }),
+      model("elf", "ELF", [["standard", "Standard"]], 1400000, {
+        carTypeByDoors: {"2": "4-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "box"],
+      }),
     ]),
     brand("hino", "Hino", [
       model("300-series", "300 Series", [
         ["standard", "Standard"],
         ["wide-cab", "Wide Cab"],
-      ], 1600000),
+      ], 1600000, {
+        carTypeByDoors: {"2": "4-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "box"],
+      }),
       model("500-series", "500 Series", [
         ["4x2", "4x2"],
         ["6x2", "6x2"],
-      ], 2900000),
-      model("700-series", "700 Series", [["6x4", "6x4"]], 4500000),
+      ], 2900000, {
+        carTypeByDoors: {"2": "6-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "flatbed", "box"],
+      }),
+      model("700-series", "700 Series", [["6x4", "6x4"]], 4500000, {
+        carTypeByDoors: {"2": "10-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["flatbed", "tanker"],
+      }),
     ]),
     brand("fuso", "Mitsubishi Fuso", [
-      model("fighter", "Fighter", [["standard", "Standard"]], 2300000),
-      model("canter", "Canter", [["standard", "Standard"]], 1300000),
+      model("fighter", "Fighter", [["standard", "Standard"]], 2300000, {
+        carTypeByDoors: {"2": "6-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["flatbed", "box"],
+      }),
+      model("canter", "Canter", [["standard", "Standard"]], 1300000, {
+        carTypeByDoors: {"2": "4-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "box"],
+      }),
     ]),
     brand("volvo", "Volvo Trucks", [
       model("fm", "FM", [
         ["4x2", "4x2"],
         ["6x4", "6x4"],
-      ], 4800000),
-      model("fh", "FH", [["6x4", "6x4"]], 5500000),
+      ], 4800000, {
+        carTypeByDoors: {"2": "10-wheel"},
+        transmissions: ["auto"],
+        bodyTypes: ["flatbed", "tanker"],
+      }),
+      model("fh", "FH", [["6x4", "6x4"]], 5500000, {
+        carTypeByDoors: {"2": "trailer"},
+        transmissions: ["auto"],
+        bodyTypes: ["flatbed"],
+      }),
     ]),
     brand("scania", "Scania", [
-      model("p-series", "P-series", [["standard", "Standard"]], 4600000),
-      model("r-series", "R-series", [["standard", "Standard"]], 5800000),
+      model("p-series", "P-series", [["standard", "Standard"]], 4600000, {
+        carTypeByDoors: {"2": "10-wheel"},
+        transmissions: ["auto"],
+        bodyTypes: ["flatbed", "tanker"],
+      }),
+      model("r-series", "R-series", [["standard", "Standard"]], 5800000, {
+        carTypeByDoors: {"2": "trailer"},
+        transmissions: ["auto"],
+        bodyTypes: ["flatbed"],
+      }),
     ]),
     brand("ud", "UD Trucks", [
-      model("quon", "Quon", [["standard", "Standard"]], 4700000),
-      model("condor", "Condor", [["standard", "Standard"]], 2600000),
+      model("quon", "Quon", [["standard", "Standard"]], 4700000, {
+        carTypeByDoors: {"2": "10-wheel"},
+        transmissions: ["auto"],
+        bodyTypes: ["flatbed", "tanker"],
+      }),
+      model("condor", "Condor", [["standard", "Standard"]], 2600000, {
+        carTypeByDoors: {"2": "6-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "box"],
+      }),
     ]),
     brand("hyundai", "Hyundai", [
-      model("mighty", "Mighty", [["standard", "Standard"]], 1500000),
-      model("hd", "HD", [["standard", "Standard"]], 2000000),
+      model("mighty", "Mighty", [["standard", "Standard"]], 1500000, {
+        carTypeByDoors: {"2": "4-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "box"],
+      }),
+      model("hd", "HD", [["standard", "Standard"]], 2000000, {
+        carTypeByDoors: {"2": "6-wheel"},
+        transmissions: ["manual"],
+        bodyTypes: ["cab-chassis", "box"],
+      }),
     ]),
   ],
 }
@@ -544,6 +766,42 @@ export function getVehicleSubModels(
       (option) => option.value === modelValue,
     )?.subModels ?? []
   )
+}
+
+export function getVehicleModelSpec(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+  modelValue?: string,
+): VehicleModelSpec | undefined {
+  return getVehicleModels(collateralType, brandValue).find(
+    (option) => option.value === modelValue,
+  )
+}
+
+// จำนวนประตู is narrowed to what the chosen รุ่น actually comes in, so the ประเภทรถ below can
+// always be resolved from it. An unpicked รุ่น — or one with no doors at all (มอเตอร์ไซค์) — has
+// nothing to offer.
+export function getVehicleDoorsOptions(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+  modelValue?: string,
+): {value: string; label: string}[] {
+  const carTypeByDoors =
+    getVehicleModelSpec(collateralType, brandValue, modelValue)?.carTypeByDoors ?? {}
+  return carDoorsOptions.filter((option) => option.value in carTypeByDoors)
+}
+
+// ประเภทรถ is a fact about the vehicle, not a question for the user: the รุ่น's own
+// จำนวนประตู → ประเภทรถ table decides it. Undefined until both are known.
+export function getVehicleCarType(
+  collateralType: CollateralType | null | undefined,
+  brandValue?: string,
+  modelValue?: string,
+  doors?: string,
+): string | undefined {
+  return getVehicleModelSpec(collateralType, brandValue, modelValue)?.carTypeByDoors[
+    doors ?? ""
+  ]
 }
 
 export function getVehicleBrandLabel(
