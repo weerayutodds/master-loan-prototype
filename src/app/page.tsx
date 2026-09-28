@@ -1,12 +1,12 @@
-import { DashboardHeader } from "@/components/organisms/DashboardHeader";
-import { QuickActionsSection } from "@/components/organisms/QuickActionsSection";
-import { FollowUpTasksCard } from "@/components/organisms/FollowUpTasksCard";
-import { BranchPerformanceCard } from "@/components/organisms/BranchPerformanceCard";
-import { followUpTasks, performanceStats, quickActions } from "@/lib/mock";
+import {BranchPerformanceCard} from "@/components/organisms/BranchPerformanceCard"
+import {DashboardHeader} from "@/components/organisms/DashboardHeader"
+import {FollowUpTasksCard} from "@/components/organisms/FollowUpTasksCard"
+import {QuickActionsSection} from "@/components/organisms/QuickActionsSection"
+import {followUpTasks, performanceStats, quickActions} from "@/lib/mock"
 
 export default function Home() {
   return (
-    <>
+    <div className="space-y-6">
       <DashboardHeader
         title="Master Loan Dashboard"
         subtitle="Track leads, manage applications, and check your metrics today."
@@ -18,6 +18,6 @@ export default function Home() {
         <FollowUpTasksCard tasks={followUpTasks} />
         <BranchPerformanceCard stats={performanceStats} />
       </div>
-    </>
-  );
+    </div>
+  )
 }
