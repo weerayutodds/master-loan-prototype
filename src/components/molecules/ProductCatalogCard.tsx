@@ -25,12 +25,14 @@ const NCB_GRADE_TONE_CLASSNAMES: Record<
 type ProductCatalogCardProps = {
   item: ProductCatalogItem
   onSelect?: () => void
+  onCheckNcb?: () => void
   onViewDetail?: () => void
 }
 
 export function ProductCatalogCard({
   item,
   onSelect,
+  onCheckNcb,
   onViewDetail,
 }: ProductCatalogCardProps) {
   return (
@@ -100,7 +102,7 @@ export function ProductCatalogCard({
             }
             size="sm"
             onClick={
-              item.primaryActionVariant === "filled" ? onSelect : undefined
+              item.primaryActionVariant === "filled" ? onSelect : onCheckNcb
             }
           >
             {item.primaryActionLabel}

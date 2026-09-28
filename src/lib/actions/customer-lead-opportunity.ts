@@ -8,6 +8,7 @@ import {
   MOCK_OPPORTUNITY_BRANCH_NAME,
   MOCK_OPPORTUNITY_STAFF_CODE,
   MOCK_OPPORTUNITY_STAFF_NAME,
+  mockCardCustomer,
 } from "@/lib/mock";
 import type { NcbGrade } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
@@ -147,14 +148,18 @@ export async function updateOpportunityCustomerInfo(
   return mapRow(row);
 }
 
+/** Same card-verified side effect as `updateCustomerLeadNcbGrade`, on the opportunity's snapshot. */
 export async function updateOpportunityNcbGrade(
   opportunityId: string,
   ncbGrade: NcbGrade,
+  idCardNumber: string = mockCardCustomer.idCardNumber,
 ): Promise<CustomerLeadOpportunity> {
   const [row] = await sql`
     update customer_lead_opportunity
     set
       ncb_grade = ${ncbGrade},
+      verification_method = 'card',
+      id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber}),
       updated_at = now()
     where id = ${opportunityId}
     returning *

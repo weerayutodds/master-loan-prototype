@@ -8,10 +8,12 @@ import {LoanCalBar} from "@/components/organisms/LoanCalBar"
 import {LoanQuestionsPanel} from "@/components/organisms/LoanQuestionsPanel"
 import {ProductCatalog} from "@/components/organisms/ProductCatalog"
 import {ProductGuide} from "@/components/organisms/ProductGuide"
+import {updateCustomerLeadNcbGrade} from "@/lib/actions/customer-lead"
 import {
   createCustomerLeadOpportunity,
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
+  updateOpportunityNcbGrade,
   updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity"
 import {getMaxApprovedAmount} from "@/lib/loan-cal"
@@ -23,8 +25,10 @@ import {
   getProductGuideData,
   getVehicleCarType,
   loanPurposeOptions,
+  mockCardCustomer,
   refinanceStatusOptions,
 } from "@/lib/mock"
+import type {VerificationMethod} from "@/types/customer-form"
 import type {CustomerLead, NcbGrade} from "@/types/customer-lead"
 import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
 import type {
@@ -107,6 +111,15 @@ export function RatebookForm({
   const [ncbGrade, setNcbGrade] = useState<NcbGrade | null>(
     initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null,
   )
+  const [idCardNumber, setIdCardNumber] = useState(
+    initialOpportunity?.idCardNumber ?? initialLead?.idCardNumber ?? "",
+  )
+  const [verificationMethod, setVerificationMethod] =
+    useState<VerificationMethod | null>(
+      initialOpportunity?.verificationMethod ??
+        initialLead?.verificationMethod ??
+        null,
+    )
   const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(
     initialOpportunity?.loanPurpose ?? null,
   )
@@ -231,6 +244,24 @@ export function RatebookForm({
 
   usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
 
+  // Shared by the sidebar's and the product cards' "ตรวจ eNCB" buttons.
+  async function handleNcbChecked(nextGrade: NcbGrade) {
+    setNcbGrade(nextGrade)
+    // The eNCB check reads the ID card, which counts as a Dipchip.
+    const cardIdNumber = idCardNumber || mockCardCustomer.idCardNumber
+    setIdCardNumber(cardIdNumber)
+    setVerificationMethod("card")
+    // customer_lead.ncb_grade is the single source of truth for the
+    // customer, so it's written there regardless of opportunity state;
+    // the opportunity's own copy is also kept in sync when one exists.
+    if (leadId) {
+      await updateCustomerLeadNcbGrade(leadId, nextGrade, cardIdNumber)
+    }
+    if (opportunityId) {
+      await updateOpportunityNcbGrade(opportunityId, nextGrade, cardIdNumber)
+    }
+  }
+
   async function handleSelectedProductConfirmed(item: ProductCatalogItem) {
     setSelectedProduct(item)
     window.scrollTo({top: 0, behavior: "instant"})
@@ -323,7 +354,6 @@ export function RatebookForm({
       <div className="lg:sticky lg:top-19">
         <CustomerCollateralPanel
           initialOpportunity={initialOpportunity}
-          initialLead={initialLead}
           opportunityId={opportunityId}
           leadId={leadId}
           tags={tags}
@@ -339,7 +369,9 @@ export function RatebookForm({
           customer={customer}
           onCustomerChange={setCustomer}
           ncbGrade={ncbGrade}
-          onNcbGradeChange={setNcbGrade}
+          idCardNumber={idCardNumber}
+          verificationMethod={verificationMethod}
+          onNcbChecked={handleNcbChecked}
         />
       </div>
       {selectedProduct && initialOpportunity ? (
@@ -389,6 +421,7 @@ export function RatebookForm({
                 data={productCatalogData}
                 filter={productFilter}
                 ncbGrade={ncbGrade}
+                onNcbChecked={handleNcbChecked}
                 onSelectConfirmed={handleSelectedProductConfirmed}
               />
               <LoanCalBar

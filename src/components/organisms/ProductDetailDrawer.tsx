@@ -45,9 +45,15 @@ type ProductDetailDrawerProps = {
   item: ProductCatalogItem | null;
   onClose: () => void;
   onSelect: () => void;
+  onCheckNcb: () => void;
 };
 
-export function ProductDetailDrawer({ item, onClose, onSelect }: ProductDetailDrawerProps) {
+export function ProductDetailDrawer({
+  item,
+  onClose,
+  onSelect,
+  onCheckNcb,
+}: ProductDetailDrawerProps) {
   const open = item !== null;
 
   useEffect(() => {
@@ -149,7 +155,7 @@ export function ProductDetailDrawer({ item, onClose, onSelect }: ProductDetailDr
             <Button
               variant={item.primaryActionVariant === "filled" ? "primary" : "outline"}
               className="w-36"
-              onClick={item.primaryActionVariant === "filled" ? onSelect : undefined}
+              onClick={item.primaryActionVariant === "filled" ? onSelect : onCheckNcb}
             >
               {item.primaryActionLabel}
             </Button>

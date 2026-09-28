@@ -1,6 +1,8 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import sql from "@/lib/db";
+import { mockCardCustomer } from "@/lib/mock";
 import type { VerificationMethod } from "@/types/customer-form";
 import type { CustomerLead, Gender, NcbGrade } from "@/types/customer-lead";
 
@@ -50,16 +52,26 @@ export async function createCustomerLead(
   };
 }
 
+/**
+ * The eNCB check reads the ID card, so it also marks the lead as card-verified;
+ * an ID number already on file is kept, otherwise the one read from the card is stored.
+ */
 export async function updateCustomerLeadNcbGrade(
   leadId: string,
   ncbGrade: NcbGrade,
+  idCardNumber: string = mockCardCustomer.idCardNumber,
 ): Promise<CustomerLead> {
   const [row] = await sql`
     update customer_lead
-    set ncb_grade = ${ncbGrade}
+    set
+      ncb_grade = ${ncbGrade},
+      verification_method = 'card',
+      id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber})
     where id = ${leadId}
     returning id, first_name, last_name, phone, id_card_number, ncb_grade, verification_method, gender, birth_date, created_at
   `;
+
+  revalidatePath("/customer-lead-list");
 
   return {
     id: row.id,

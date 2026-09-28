@@ -2,6 +2,7 @@
 
 import { Icon } from "@/components/atoms/Icon";
 import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
+import { NcbCheckModal } from "@/components/organisms/NcbCheckModal";
 import { ProductDetailDrawer } from "@/components/organisms/ProductDetailDrawer";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
 import type { NcbGrade } from "@/types/customer-lead";
@@ -17,6 +18,8 @@ type ProductCatalogProps = {
   filter: ProductCatalogFilter | null;
   /** Set once eNCB has been checked; null shows every grade. */
   ncbGrade: NcbGrade | null;
+  /** Same handler as the sidebar's "ตรวจ eNCB", so both paths share one outcome. */
+  onNcbChecked: (ncbGrade: NcbGrade) => unknown;
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
 
@@ -73,8 +76,10 @@ export function ProductCatalog({
   data,
   filter,
   ncbGrade,
+  onNcbChecked,
   onSelectConfirmed,
 }: ProductCatalogProps) {
+  const [checkingNcb, setCheckingNcb] = useState(false);
   // "ตรวจ eNCB" (outline) products only become selectable once the grade is known.
   const items = ncbGrade
     ? data.items.map((item) =>
@@ -112,6 +117,7 @@ export function ProductCatalog({
         key={item.id}
         item={item}
         onSelect={() => setSelectedItemId(item.id)}
+        onCheckNcb={() => setCheckingNcb(true)}
         onViewDetail={() => setDetailItemId(item.id)}
       />
     ));
@@ -167,6 +173,15 @@ export function ProductCatalog({
         item={detailItem}
         onClose={() => setDetailItemId(null)}
         onSelect={() => setSelectedItemId(detailItemId)}
+        onCheckNcb={() => setCheckingNcb(true)}
+      />
+
+      <NcbCheckModal
+        open={checkingNcb}
+        onComplete={async (nextGrade) => {
+          await onNcbChecked(nextGrade);
+          setCheckingNcb(false);
+        }}
       />
 
       <SelectProductConfirmModal

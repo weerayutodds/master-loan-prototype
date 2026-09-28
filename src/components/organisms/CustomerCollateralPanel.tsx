@@ -10,7 +10,6 @@ import {Toast} from "@/components/molecules/Toast"
 import {CollateralDetailModal} from "@/components/organisms/CollateralDetailModal"
 import {CustomerInfoModal} from "@/components/organisms/CustomerInfoModal"
 import {NcbCheckControl} from "@/components/organisms/NcbCheckControl"
-import {updateCustomerLeadNcbGrade} from "@/lib/actions/customer-lead"
 import {
   createCustomerLeadOpportunity,
   updateOpportunityCarInfo,
@@ -19,7 +18,6 @@ import {
   updateOpportunityCustomerInfo,
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
-  updateOpportunityNcbGrade,
   updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity"
 import {calculateAge, maskIdCardNumber} from "@/lib/format"
@@ -28,7 +26,8 @@ import {
   getVehicleModelLabel,
   provinceOptions,
 } from "@/lib/mock"
-import type {CustomerLead, NcbGrade} from "@/types/customer-lead"
+import type {VerificationMethod} from "@/types/customer-form"
+import type {NcbGrade} from "@/types/customer-lead"
 import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
 import type {
   CarInfo,
@@ -47,7 +46,6 @@ const TOTAL_SECTIONS = 4
 
 type CustomerCollateralPanelProps = {
   initialOpportunity?: CustomerLeadOpportunity | null
-  initialLead?: CustomerLead | null
   opportunityId: string | null
   leadId: string | null
   tags: string[]
@@ -63,7 +61,9 @@ type CustomerCollateralPanelProps = {
   customer: CustomerInfo | null
   onCustomerChange: (value: CustomerInfo) => void
   ncbGrade: NcbGrade | null
-  onNcbGradeChange: (value: NcbGrade) => void
+  idCardNumber: string
+  verificationMethod: VerificationMethod | null
+  onNcbChecked: (value: NcbGrade) => unknown
 }
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -105,7 +105,6 @@ function formatBrandModelYear(
 
 export function CustomerCollateralPanel({
   initialOpportunity = null,
-  initialLead = null,
   opportunityId,
   leadId,
   tags,
@@ -121,7 +120,9 @@ export function CustomerCollateralPanel({
   customer,
   onCustomerChange,
   ncbGrade,
-  onNcbGradeChange,
+  idCardNumber,
+  verificationMethod,
+  onNcbChecked,
 }: CustomerCollateralPanelProps) {
   const router = useRouter()
   const [modalOpen, setModalOpen] = useState(false)
@@ -145,13 +146,6 @@ export function CustomerCollateralPanel({
   )
   const [editingBrandModel, setEditingBrandModel] = useState(false)
   const [savedToastOpen, setSavedToastOpen] = useState(false)
-
-  const idCardNumber =
-    initialOpportunity?.idCardNumber ?? initialLead?.idCardNumber ?? ""
-  const verificationMethod =
-    initialOpportunity?.verificationMethod ??
-    initialLead?.verificationMethod ??
-    null
 
   async function handleSaveLead() {
     if (!customer) return
@@ -292,21 +286,7 @@ export function CustomerCollateralPanel({
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">NCB เกรด</span>
-        <NcbCheckControl
-          ncbGrade={ncbGrade}
-          onChecked={async (nextGrade) => {
-            onNcbGradeChange(nextGrade)
-            // customer_lead.ncb_grade is the single source of truth for the
-            // customer, so it's written there regardless of opportunity state;
-            // the opportunity's own copy is also kept in sync when one exists.
-            if (leadId) {
-              await updateCustomerLeadNcbGrade(leadId, nextGrade)
-            }
-            if (opportunityId) {
-              await updateOpportunityNcbGrade(opportunityId, nextGrade)
-            }
-          }}
-        />
+        <NcbCheckControl ncbGrade={ncbGrade} onChecked={onNcbChecked} />
       </div>
 
       <div className="border-t border-dashed border-secondary-border" />
