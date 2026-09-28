@@ -295,18 +295,20 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
 
   return (
     <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_2fr]">
-      <CustomerCollateralPanel
-        initialOpportunity={initialOpportunity}
-        opportunityId={opportunityId}
-        tags={tags}
-        carInfo={carInfo}
-        collateralType={collateralType}
-        hasSelectedProduct={selectedProduct !== null}
-        loanInfo={loanInfo}
-        carInsuranceInfo={carInsuranceInfo}
-        customer={customer}
-        onCustomerChange={setCustomer}
-      />
+      <div className="lg:sticky lg:top-[4.75rem]">
+        <CustomerCollateralPanel
+          initialOpportunity={initialOpportunity}
+          opportunityId={opportunityId}
+          tags={tags}
+          carInfo={carInfo}
+          collateralType={collateralType}
+          hasSelectedProduct={selectedProduct !== null}
+          loanInfo={loanInfo}
+          carInsuranceInfo={carInsuranceInfo}
+          customer={customer}
+          onCustomerChange={setCustomer}
+        />
+      </div>
       {selectedProduct && initialOpportunity ? (
         <LeadContent
           initialOpportunity={initialOpportunity}
