@@ -303,12 +303,8 @@ export function LoanCalBar({
   }
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-40 flex justify-center">
-      <div
-        className={`loan-cal-bar flex w-full items-end justify-between gap-6 rounded-xl px-4 py-2.5 ${
-          isRefinance ? "max-w-312.5" : "max-w-306.5"
-        }`}
-      >
+    <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 md:px-20">
+      <div className="loan-cal-bar flex w-full max-w-341 items-end justify-between gap-6 rounded-xl px-4 py-2.5">
         <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1">
           <div className="w-fit shrink-0">
             <FieldLabel>เล่มทะเบียน</FieldLabel>

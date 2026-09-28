@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import { usePageTitleOverride } from "@/components/organisms/AppShell";
-import { CarInfoForm } from "@/components/organisms/CarInfoForm";
-import { CustomerCollateralPanel } from "@/components/organisms/CustomerCollateralPanel";
-import { LeadContent } from "@/components/organisms/LeadContent";
-import { LoanCalBar } from "@/components/organisms/LoanCalBar";
-import { LoanQuestionsPanel } from "@/components/organisms/LoanQuestionsPanel";
-import { ProductCatalog } from "@/components/organisms/ProductCatalog";
-import { ProductGuide } from "@/components/organisms/ProductGuide";
+import {usePageTitleOverride} from "@/components/organisms/AppShell"
+import {CarInfoForm} from "@/components/organisms/CarInfoForm"
+import {CustomerCollateralPanel} from "@/components/organisms/CustomerCollateralPanel"
+import {LeadContent} from "@/components/organisms/LeadContent"
+import {LoanCalBar} from "@/components/organisms/LoanCalBar"
+import {LoanQuestionsPanel} from "@/components/organisms/LoanQuestionsPanel"
+import {ProductCatalog} from "@/components/organisms/ProductCatalog"
+import {ProductGuide} from "@/components/organisms/ProductGuide"
 import {
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
   updateOpportunitySelectedProduct,
-} from "@/lib/actions/customer-lead-opportunity";
-import { getMaxApprovedAmount } from "@/lib/loan-cal";
+} from "@/lib/actions/customer-lead-opportunity"
+import {getMaxApprovedAmount} from "@/lib/loan-cal"
 import {
   collateralTypeOptions,
   existingFinanceOptions,
@@ -23,9 +23,13 @@ import {
   getVehicleCarType,
   loanPurposeOptions,
   refinanceStatusOptions,
-} from "@/lib/mock";
-import type { CustomerLead, NcbGrade } from "@/types/customer-lead";
-import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
+} from "@/lib/mock"
+import type {CustomerLead} from "@/types/customer-lead"
+import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
+import type {
+  ProductCatalogFilter,
+  ProductCatalogItem,
+} from "@/types/product-catalog"
 import type {
   CarInfo,
   CarInsuranceInfo,
@@ -34,55 +38,48 @@ import type {
   LoanInfo,
   LoanPurpose,
   RefinanceStatus,
-} from "@/types/ratebook";
-import type {
-  ProductCatalogFilter,
-  ProductCatalogItem,
-} from "@/types/product-catalog";
-import { useState } from "react";
+} from "@/types/ratebook"
+import {useState} from "react"
 
 type RatebookFormProps = {
-  initialOpportunity: CustomerLeadOpportunity | null;
-  initialLead?: CustomerLead | null;
-};
+  initialOpportunity: CustomerLeadOpportunity | null
+  initialLead?: CustomerLead | null
+}
 
 type LoanQuestionAnswers = {
-  loanPurpose: LoanPurpose;
-  collateralType: CollateralType;
-  refinanceStatus: RefinanceStatus;
-  existingFinanceCompany: string | null;
-};
+  loanPurpose: LoanPurpose
+  collateralType: CollateralType
+  refinanceStatus: RefinanceStatus
+  existingFinanceCompany: string | null
+}
 
-// The four loan questions as a complete set, or null while any of them is unanswered.
-// Returning the answers rather than a boolean keeps them narrowed for the server action.
 function toCompleteLoanQuestions(
   loanPurpose: LoanPurpose | null,
   collateralType: CollateralType | null,
   refinanceStatus: RefinanceStatus | null,
   existingFinance: string | null,
 ): LoanQuestionAnswers | null {
-  // A รีไฟแนนซ์ isn't complete until we know which ไฟแนนซ์ currently holds the car.
   const financeAnswered =
-    refinanceStatus === "still-paying" ? Boolean(existingFinance) : true;
+    refinanceStatus === "still-paying" ? Boolean(existingFinance) : true
   if (!loanPurpose || !collateralType || !refinanceStatus || !financeAnswered) {
-    return null;
+    return null
   }
   return {
     loanPurpose,
     collateralType,
     refinanceStatus,
-    // "ผ่อนหมดแล้ว" means there is no existing ไฟแนนซ์ to carry over.
+
     existingFinanceCompany:
       refinanceStatus === "still-paying" ? existingFinance : null,
-  };
+  }
 }
 
 export function RatebookForm({
   initialOpportunity,
   initialLead = null,
 }: RatebookFormProps) {
-  const opportunityId = initialOpportunity?.id ?? null;
-  const leadId = initialOpportunity?.leadId ?? initialLead?.id ?? null;
+  const opportunityId = initialOpportunity?.id ?? null
+  const leadId = initialOpportunity?.leadId ?? initialLead?.id ?? null
 
   const [customer, setCustomer] = useState<CustomerInfo | null>(
     initialOpportunity
@@ -102,25 +99,20 @@ export function RatebookForm({
             birthDate: initialLead.birthDate ?? undefined,
           }
         : null,
-  );
-  // customer_lead.ncb_grade is the single source of truth, so it's preferred
-  // over the opportunity's own snapshot copy, which can go stale.
-  const [ncbGrade, setNcbGrade] = useState<NcbGrade | null>(
-    initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null,
-  );
+  )
   const [loanPurpose, setLoanPurpose] = useState<LoanPurpose | null>(
     initialOpportunity?.loanPurpose ?? null,
-  );
+  )
   const [collateralType, setCollateralType] = useState<CollateralType | null>(
     initialOpportunity?.collateralType ?? null,
-  );
+  )
   const [refinanceStatus, setRefinanceStatus] =
     useState<RefinanceStatus | null>(
       initialOpportunity?.refinanceStatus ?? null,
-    );
+    )
   const [existingFinance, setExistingFinance] = useState<string | null>(
     initialOpportunity?.existingFinanceCompany ?? null,
-  );
+  )
   const [carInfo, setCarInfo] = useState<CarInfo>(
     initialOpportunity
       ? {
@@ -129,8 +121,7 @@ export function RatebookForm({
           year: initialOpportunity.carYear ?? undefined,
           condition: initialOpportunity.carCondition ?? undefined,
           doors: initialOpportunity.carDoors ?? undefined,
-          // ประเภทรถ is system-derived — CarInfoForm never lets it be answered — so it is re-derived
-          // from the saved รุ่น/ประตู rather than trusting a value stored before that rule existed.
+
           carType: getVehicleCarType(
             initialOpportunity.collateralType,
             initialOpportunity.carBrand ?? undefined,
@@ -143,7 +134,7 @@ export function RatebookForm({
           subModel: initialOpportunity.carSubModel ?? undefined,
         }
       : {},
-  );
+  )
   const [loanInfo, setLoanInfo] = useState<LoanInfo>(
     initialOpportunity
       ? {
@@ -159,7 +150,7 @@ export function RatebookForm({
               : undefined,
         }
       : {},
-  );
+  )
   const [carInsuranceInfo, setCarInsuranceInfo] = useState<CarInsuranceInfo>(
     initialOpportunity
       ? {
@@ -174,8 +165,8 @@ export function RatebookForm({
           compulsoryCompany: initialOpportunity.compulsoryCompany ?? undefined,
         }
       : {},
-  );
-  const hasSavedProduct = Boolean(initialOpportunity?.selectedProductId);
+  )
+  const hasSavedProduct = Boolean(initialOpportunity?.selectedProductId)
   const [showCarInfo, setShowCarInfo] = useState(
     () =>
       hasSavedProduct ||
@@ -185,22 +176,20 @@ export function RatebookForm({
         refinanceStatus,
         existingFinance,
       ) !== null,
-  );
-  const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct);
-  const productGuideData = getProductGuideData(carInfo, collateralType);
+  )
+  const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct)
+  const productGuideData = getProductGuideData(carInfo, collateralType)
   const productCatalogContext = {
     carInfo,
     collateralType,
     loanPurpose,
     refinanceStatus,
     appraisalPrice: productGuideData.appraisalPrice,
-  };
-  const productCatalogData = getProductCatalogData(productCatalogContext);
+  }
+  const productCatalogData = getProductCatalogData(productCatalogContext)
   const [productFilter, setProductFilter] =
-    useState<ProductCatalogFilter | null>(null);
+    useState<ProductCatalogFilter | null>(null)
 
-  // Runs once, against the first render's persisted car info — so a saved product
-  // rehydrates from the same catalog the customer picked it out of.
   const [selectedProduct, setSelectedProduct] =
     useState<ProductCatalogItem | null>(
       initialOpportunity?.selectedProductId
@@ -209,10 +198,8 @@ export function RatebookForm({
             productCatalogContext,
           )
         : null,
-    );
+    )
 
-  // The questions stay on screen and editable, so this runs on every answer change and
-  // has to take the car form away again when an answer is undone, not just reveal it.
   function commitLoanQuestionsIfComplete(
     nextLoanPurpose: LoanPurpose | null,
     nextCollateralType: CollateralType | null,
@@ -224,87 +211,83 @@ export function RatebookForm({
       nextCollateralType,
       nextRefinanceStatus,
       nextExistingFinance,
-    );
-    setShowCarInfo(answers !== null);
+    )
+    setShowCarInfo(answers !== null)
     if (!answers) {
-      // No car form means no car to have appraised.
-      setShowProductGuide(false);
-      return;
+      setShowProductGuide(false)
+      return
     }
     if (opportunityId) {
-      void updateOpportunityLoanQuestions(opportunityId, answers);
+      void updateOpportunityLoanQuestions(opportunityId, answers)
     }
   }
 
-  usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null);
+  usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
 
   function handleSelectedProductConfirmed(item: ProductCatalogItem) {
-    setSelectedProduct(item);
-    window.scrollTo({ top: 0, behavior: "instant" });
+    setSelectedProduct(item)
+    window.scrollTo({top: 0, behavior: "instant"})
     const nextLoanInfo: LoanInfo = {
       ...loanInfo,
       requestedAmount: loanInfo.requestedAmount ?? getMaxApprovedAmount(item),
-    };
-    setLoanInfo(nextLoanInfo);
+    }
+    setLoanInfo(nextLoanInfo)
     if (opportunityId) {
-      void updateOpportunitySelectedProduct(opportunityId, item.id);
-      void updateOpportunityLoanInfo(opportunityId, nextLoanInfo);
+      void updateOpportunitySelectedProduct(opportunityId, item.id)
+      void updateOpportunityLoanInfo(opportunityId, nextLoanInfo)
     }
   }
 
   function handleLoanPurposeChange(value: LoanPurpose) {
-    setLoanPurpose(value);
+    setLoanPurpose(value)
     commitLoanQuestionsIfComplete(
       value,
       collateralType,
       refinanceStatus,
       existingFinance,
-    );
+    )
   }
 
   function handleCollateralTypeChange(value: CollateralType) {
-    setCollateralType(value);
-    // A different หลักประกัน swaps the whole vehicle catalog — brands, models, ประเภทรถ,
-    // ตัวถัง and cc are all keyed off it — so the car answered for the old type no longer
-    // exists in these dropdowns, and any appraisal computed from it is void.
-    setCarInfo({});
-    setShowProductGuide(false);
+    setCollateralType(value)
+
+    setCarInfo({})
+    setShowProductGuide(false)
     commitLoanQuestionsIfComplete(
       loanPurpose,
       value,
       refinanceStatus,
       existingFinance,
-    );
+    )
   }
 
   function handleRefinanceStatusChange(value: RefinanceStatus) {
-    setRefinanceStatus(value);
-    // "ผ่อนหมดแล้ว" means there is no existing ไฟแนนซ์ to carry over.
-    const nextExistingFinance = value === "still-paying" ? existingFinance : null;
-    setExistingFinance(nextExistingFinance);
+    setRefinanceStatus(value)
+
+    const nextExistingFinance =
+      value === "still-paying" ? existingFinance : null
+    setExistingFinance(nextExistingFinance)
     commitLoanQuestionsIfComplete(
       loanPurpose,
       collateralType,
       value,
       nextExistingFinance,
-    );
+    )
   }
 
   function handleExistingFinanceChange(value: string) {
-    setExistingFinance(value);
+    setExistingFinance(value)
     commitLoanQuestionsIfComplete(
       loanPurpose,
       collateralType,
       refinanceStatus,
       value,
-    );
+    )
   }
 
-  // The product guide is only ever revealed by "ดูราคาประเมิน", so editing the car
-  // info takes it away again — it can never show numbers for a car that changed since.
   function handleCarInfoChange(nextCarInfo: CarInfo) {
-    setCarInfo(nextCarInfo);
-    setShowProductGuide(false);
+    setCarInfo(nextCarInfo)
+    setShowProductGuide(false)
   }
 
   const tags = [
@@ -315,10 +298,10 @@ export function RatebookForm({
       ?.label.replace(/ /g, "-"),
     refinanceStatusOptions.find((option) => option.value === refinanceStatus)
       ?.description,
-    // ไฟแนนซ์เดิม — only ever set while refinanceStatus is "still-paying"
+
     existingFinanceOptions.find((option) => option.value === existingFinance)
       ?.label,
-  ].filter((tag): tag is string => Boolean(tag));
+  ].filter((tag): tag is string => Boolean(tag))
 
   return (
     <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
@@ -378,9 +361,8 @@ export function RatebookForm({
               collateralType={collateralType}
               onCarInfoChange={handleCarInfoChange}
               onViewAppraisal={() => {
-                // LoanCalBar remounts with empty inputs, so start unfiltered too.
-                setProductFilter(null);
-                setShowProductGuide(true);
+                setProductFilter(null)
+                setShowProductGuide(true)
               }}
             />
           )}
@@ -409,5 +391,5 @@ export function RatebookForm({
         </div>
       )}
     </div>
-  );
+  )
 }

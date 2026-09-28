@@ -50,7 +50,7 @@ export function ProductCatalogCard({
       </div>
 
       <div className="flex flex-col gap-4 overflow-x-auto rounded-t-lg bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-60 sm:shrink-0">
+        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-50 sm:shrink-0">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-catalog-card-bg text-primary-to">
             <Icon name="money-bag" className="size-4" />
           </span>
@@ -69,21 +69,21 @@ export function ProductCatalogCard({
         </div>
 
         <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:items-center sm:gap-6">
-          <div className="sm:w-18 md:w-16 sm:shrink-0">
+          <div className="sm:w-16 sm:shrink-0">
             <p className="text-muted-foreground">เล่มทะเบียน</p>
             <p className="font-medium text-price-label">
               {item.bookStatusLabel}
             </p>
           </div>
           <div className="hidden w-px self-stretch bg-secondary-border sm:block" />
-          <div className="sm:w-52 md:w-30 sm:shrink-0">
+          <div className="sm:w-40 sm:shrink-0">
             <p className="text-muted-foreground">อัตราดอกเบี้ย</p>
             <p className="text-unit-label">{item.interestRateLabel}</p>
             <p className="text-price-label">{item.interestReductionLabel}</p>
           </div>
           <div className="hidden w-px self-stretch bg-secondary-border sm:block" />
 
-          <div className="sm:w-18 md:w-16 sm:shrink-0">
+          <div className="sm:w-16 sm:shrink-0">
             <p className="text-muted-foreground">เฉพาะ NCB</p>
             <p
               className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}

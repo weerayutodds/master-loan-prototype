@@ -17,11 +17,6 @@ export function Toast({open, message, onClose, duration = 2500}: ToastProps) {
     return () => clearTimeout(timer)
   }, [open, duration, onClose])
 
-  // Portaled to <body> so `fixed` always escapes an ancestor's stacking
-  // context (e.g. a `sticky` sidebar) instead of getting painted under
-  // later DOM siblings regardless of z-index. `open` only ever turns true
-  // client-side (in response to user interaction), so `document` is safe
-  // to reach for here without an extra mount-effect.
   if (!open || typeof document === "undefined") return null
 
   return createPortal(

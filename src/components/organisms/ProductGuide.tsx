@@ -18,14 +18,14 @@ export function ProductGuide({ data }: ProductGuideProps) {
       <div className="pointer-events-none absolute -top-16 left-[9%] size-64 rounded-full bg-primary blur-[100px] mix-blend-screen" />
 
       <div className="relative flex flex-wrap items-stretch justify-center gap-4">
-        <div className="product-guide-ltv-box flex w-[140px] flex-col items-center gap-1 rounded-[10px_20px] border border-white/30 py-2 shadow-primary-xs">
+        <div className="product-guide-ltv-box flex w-35 flex-col items-center gap-1 rounded-[10px_20px] border border-white/30 py-2 shadow-primary-xs">
           <span className="text-sm font-medium text-white">ราคาประเมิน</span>
           <span className="text-xl font-semibold text-accent-lime">
             {data.appraisalPrice.toLocaleString("th-TH")}
           </span>
           <Badge tone="info">100% LTV</Badge>
         </div>
-        <div className="product-guide-ltv-box flex w-[250px] flex-col items-center gap-1 rounded-[10px_20px] border border-white/30 py-2 shadow-primary-xs">
+        <div className="product-guide-ltv-box flex w-62.5 flex-col items-center gap-1 rounded-[10px_20px] border border-white/30 py-2 shadow-primary-xs">
           <span className="text-sm font-medium text-white">วงเงินที่จัดได้</span>
           <span className="text-xl font-semibold text-accent-lime">
             {data.approvedRange.min.toLocaleString("th-TH")} -{" "}

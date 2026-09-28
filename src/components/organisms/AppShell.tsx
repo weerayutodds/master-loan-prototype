@@ -47,12 +47,12 @@ export function AppShell({children}: {children: React.ReactNode}) {
   return (
     <div className="flex flex-1">
       {pageTitle ? null : <Sidebar navItems={navItems} user={currentUser} />}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-x-hidden">
         {pageTitle ? <TopHeader title={pageTitle} /> : null}
         <main
-          className={`flex-1 space-y-6 py-8 ${pageTitle ? "bg-surface px-20" : "bg-surface-muted px-8"}`}
+          className={`flex flex-col flex-1 py-8 ${pageTitle ? "bg-surface px-4 md:px-20" : "bg-surface-muted px-4 md:px-8"}`}
         >
-          <div className="flex-1 flex justify-center items-center w-full">
+          <div className="flex-1 flex justify-center w-full">
             <div className="w-full max-w-341">
               <PageTitleOverrideContext.Provider value={setTitleOverride}>
                 {children}

@@ -39,7 +39,7 @@ export function OptionCard({
         </span>
       ) : null}
       {image ? (
-        <Image src={image} alt="" width={94} height={55} className="h-[55px] w-[94px] object-contain" />
+        <Image src={image} alt="" width={94} height={55} className="h-13.75 w-23.5 object-contain" />
       ) : icon ? (
         <Icon name={icon} className="size-6 text-foreground" />
       ) : null}
