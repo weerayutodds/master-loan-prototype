@@ -1,22 +1,22 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { Icon } from "@/components/atoms/Icon";
+import {Icon} from "@/components/atoms/Icon"
+import {useRouter} from "next/navigation"
 
 type TopHeaderProps = {
-  title: string;
-};
+  title: string
+}
 
-export function TopHeader({ title }: TopHeaderProps) {
-  const router = useRouter();
+export function TopHeader({title}: TopHeaderProps) {
+  const router = useRouter()
 
   return (
     <div className="sticky top-0 z-10 flex h-11 items-center justify-between border-b border-secondary-border bg-surface/70 px-6 backdrop-blur-md">
       <button
         type="button"
         onClick={() => {
-         router.back();
-          router.refresh();
+          router.back()
+          router.refresh()
         }}
         className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
       >
@@ -31,5 +31,5 @@ export function TopHeader({ title }: TopHeaderProps) {
         <Icon name="menu" className="size-4 text-black" />
       </button>
     </div>
-  );
+  )
 }
