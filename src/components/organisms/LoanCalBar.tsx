@@ -179,13 +179,35 @@ export function LoanCalBar({
     });
   }
 
-  // ยอดปิดไฟแนนซ์เดิม + เงินรับกลับบ้าน = วงเงินที่ขอ, applied only on blur so typing doesn't move other fields.
-  function handleRefinanceAmountBlur() {
-    const amount = payoffAmount + cashBackAmount;
-    const ltvPercent = calculateLtvPercent(amount, appraisalPrice);
+  // วงเงินที่ขอ - ยอดปิดไฟแนนซ์เดิม = เงินรับกลับบ้าน. The three amounts are separate
+  // fields: editing one recomputes a single counterpart, never the field just left.
+  function syncCashBack(amount: number, payoff: number) {
+    if (isRefinance) setCashBackAmount(Math.max(0, amount - payoff));
+  }
+
+  function handleRequestedAmountChange(amount: number) {
     setRequestedAmount(amount);
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
+    syncCashBack(amount, payoffAmount);
+  }
+
+  function handleRequestedLtvChange(ltvPercent: number) {
+    const amount = calculateAmountFromLtv(ltvPercent, appraisalPrice);
     setRequestedLtvPercent(ltvPercent);
-    commitFilter({ requestedAmount: amount, requestedLtvPercent: ltvPercent });
+    setRequestedAmount(amount);
+    syncCashBack(amount, payoffAmount);
+  }
+
+  function handlePayoffChange(payoff: number) {
+    setPayoffAmount(payoff);
+    syncCashBack(requestedAmount, payoff);
+  }
+
+  function handleCashBackChange(cashBack: number) {
+    const amount = payoffAmount + cashBack;
+    setCashBackAmount(cashBack);
+    setRequestedAmount(amount);
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
   }
 
   function handleBookStatusChange(value: string) {
@@ -329,12 +351,12 @@ export function LoanCalBar({
                       payoffAmount ? payoffAmount.toLocaleString("th-TH") : ""
                     }
                     placeholder="0"
-                    onChange={(e) => {
-                      const amount =
-                        Number(e.target.value.replace(/\D/g, "")) || 0;
-                      setPayoffAmount(amount);
-                    }}
-                    onBlur={handleRefinanceAmountBlur}
+                    onChange={(e) =>
+                      handlePayoffChange(
+                        Number(e.target.value.replace(/\D/g, "")) || 0,
+                      )
+                    }
+                    onBlur={() => commitFilter()}
                     className="w-full text-sm text-foreground outline-none"
                   />
                   <span className="shrink-0 text-xs text-muted-foreground">
@@ -357,12 +379,12 @@ export function LoanCalBar({
                         : ""
                     }
                     placeholder="0"
-                    onChange={(e) => {
-                      const amount =
-                        Number(e.target.value.replace(/\D/g, "")) || 0;
-                      setCashBackAmount(amount);
-                    }}
-                    onBlur={handleRefinanceAmountBlur}
+                    onChange={(e) =>
+                      handleCashBackChange(
+                        Number(e.target.value.replace(/\D/g, "")) || 0,
+                      )
+                    }
+                    onBlur={() => commitFilter()}
                     className="w-full text-sm text-foreground outline-none"
                   />
                   <span className="shrink-0 text-xs text-muted-foreground">
@@ -386,14 +408,11 @@ export function LoanCalBar({
                       : ""
                   }
                   placeholder="0"
-                  onChange={(e) => {
-                    const amount =
-                      Number(e.target.value.replace(/\D/g, "")) || 0;
-                    setRequestedAmount(amount);
-                    setRequestedLtvPercent(
-                      calculateLtvPercent(amount, appraisalPrice),
-                    );
-                  }}
+                  onChange={(e) =>
+                    handleRequestedAmountChange(
+                      Number(e.target.value.replace(/\D/g, "")) || 0,
+                    )
+                  }
                   onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"
                 />
@@ -405,14 +424,11 @@ export function LoanCalBar({
                   inputMode="numeric"
                   value={requestedLtvPercent || ""}
                   placeholder="0"
-                  onChange={(e) => {
-                    const ltvPercent =
-                      Number(e.target.value.replace(/\D/g, "")) || 0;
-                    setRequestedLtvPercent(ltvPercent);
-                    setRequestedAmount(
-                      calculateAmountFromLtv(ltvPercent, appraisalPrice),
-                    );
-                  }}
+                  onChange={(e) =>
+                    handleRequestedLtvChange(
+                      Number(e.target.value.replace(/\D/g, "")) || 0,
+                    )
+                  }
                   onBlur={() => commitFilter()}
                   className="w-full text-sm text-foreground outline-none"
                 />
