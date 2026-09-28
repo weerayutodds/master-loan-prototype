@@ -18,6 +18,31 @@ export type ProductCatalogItem = {
   interestReductionLabel: string;
   primaryActionLabel: string;
   primaryActionVariant: "outline" | "filled";
+  detail: ProductCatalogDetail;
+};
+
+export type ProductCatalogLtvGroup = {
+  ncbGrade: string;
+  rows: { holdingPeriod: string; limit: string }[];
+};
+
+/** Rates follow the interest table's column order: <50%, 50%-60%, >=60% LTV. */
+export type ProductCatalogInterestRow = {
+  ncbGrade: string;
+  rates: [string, string, string];
+};
+
+export type ProductCatalogCondition = {
+  label: string;
+  value: string;
+  tone?: "success";
+};
+
+export type ProductCatalogDetail = {
+  ltvGroups: ProductCatalogLtvGroup[];
+  interestRows: ProductCatalogInterestRow[];
+  collateralConditions: ProductCatalogCondition[];
+  borrowerConditions: ProductCatalogCondition[];
 };
 
 export type ProductCatalogData = {

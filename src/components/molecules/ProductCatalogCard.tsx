@@ -19,9 +19,10 @@ const NCB_GRADE_TONE_CLASSNAMES: Record<ProductCatalogItem["ncbGradeTone"], stri
 type ProductCatalogCardProps = {
   item: ProductCatalogItem;
   onSelect?: () => void;
+  onViewDetail?: () => void;
 };
 
-export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) {
+export function ProductCatalogCard({ item, onSelect, onViewDetail }: ProductCatalogCardProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-card-border bg-catalog-card-bg shadow-primary-xs">
       <div className="flex flex-wrap items-center gap-2 px-4 py-2.5">
@@ -78,7 +79,7 @@ export function ProductCatalogCard({ item, onSelect }: ProductCatalogCardProps) 
           >
             {item.primaryActionLabel}
           </Button>
-          <Button variant="secondary" size="sm">
+          <Button variant="secondary" size="sm" onClick={onViewDetail}>
             ดูรายละเอียด
           </Button>
         </div>

@@ -25,7 +25,10 @@ import type {
 import type { ProductGuideData } from "@/types/product-guide"
 import type {
   ProductCatalogData,
+  ProductCatalogDetail,
+  ProductCatalogInterestRow,
   ProductCatalogItem,
+  ProductCatalogLtvGroup,
   ProductCatalogTag,
 } from "@/types/product-catalog"
 import { calculateAmountFromLtv } from "@/lib/loan-cal"
@@ -1221,6 +1224,84 @@ function isRuleEligible(rule: ProductRule, context: ProductCatalogContext): bool
   return true
 }
 
+const ALL_NCB_GRADES_LABEL = "ทุกเกรด"
+
+const allGradeLtvGroups: ProductCatalogLtvGroup[] = [
+  {
+    ncbGrade: "A01 - A03",
+    rows: [{ holdingPeriod: "60 วันขึ้นไป", limit: "130%LTV" }],
+  },
+  {
+    ncbGrade: "A04",
+    rows: [
+      { holdingPeriod: "180 วันขึ้นไป", limit: "130%LTV" },
+      { holdingPeriod: "60 - 179 วัน", limit: "100%LTV" },
+    ],
+  },
+  {
+    ncbGrade: "U01 - U04, L01",
+    rows: [
+      { holdingPeriod: "180 วันขึ้นไป", limit: "130%LTV" },
+      { holdingPeriod: "90 - 179 วัน", limit: "80%LTV" },
+    ],
+  },
+  {
+    ncbGrade: "A05, U05, L05",
+    rows: [
+      { holdingPeriod: "180 วันขึ้นไป", limit: "100%LTV" },
+      { holdingPeriod: "90 - 179 วัน", limit: "80%LTV" },
+    ],
+  },
+]
+
+const allGradeInterestRows: ProductCatalogInterestRow[] = [
+  { ncbGrade: "A01 - A03", rates: ["20.00%", "21.00%", "22.00%"] },
+  { ncbGrade: "A04 - A05", rates: ["21.00%", "22.00%", "24.00%"] },
+  { ncbGrade: "U01 - U05", rates: ["23.00%", "23.00%", "24.00%"] },
+  { ncbGrade: "L01, L05", rates: ["23.00%", "23.00%", "24.00%"] },
+]
+
+// Mock: both condition blocks are the same for every product for now.
+const productDetailTemplate: Pick<
+  ProductCatalogDetail,
+  "collateralConditions" | "borrowerConditions"
+> = {
+  collateralConditions: [
+    { label: "ประเภทรถ", value: "ทุกประเภท" },
+    { label: "ประเภทจดทะเบียน", value: "ร.ย.1, ร.ย.2, ร.ย.3" },
+    { label: "ยี่ห้อ", value: "ทุกยี่ห้อ" },
+    { label: "อายุทรัพย์สิน", value: "1 - 20 ปี" },
+    { label: "ระยะครอบครอง", value: "1 - 20 ปี" },
+  ],
+  borrowerConditions: [
+    { label: "ประเภท", value: "บุคคลธรรมดา" },
+    { label: "อายุ", value: "20 - 65 ปี" },
+    { label: "เกรด NCB", value: "A01 - A05" },
+    { label: "ระยะอาศัยที่อยู่ปัจจุบัน", value: "1- 99 ปี" },
+    { label: "ผู้ค้ำประกัน", value: "ไม่จำเป็น", tone: "success" },
+  ],
+}
+
+function toProductDetail(rule: ProductRule): ProductCatalogDetail {
+  const maxLtv = typeof rule.ltv === "number" ? rule.ltv : rule.ltv.max
+  const isAllGrades = rule.ncbGradeLabel === ALL_NCB_GRADES_LABEL
+  return {
+    ...productDetailTemplate,
+    ltvGroups: isAllGrades
+      ? allGradeLtvGroups
+      : [
+          {
+            ncbGrade: rule.ncbGradeLabel,
+            rows: [{ holdingPeriod: "60 วันขึ้นไป", limit: `${maxLtv}%LTV` }],
+          },
+        ],
+    // Mock: a single-grade product reuses the A01 - A03 rates.
+    interestRows: isAllGrades
+      ? allGradeInterestRows
+      : [{ ncbGrade: rule.ncbGradeLabel, rates: allGradeInterestRows[0].rates }],
+  }
+}
+
 function toCatalogItem(
   rule: ProductRule,
   appraisalPrice: number,
@@ -1246,6 +1327,7 @@ function toCatalogItem(
     )} ต่อปี`,
     primaryActionLabel: rule.primaryActionLabel,
     primaryActionVariant: rule.primaryActionVariant,
+    detail: toProductDetail(rule),
   }
 }
 
