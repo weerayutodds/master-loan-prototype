@@ -75,16 +75,24 @@ export function ProductCatalog({
   ncbGrade,
   onSelectConfirmed,
 }: ProductCatalogProps) {
+  // "ตรวจ eNCB" (outline) products only become selectable once the grade is known.
+  const items = ncbGrade
+    ? data.items.map((item) =>
+        item.primaryActionVariant === "outline"
+          ? { ...item, primaryActionLabel: "เลือก", primaryActionVariant: "filled" as const }
+          : item,
+      )
+    : data.items;
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const selectedItem = data.items.find((item) => item.id === selectedItemId) ?? null;
+  const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
   const [detailItemId, setDetailItemId] = useState<string | null>(null);
-  const detailItem = data.items.find((item) => item.id === detailItemId) ?? null;
+  const detailItem = items.find((item) => item.id === detailItemId) ?? null;
 
   // A grade the product doesn't accept can't be approved, so those are dropped
   // outright rather than moved down to "ผลิตภัณฑ์อื่นที่น่าสนใจ".
   const gradeEligibleItems = ncbGrade
-    ? data.items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, ncbGrade))
-    : data.items;
+    ? items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, ncbGrade))
+    : items;
   const matchedItems = filter
     ? gradeEligibleItems.filter((item) => matchesFilter(item, filter))
     : gradeEligibleItems;
