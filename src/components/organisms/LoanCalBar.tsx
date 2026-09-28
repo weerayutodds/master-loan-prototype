@@ -19,7 +19,7 @@ import type {
   ProductCatalogData,
   ProductCatalogFilter,
 } from "@/types/product-catalog"
-import type {CustomerInfo} from "@/types/ratebook"
+import type {CustomerInfo, RefinanceStatus} from "@/types/ratebook"
 import {useEffect, useMemo, useRef, useState} from "react"
 
 type CalculatedInputs = {
@@ -81,6 +81,7 @@ type LoanCalBarProps = {
   appraisalPrice: number
   customer: CustomerInfo | null
   opportunityId: string | null
+  refinanceStatus: RefinanceStatus | null
   onCustomerChange: (value: CustomerInfo) => void
   onFilterChange: (filter: ProductCatalogFilter) => void
 }
@@ -90,6 +91,7 @@ export function LoanCalBar({
   appraisalPrice,
   customer,
   opportunityId,
+  refinanceStatus,
   onCustomerChange,
   onFilterChange,
 }: LoanCalBarProps) {
@@ -106,6 +108,8 @@ export function LoanCalBar({
   )
   const [requestedAmount, setRequestedAmount] = useState(0)
   const [requestedLtvPercent, setRequestedLtvPercent] = useState(0)
+  const [payoffAmount, setPayoffAmount] = useState(0)
+  const [cashBackAmount, setCashBackAmount] = useState(0)
   const [isTLC, setIsTLC] = useState(
     productCatalog.filterChips.includes("บัตรติดล้อ"),
   )
@@ -125,6 +129,7 @@ export function LoanCalBar({
   const genderAgePopoverRef = useRef<HTMLDivElement>(null)
 
   const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS
+  const isRefinance = refinanceStatus === "still-paying"
 
   function commitFilter(overrides: Partial<ProductCatalogFilter> = {}) {
     onFilterChange({
@@ -133,6 +138,15 @@ export function LoanCalBar({
       requestedLtvPercent,
       ...overrides,
     })
+  }
+
+  function handleRefinanceAmountChange(
+    nextPayoffAmount: number,
+    nextCashBackAmount: number,
+  ) {
+    const amount = nextPayoffAmount + nextCashBackAmount
+    setRequestedAmount(amount)
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice))
   }
 
   function handleBookStatusChange(value: string) {
@@ -222,6 +236,7 @@ export function LoanCalBar({
       isTLC: isTransferBook ? false : isTLC,
       hasPpi,
     })
+    setShowDetail(true)
   }
 
   async function handleSaveGenderAge(value: {
@@ -244,16 +259,12 @@ export function LoanCalBar({
 
   return (
     <div className="fixed inset-x-4 bottom-4 z-40 flex justify-center">
-      {/* 
-        FIX 1: Removed `overflow-x-auto` from this main wrapper. 
-        This stops the browser from clipping the detail popup.
-      */}
-      <div className="loan-cal-bar flex w-full max-w-6xl items-end justify-between gap-6 rounded-xl px-4 py-2.5">
-        {/* 
-          FIX 2: Added `flex-1 min-w-0 overflow-x-auto pb-2` here. 
-          Now only the inputs scroll on small screens, preventing the popup from being trapped.
-        */}
-        <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1 scrollbar-hide">
+      <div
+        className={`loan-cal-bar flex w-full items-end justify-between gap-6 rounded-xl px-4 py-2.5 ${
+          isRefinance ? "max-w-312.5" : "max-w-306.5"
+        }`}
+      >
+        <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1">
           <div className="w-fit shrink-0">
             <FieldLabel>เล่มทะเบียน</FieldLabel>
             <Select
@@ -263,6 +274,64 @@ export function LoanCalBar({
               className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
             />
           </div>
+          {isRefinance ? (
+            <div className="flex shrink-0 items-end">
+              <div className="w-28 shrink-0">
+                <FieldLabel>ยอดปิดไฟแนนซ์เดิม</FieldLabel>
+                <div className="relative flex h-9 items-center gap-1 rounded-l-md border border-secondary-border bg-surface px-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={
+                      payoffAmount ? payoffAmount.toLocaleString("th-TH") : ""
+                    }
+                    placeholder="0"
+                    onChange={(e) => {
+                      const amount =
+                        Number(e.target.value.replace(/\D/g, "")) || 0
+                      setPayoffAmount(amount)
+                      handleRefinanceAmountChange(amount, cashBackAmount)
+                    }}
+                    onBlur={() => commitFilter()}
+                    className="w-full text-sm text-foreground outline-none"
+                  />
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    บาท
+                  </span>
+                  <span className="absolute top-1/2 -right-2 z-10 flex size-4 -translate-y-1/2 items-center justify-center rounded-full border border-secondary-border bg-white text-[10px] leading-none text-muted-foreground">
+                    +
+                  </span>
+                </div>
+              </div>
+              <div className="-ml-px w-28 shrink-0">
+                <FieldLabel>เงินรับกลับบ้าน</FieldLabel>
+                <div className="flex h-9 items-center gap-1 rounded-r-md border border-secondary-border bg-surface px-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={
+                      cashBackAmount
+                        ? cashBackAmount.toLocaleString("th-TH")
+                        : ""
+                    }
+                    placeholder="0"
+                    onChange={(e) => {
+                      const amount =
+                        Number(e.target.value.replace(/\D/g, "")) || 0
+                      setCashBackAmount(amount)
+                      handleRefinanceAmountChange(payoffAmount, amount)
+                    }}
+                    onBlur={() => commitFilter()}
+                    className="w-full text-sm text-foreground outline-none"
+                  />
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    บาท
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           <div className="w-52 shrink-0">
             <FieldLabel>วงเงินที่ขอ</FieldLabel>
             <div className="flex h-9 overflow-hidden rounded-md border border-secondary-border bg-surface">

@@ -313,6 +313,7 @@ export function RatebookForm({ initialOpportunity }: RatebookFormProps) {
                 appraisalPrice={productGuideData.appraisalPrice}
                 customer={customer}
                 opportunityId={opportunityId}
+                refinanceStatus={refinanceStatus}
                 onCustomerChange={setCustomer}
                 onFilterChange={setProductFilter}
               />
