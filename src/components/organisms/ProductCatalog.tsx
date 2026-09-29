@@ -19,8 +19,10 @@ type ProductCatalogProps = {
   filter: ProductCatalogFilter;
   /** Set once eNCB has been checked; null shows every grade. */
   ncbGrade: NcbGrade | null;
-  /** Same handler as the sidebar's "ตรวจ eNCB", so both paths share one outcome. */
-  onNcbChecked: (ncbGrade: NcbGrade) => unknown;
+  /** Dipchip-verified: "ตรวจ eNCB" skips the card modal. */
+  cardAlreadyRead: boolean;
+  /** Card read done; the grade comes from the sidebar's "รีเฟรช", same as the sidebar's own "ตรวจ eNCB". */
+  onNcbCardRead: () => unknown;
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
 
@@ -77,7 +79,8 @@ export function ProductCatalog({
   data,
   filter,
   ncbGrade,
-  onNcbChecked,
+  cardAlreadyRead,
+  onNcbCardRead,
   onSelectConfirmed,
 }: ProductCatalogProps) {
   const [checkingNcb, setCheckingNcb] = useState(false);
@@ -93,6 +96,13 @@ export function ProductCatalog({
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
   const [detailItemId, setDetailItemId] = useState<string | null>(null);
   const detailItem = items.find((item) => item.id === detailItemId) ?? null;
+
+  // The drawer is closed so the sidebar's "รีเฟรช" is visible afterward.
+  function handleCheckNcb() {
+    setDetailItemId(null);
+    if (cardAlreadyRead) onNcbCardRead();
+    else setCheckingNcb(true);
+  }
 
   // A grade the product doesn't accept can't be approved, so those are dropped
   // outright rather than moved down to "ผลิตภัณฑ์อื่นที่น่าสนใจ".
@@ -114,7 +124,7 @@ export function ProductCatalog({
         key={item.id}
         item={item}
         onSelect={() => setSelectedItemId(item.id)}
-        onCheckNcb={() => setCheckingNcb(true)}
+        onCheckNcb={handleCheckNcb}
         onViewDetail={() => setDetailItemId(item.id)}
       />
     ));
@@ -170,13 +180,13 @@ export function ProductCatalog({
         item={detailItem}
         onClose={() => setDetailItemId(null)}
         onSelect={() => setSelectedItemId(detailItemId)}
-        onCheckNcb={() => setCheckingNcb(true)}
+        onCheckNcb={handleCheckNcb}
       />
 
       <NcbCheckModal
         open={checkingNcb}
-        onComplete={async (nextGrade) => {
-          await onNcbChecked(nextGrade);
+        onComplete={async () => {
+          await onNcbCardRead();
           setCheckingNcb(false);
         }}
       />

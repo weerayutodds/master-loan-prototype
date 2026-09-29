@@ -12,9 +12,11 @@ type NcbCheckControlProps = {
   onChecked: (ncbGrade: NcbGrade) => unknown;
   buttonVariant?: "primary" | "outline";
   buttonSize?: "xs" | "sm";
-  /** When set, "ตรวจ eNCB" only reads the card and then waits on "รีเฟรช" for the grade. */
+  /** When set, "ตรวจ eNCB" only reads the card; the parent then sets `awaitingRefresh`. */
   onCardRead?: () => unknown;
-  /** Card already read (Dipchip-verified): "ตรวจ eNCB" goes straight to "รีเฟรช" without the card modal. */
+  /** Shows "รอผล..." + "รีเฟรช"; "รีเฟรช" gives the grade. */
+  awaitingRefresh?: boolean;
+  /** Card already read (Dipchip-verified): "ตรวจ eNCB" skips the card modal. */
   cardAlreadyRead?: boolean;
 };
 
@@ -24,10 +26,10 @@ export function NcbCheckControl({
   buttonVariant = "outline",
   buttonSize = "xs",
   onCardRead,
+  awaitingRefresh = false,
   cardAlreadyRead = false,
 }: NcbCheckControlProps) {
   const [checking, setChecking] = useState(false);
-  const [cardRead, setCardRead] = useState(false);
   // Covers the gap until a server-rendered parent re-renders with the saved grade.
   const [checkedGrade, setCheckedGrade] = useState<NcbGrade | null>(null);
   const grade = ncbGrade ?? checkedGrade;
@@ -40,11 +42,15 @@ export function NcbCheckControl({
   async function handleComplete(nextGrade: NcbGrade) {
     if (onCardRead) {
       await onCardRead();
-      setCardRead(true);
     } else {
       await applyGrade(nextGrade);
     }
     setChecking(false);
+  }
+
+  function handleCheckClick() {
+    if (cardAlreadyRead && onCardRead) onCardRead();
+    else setChecking(true);
   }
 
   if (grade) {
@@ -57,7 +63,7 @@ export function NcbCheckControl({
 
   return (
     <>
-      {cardRead ? (
+      {awaitingRefresh ? (
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground">รอผล...</span>
           <Button variant="secondary" size="sm" onClick={() => applyGrade(MOCK_NCB_GRADE)}>
@@ -66,11 +72,7 @@ export function NcbCheckControl({
           </Button>
         </div>
       ) : (
-        <Button
-          variant={buttonVariant}
-          size={buttonSize}
-          onClick={() => (cardAlreadyRead ? setCardRead(true) : setChecking(true))}
-        >
+        <Button variant={buttonVariant} size={buttonSize} onClick={handleCheckClick}>
           ตรวจ eNCB
         </Button>
       )}

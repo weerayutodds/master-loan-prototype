@@ -63,6 +63,8 @@ type CustomerCollateralPanelProps = {
   verificationMethod: VerificationMethod | null;
   onNcbChecked: (value: NcbGrade) => unknown;
   onDipchipRead: () => unknown;
+  ncbAwaitingRefresh: boolean;
+  onNcbCardRead: () => unknown;
 };
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
@@ -123,6 +125,8 @@ export function CustomerCollateralPanel({
   verificationMethod,
   onNcbChecked,
   onDipchipRead,
+  ncbAwaitingRefresh,
+  onNcbCardRead,
 }: CustomerCollateralPanelProps) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
@@ -288,7 +292,8 @@ export function CustomerCollateralPanel({
         <NcbCheckControl
           ncbGrade={ncbGrade}
           onChecked={onNcbChecked}
-          onCardRead={onDipchipRead}
+          onCardRead={onNcbCardRead}
+          awaitingRefresh={ncbAwaitingRefresh}
           cardAlreadyRead={verificationMethod === "card"}
         />
       </div>

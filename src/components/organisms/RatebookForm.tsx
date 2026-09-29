@@ -115,6 +115,7 @@ export function RatebookForm({
         : null,
   )
 
+  const [ncbAwaitingRefresh, setNcbAwaitingRefresh] = useState(false)
   const [ncbGrade, setNcbGrade] = useState<NcbGrade | null>(
     initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null,
   )
@@ -280,9 +281,16 @@ export function RatebookForm({
     }
   }
 
-  // Shared by the sidebar's and the product cards' "ตรวจ eNCB" buttons.
+  // "ตรวจ eNCB" card read: the sidebar's NCB เกรด row then waits on "รีเฟรช" for the grade.
+  async function handleNcbCardRead() {
+    if (verificationMethod !== "card") await handleDipchipRead()
+    setNcbAwaitingRefresh(true)
+  }
+
+  // Shared by the sidebar's "รีเฟรช" and the product cards' "ตรวจ eNCB" buttons.
   async function handleNcbChecked(nextGrade: NcbGrade) {
     setNcbGrade(nextGrade)
+    setNcbAwaitingRefresh(false)
     // The eNCB check reads the ID card, which counts as a Dipchip.
     const cardIdNumber = applyCardRead()
     // customer_lead.ncb_grade is the single source of truth for the
@@ -407,6 +415,8 @@ export function RatebookForm({
           verificationMethod={verificationMethod}
           onNcbChecked={handleNcbChecked}
           onDipchipRead={handleDipchipRead}
+          ncbAwaitingRefresh={ncbAwaitingRefresh}
+          onNcbCardRead={handleNcbCardRead}
         />
       </div>
       {selectedProduct && initialOpportunity ? (
@@ -459,7 +469,8 @@ export function RatebookForm({
                   getDefaultProductCatalogFilter(productCatalogData)
                 }
                 ncbGrade={ncbGrade}
-                onNcbChecked={handleNcbChecked}
+                cardAlreadyRead={verificationMethod === "card"}
+                onNcbCardRead={handleNcbCardRead}
                 onSelectConfirmed={handleSelectedProductConfirmed}
               />
               <LoanCalBar
