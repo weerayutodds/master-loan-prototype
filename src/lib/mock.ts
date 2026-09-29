@@ -1519,8 +1519,8 @@ const productDetailTemplate: Pick<
   ],
   borrowerConditions: [
     { label: "ประเภท", value: "บุคคลธรรมดา" },
-    { label: "อายุ", value: "20 - 65 ปี" },
-    { label: "เกรด NCB", value: "A01 - A05" },
+    { label: "อายุ", value: "20 - 68 ปี" },
+    { label: "เกรด NCB", value: "ทุกเกรด" },
     { label: "ระยะอาศัยที่อยู่ปัจจุบัน", value: "1- 99 ปี" },
     { label: "ผู้ค้ำประกัน", value: "ไม่จำเป็น", tone: "success" },
   ],
