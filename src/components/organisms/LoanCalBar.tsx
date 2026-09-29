@@ -194,21 +194,27 @@ export function LoanCalBar({
   }
 
   function handleRequestedAmountChange(amount: number) {
+    setPayoffAmount(0);
+    setCashBackAmount(0);
     onRequestedAmountChange(amount);
     setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
-    syncCashBack(amount, payoffAmount);
+    syncCashBack(amount, 0);
   }
 
   function handleRequestedLtvChange(ltvPercent: number) {
     const amount = calculateAmountFromLtv(ltvPercent, appraisalPrice);
+    setPayoffAmount(0);
+    setCashBackAmount(0);
     setRequestedLtvPercent(ltvPercent);
     onRequestedAmountChange(amount);
-    syncCashBack(amount, payoffAmount);
+    syncCashBack(amount, 0);
   }
 
   function handlePayoffChange(payoff: number) {
+    const amount = payoff + cashBackAmount;
     setPayoffAmount(payoff);
-    syncCashBack(requestedAmount, payoff);
+    onRequestedAmountChange(amount);
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
   }
 
   function handleCashBackChange(cashBack: number) {
