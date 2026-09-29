@@ -18,6 +18,7 @@ import {
   type VehicleFieldKey,
 } from "@/lib/vehicle-options";
 import type { CarInfo, CollateralType, LoanPurpose } from "@/types/ratebook";
+import { useState } from "react";
 
 const PLACEHOLDER = { value: "", label: "เลือกข้อมูล" };
 
@@ -73,6 +74,8 @@ export function CarInfoForm({
   onViewAppraisal,
 }: CarInfoFormProps) {
   const isMotorcycle = collateralType === "motorcycle";
+  const [yearInfoOpen, setYearInfoOpen] = useState(false);
+  const [modelInfoOpen, setModelInfoOpen] = useState(false);
   const vehicle = useVehicleOptions(collateralType, carInfo, loanPurpose);
   const carTypeOptions =
     carTypeOptionsByCollateralType[toVehicleCollateralType(collateralType)];
@@ -138,14 +141,20 @@ export function CarInfoForm({
           <FormField label={FIELD_LABELS.brand}>
             <Select {...selectProps("brand")} disabled={false} />
           </FormField>
-          <FormField label={<InfoLabel>{FIELD_LABELS.model}</InfoLabel>}>
+          <FormField
+            label={
+              <InfoLabel onClick={() => setModelInfoOpen(true)}>
+                {FIELD_LABELS.model}
+              </InfoLabel>
+            }
+          >
             <Select {...selectProps("model")} />
           </FormField>
         </div>
 
         {isMotorcycle ? (
           <div className="grid grid-cols-2 gap-4">
-            <FormField label={<InfoLabel>{FIELD_LABELS.year}</InfoLabel>}>
+            <FormField label={<InfoLabel onClick={() => setYearInfoOpen(true)}>{FIELD_LABELS.year}</InfoLabel>}>
               <Select {...selectProps("year")} />
             </FormField>
             <FormField label={FIELD_LABELS.ratebookCode}>
@@ -155,7 +164,7 @@ export function CarInfoForm({
         ) : (
           <>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <FormField label={<InfoLabel>{FIELD_LABELS.year}</InfoLabel>}>
+              <FormField label={<InfoLabel onClick={() => setYearInfoOpen(true)}>{FIELD_LABELS.year}</InfoLabel>}>
                 <Select {...selectProps("year")} />
               </FormField>
               <FormField label={FIELD_LABELS.condition}>
@@ -239,8 +248,8 @@ export function CarInfoForm({
         </div>
       </div>
 
-      {/* <CarYearInfoModal open={yearInfoOpen} onClose={() => setYearInfoOpen(false)} />
-      <CarModelInfoModal open={modelInfoOpen} onClose={() => setModelInfoOpen(false)} /> */}
+      <CarYearInfoModal open={yearInfoOpen} onClose={() => setYearInfoOpen(false)} />
+      <CarModelInfoModal open={modelInfoOpen} onClose={() => setModelInfoOpen(false)} />
     </div>
   );
 }
