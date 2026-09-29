@@ -1,10 +1,11 @@
 "use client";
 
-import { Icon } from "@/components/atoms/Icon";
+import { Select } from "@/components/atoms/Select";
 import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
 import { NcbCheckModal } from "@/components/organisms/NcbCheckModal";
 import { ProductDetailDrawer } from "@/components/organisms/ProductDetailDrawer";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
+import { ncbGradeList } from "@/lib/mock";
 import type { NcbGrade } from "@/types/customer-lead";
 import type {
   ProductCatalogData,
@@ -17,7 +18,7 @@ type ProductCatalogProps = {
   data: ProductCatalogData;
   /** Starts as `LoanCalBar`'s defaults, then follows whatever the user commits there. */
   filter: ProductCatalogFilter;
-  /** Set once eNCB has been checked; null shows every grade. */
+  /** Verified eNCB result; takes precedence over the local preview filter. */
   ncbGrade: NcbGrade | null;
   /** Dipchip-verified: "ตรวจ eNCB" skips the card modal. */
   cardAlreadyRead: boolean;
@@ -25,6 +26,11 @@ type ProductCatalogProps = {
   onNcbCardRead: () => unknown;
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
+
+const ncbGradeOptions = [
+  { label: "ทุกเกรด", value: "" },
+  ...ncbGradeList.map(({ name, code }) => ({ label: name, value: code })),
+];
 
 /** Grades in a label like "A01, A02", "A01 - A03" or "U01-U03", with ranges expanded. */
 function parseNcbGrades(label: string): Set<string> {
@@ -84,6 +90,8 @@ export function ProductCatalog({
   onSelectConfirmed,
 }: ProductCatalogProps) {
   const [checkingNcb, setCheckingNcb] = useState(false);
+  const [previewNcbGrade, setPreviewNcbGrade] = useState<NcbGrade | null>(null);
+  const effectiveNcbGrade = ncbGrade ?? previewNcbGrade;
   // "ตรวจ eNCB" (outline) products only become selectable once the grade is known.
   const items = ncbGrade
     ? data.items.map((item) =>
@@ -106,15 +114,15 @@ export function ProductCatalog({
 
   // A grade the product doesn't accept can't be approved, so those are dropped
   // outright rather than moved down to "ผลิตภัณฑ์อื่นที่น่าสนใจ".
-  const gradeEligibleItems = ncbGrade
-    ? items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, ncbGrade))
+  const gradeEligibleItems = effectiveNcbGrade
+    ? items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, effectiveNcbGrade))
     : items;
   const matchedItems = gradeEligibleItems.filter((item) => matchesFilter(item, filter));
   const otherItems = gradeEligibleItems.filter((item) => !matchesFilter(item, filter));
 
   function emptyMessage() {
     if (data.items.length === 0) return "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้";
-    if (gradeEligibleItems.length === 0) return `ไม่มีผลิตภัณฑ์ที่รองรับ NCB เกรด ${ncbGrade}`;
+    if (gradeEligibleItems.length === 0) return `ไม่มีผลิตภัณฑ์ที่รองรับ NCB เกรด ${effectiveNcbGrade}`;
     return "ไม่พบผลิตภัณฑ์ที่ตรงตามเงื่อนไข";
   }
 
@@ -148,10 +156,23 @@ export function ProductCatalog({
               {filter.requestedLtvPercent} %LTV
             </span>
           ) : null}
-          <span className="flex items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground">
-            {ncbGrade ? `เกรด ${ncbGrade}` : data.gradeFilterLabel}
-            <Icon name="arrow-down" className="size-3.5 text-muted-foreground" />
-          </span>
+          {ncbGrade ? (
+            <span className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground">
+              เกรด {ncbGrade}
+            </span>
+          ) : (
+            <Select
+              variant="compact"
+              aria-label="กรองผลิตภัณฑ์ตามเกรด NCB"
+              options={ncbGradeOptions}
+              value={previewNcbGrade ?? ""}
+              onChange={(event) => {
+                const grade = ncbGradeList.find(({ code }) => code === event.target.value);
+                setPreviewNcbGrade(grade?.code ?? null);
+              }}
+              className="font-medium"
+            />
+          )}
         </div>
       </div>
 

@@ -33,7 +33,25 @@ import type {
 } from "@/types/product-catalog";
 import { calculateAmountFromLtv } from "@/lib/loan-cal";
 import type { FollowUpEntry } from "@/types/lead-content";
-import type { Gender } from "@/types/customer-lead";
+import type { Gender, NcbGrade } from "@/types/customer-lead";
+
+export const ncbGradeList = [
+  { id: "104", name: "A01", code: "A01", parentCode: "NCB_GRADE" },
+  { id: "105", name: "A02", code: "A02", parentCode: "NCB_GRADE" },
+  { id: "106", name: "A03", code: "A03", parentCode: "NCB_GRADE" },
+  { id: "107", name: "A04", code: "A04", parentCode: "NCB_GRADE" },
+  { id: "108", name: "A05", code: "A05", parentCode: "NCB_GRADE" },
+  { id: "109", name: "U01", code: "U01", parentCode: "NCB_GRADE" },
+  { id: "110", name: "U02", code: "U02", parentCode: "NCB_GRADE" },
+  { id: "111", name: "U03", code: "U03", parentCode: "NCB_GRADE" },
+  { id: "112", name: "U04", code: "U04", parentCode: "NCB_GRADE" },
+  { id: "113", name: "U05", code: "U05", parentCode: "NCB_GRADE" },
+  { id: "114", name: "L01", code: "L01", parentCode: "NCB_GRADE" },
+  { id: "115", name: "L02", code: "L02", parentCode: "NCB_GRADE" },
+  { id: "116", name: "L03", code: "L03", parentCode: "NCB_GRADE" },
+  { id: "117", name: "L04", code: "L04", parentCode: "NCB_GRADE" },
+  { id: "118", name: "L05", code: "L05", parentCode: "NCB_GRADE" },
+] satisfies { id: string; name: string; code: NcbGrade; parentCode: "NCB_GRADE" }[];
 
 export const navItems: NavItem[] = [
   { href: "/", label: "หน้าแรก", icon: "home", active: true },
