@@ -21,11 +21,7 @@ import {
   updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity";
 import { calculateAge, maskIdCardNumber } from "@/lib/format";
-import {
-  getVehicleBrandLabel,
-  getVehicleModelLabel,
-  provinceOptions,
-} from "@/lib/mock";
+import { provinceOptions } from "@/lib/mock";
 import type { VerificationMethod } from "@/types/customer-form";
 import type { NcbGrade } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
@@ -81,22 +77,15 @@ function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
 function formatBrandModelYear(
   carInfo: CarInfo,
   opportunity: CustomerLeadOpportunity | null,
-  collateralType: CollateralType | null,
 ): string {
   const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined;
   const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined;
   const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined;
 
-  const brandLabel = getVehicleBrandLabel(collateralType, brandValue);
-  const modelLabel = getVehicleModelLabel(
-    collateralType,
-    brandValue,
-    modelValue,
-  );
-  const parts = [
-    brandLabel === "-" ? undefined : brandLabel.toUpperCase(),
-    modelLabel === "-" ? undefined : modelLabel.toUpperCase(),
-  ].filter((part): part is string => Boolean(part));
+  // Already the ratebook's own wording -- nothing to resolve.
+  const parts = [brandValue, modelValue].filter((part): part is string =>
+    Boolean(part),
+  ).map((part) => part.toUpperCase());
   if (yearValue) {
     const buddhistYear = Number(yearValue) + 543;
     parts.push(`${yearValue} (${buddhistYear})`);
@@ -210,11 +199,7 @@ export function CustomerCollateralPanel({
     }
   }
 
-  const brandModelDisplay = formatBrandModelYear(
-    carInfo,
-    initialOpportunity,
-    collateralType,
-  );
+  const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity);
 
   return (
     <Card className="space-y-4 border-2">

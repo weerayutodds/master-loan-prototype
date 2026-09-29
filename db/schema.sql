@@ -56,6 +56,12 @@ create table customer_lead_opportunity (
   chassis_number text,
   brand_model text,
 
+  -- Vehicle facts for รถยนต์/มอเตอร์ไซค์ come from the ratebook workbooks
+  -- (Ratebook/*.xlsx, see scripts/generate-ratebook.mjs); รถบรรทุก still comes
+  -- from the mock catalog. car_brand/car_model/car_sub_model/car_body_type hold
+  -- the ratebook's own wording so they can be shown without a lookup, while
+  -- car_condition/car_doors/car_transmission/car_type stay slugs.
+  --
   -- car_type is CarInfo's body-style dropdown (sedan/pickup/...), distinct
   -- from collateral_type above (the top-level หลักประกัน type).
   car_brand text,
@@ -68,6 +74,15 @@ create table customer_lead_opportunity (
   car_transmission text,
   car_body_type text,
   car_sub_model text,
+  -- Identity of the chosen row: the ratebook Code (e.g. MERC04AE) for
+  -- รถยนต์/มอเตอร์ไซค์, the mock catalog's sub-model slug for รถบรรทุก. A
+  -- Sub-Model alone is not unique -- BENZ S280 2005 lists two priced rows
+  -- under "2.8 RWD (2799ซีซี)" -- so this is what the form reloads from.
+  car_ratebook_code text,
+  -- ราคาประเมิน and Rate Book (วงเงินจัด) of that row. รถบรรทุก has no
+  -- ratebook price, so car_ratebook_price stays null there.
+  car_appraisal_price integer,
+  car_ratebook_price integer,
   selected_product_id text,
 
   requested_amount text,

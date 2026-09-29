@@ -3,13 +3,11 @@ import { Card } from "@/components/molecules/Card";
 import {
   carConditionOptions,
   carDoorsOptions,
-  carEngineCcOptionsByCollateralType,
+  carTransmissionOptions,
   carTypeOptionsByCollateralType,
-  getVehicleBrandLabel,
-  getVehicleModelLabel,
-  getVehicleSubModelLabel,
   toVehicleCollateralType,
 } from "@/lib/mock";
+import { bodyTypeLabel } from "@/lib/ratebook";
 import type { CarInfo, CollateralType } from "@/types/ratebook";
 
 function optionLabel(options: { value: string; label: string }[], value?: string): string {
@@ -23,8 +21,10 @@ type LeadCollateralInfoCardProps = {
 
 export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollateralInfoCardProps) {
   const vehicleCollateralType = toVehicleCollateralType(collateralType);
-  const brandLabel = getVehicleBrandLabel(collateralType, carInfo.brand).toUpperCase();
-  const modelLabel = getVehicleModelLabel(collateralType, carInfo.brand, carInfo.model).toUpperCase();
+  // ยี่ห้อ/รุ่น/รุ่นย่อย are stored as the ratebook's own wording, so they are
+  // shown as they are rather than looked up in a catalog this card cannot reach.
+  const brandLabel = carInfo.brand?.toUpperCase() ?? "-";
+  const modelLabel = carInfo.model?.toUpperCase() ?? "-";
   const yearLabel = carInfo.year ? `${carInfo.year} (${Number(carInfo.year) + 543})` : "-";
   const doorsLabel = optionLabel(carDoorsOptions, carInfo.doors);
   const typeLabel = carInfo.carType
@@ -40,14 +40,11 @@ export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollater
     { label: "จำนวนประตู", value: doorsLabel },
     {
       label: "ขนาดเครื่องยนต์",
-      value: optionLabel(carEngineCcOptionsByCollateralType[vehicleCollateralType], carInfo.engineCc),
+      value: carInfo.engineCc ? `${carInfo.engineCc} ซีซี` : "-",
     },
-    { label: "ระบบเกียร์", value: carInfo.transmission?.toUpperCase() ?? "-" },
-    { label: "ประเภทตัวถัง", value: carInfo.bodyType?.toUpperCase() ?? "-" },
-    {
-      label: "รุ่นย่อย",
-      value: getVehicleSubModelLabel(collateralType, carInfo.brand, carInfo.model, carInfo.subModel),
-    },
+    { label: "ระบบเกียร์", value: optionLabel(carTransmissionOptions, carInfo.transmission) },
+    { label: "ประเภทตัวถัง", value: carInfo.bodyType ? bodyTypeLabel(carInfo.bodyType) : "-" },
+    { label: "รุ่นย่อย", value: carInfo.subModel ?? "-" },
   ];
 
   return (

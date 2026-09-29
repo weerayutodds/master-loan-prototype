@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "generate:catalog": "node scripts/generate-product-catalog.mjs",
+    "generate:ratebook": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-ratebook.mjs",
     "verify:catalog": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-product-catalog.mjs"
   },
   "dependencies": {

@@ -68,7 +68,19 @@ export type CarInfo = {
   engineCc?: string;
   transmission?: string;
   bodyType?: string;
+  /** Display text for รุ่นย่อย -- read off the chosen row, never picked directly. */
   subModel?: string;
+  /**
+   * What the รุ่นย่อย dropdown is actually keyed on, and the stable identity of
+   * the whole selection: the ratebook Code for รถยนต์/มอเตอร์ไซค์, the mock
+   * catalog's sub-model slug for รถบรรทุก. A Sub-Model alone is not enough --
+   * BENZ S280 2005 has two priced rows under "2.8 RWD (2799ซีซี)".
+   */
+  ratebookCode?: string;
+  /** ราคาประเมิน of the chosen row. */
+  appraisalPrice?: number;
+  /** `Rate Book` (วงเงินจัด) of the chosen row. รถบรรทุก has none. */
+  ratebookPrice?: number;
 };
 
 export type LoanInfo = {

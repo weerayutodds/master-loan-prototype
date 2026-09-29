@@ -4,9 +4,6 @@ import {formatDateTime} from "@/lib/format"
 import {
   carConditionOptions,
   collateralTypeOptions,
-  getVehicleBrandLabel,
-  getVehicleModelLabel,
-  getVehicleSubModelLabel,
   refinanceStatusOptions,
 } from "@/lib/mock"
 import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
@@ -30,14 +27,9 @@ function getCollateralChips(opportunity: CustomerLeadOpportunity): string[] {
     (option) => option.value === collateralType,
   )?.label
 
-  const brandLabel = getVehicleBrandLabel(collateralType, carBrand ?? undefined)
-  const modelLabel = getVehicleModelLabel(
-    collateralType,
-    carBrand ?? undefined,
-    carModel ?? undefined,
-  )
-  const brandModelParts = [brandLabel, modelLabel].filter(
-    (label) => label !== "-",
+  // Stored as the ratebook writes them ("TOYOTA", "HILUXREVO"), so no lookup.
+  const brandModelParts = [carBrand, carModel].filter(
+    (label): label is string => Boolean(label),
   )
   const brandModelLabel =
     brandModelParts.length > 0
@@ -50,19 +42,12 @@ function getCollateralChips(opportunity: CustomerLeadOpportunity): string[] {
     (option) => option.value === carCondition,
   )?.label
 
-  const subModelLabel = getVehicleSubModelLabel(
-    collateralType,
-    carBrand ?? undefined,
-    carModel ?? undefined,
-    carSubModel ?? undefined,
-  )
-
   return [
     collateralLabel,
     brandModelLabel,
     yearLabel,
     conditionLabel,
-    subModelLabel !== "-" ? subModelLabel.toUpperCase() : null,
+    carSubModel ? carSubModel.toUpperCase() : null,
   ].filter((chip): chip is string => Boolean(chip))
 }
 

@@ -27,7 +27,6 @@ import {
   findProductCatalogItemById,
   getProductCatalogData,
   getProductGuideData,
-  getVehicleCarType,
   loanPurposeOptions,
   mockKeyInCardCustomer,
   refinanceStatusOptions,
@@ -147,16 +146,16 @@ export function RatebookForm({
           condition: initialOpportunity.carCondition ?? undefined,
           doors: initialOpportunity.carDoors ?? undefined,
 
-          carType: getVehicleCarType(
-            initialOpportunity.collateralType,
-            initialOpportunity.carBrand ?? undefined,
-            initialOpportunity.carModel ?? undefined,
-            initialOpportunity.carDoors ?? undefined,
-          ),
+          // Read back rather than re-derived: the ratebook row that decided it
+          // is not in memory until the brand file loads.
+          carType: initialOpportunity.carType ?? undefined,
           engineCc: initialOpportunity.carEngineCc ?? undefined,
           transmission: initialOpportunity.carTransmission ?? undefined,
           bodyType: initialOpportunity.carBodyType ?? undefined,
           subModel: initialOpportunity.carSubModel ?? undefined,
+          ratebookCode: initialOpportunity.carRatebookCode ?? undefined,
+          appraisalPrice: initialOpportunity.carAppraisalPrice ?? undefined,
+          ratebookPrice: initialOpportunity.carRatebookPrice ?? undefined,
         }
       : {},
   )
@@ -208,7 +207,7 @@ export function RatebookForm({
       ) !== null,
   )
   const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct)
-  const productGuideData = getProductGuideData(carInfo, collateralType)
+  const productGuideData = getProductGuideData(carInfo.appraisalPrice)
   const productCatalogContext = {
     carInfo,
     collateralType,
@@ -330,6 +329,12 @@ export function RatebookForm({
 
   function handleLoanPurposeChange(value: LoanPurpose) {
     setLoanPurpose(value)
+
+    // วัตถุประสงค์ selects the LOANTYPE the ratebook is read at (จำนำทะเบียน vs
+    // ดีลเลอร์), which is a different set of rows and prices, so the vehicle
+    // answers cannot carry over.
+    setCarInfo({})
+    setShowProductGuide(false)
     commitLoanQuestionsIfComplete(
       value,
       collateralType,
@@ -453,6 +458,7 @@ export function RatebookForm({
               opportunityId={opportunityId}
               carInfo={carInfo}
               collateralType={collateralType}
+              loanPurpose={loanPurpose}
               onCarInfoChange={handleCarInfoChange}
               onViewAppraisal={() => {
                 setProductFilter(null)

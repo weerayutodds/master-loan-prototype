@@ -236,9 +236,15 @@ function brand(
   return { value, label, models };
 }
 
-export const vehicleCatalogByCollateralType: Record<
-  VehicleCollateralType,
-  VehicleBrandOption[]
+/**
+ * The hand-written catalog, now only what the ratebook does not cover:
+ * `truck` (Cartype5 describes a different form -- ยี่ห้อ → จำนวนล้อ → รุ่นแชสซี
+ * → ปี → ลักษณะตัวถัง, with no สภาพรถ/ประตู/เกียร์) and `car`, which ที่ดิน still
+ * falls back to because it has no collateral form of its own yet.
+ * รถยนต์ and มอเตอร์ไซค์ read Ratebook/*.xlsx through src/lib/ratebook.ts.
+ */
+const vehicleCatalogByCollateralType: Partial<
+  Record<VehicleCollateralType, VehicleBrandOption[]>
 > = {
   car: [
     brand("toyota", "Toyota", [
@@ -548,202 +554,6 @@ export const vehicleCatalogByCollateralType: Record<
       ),
     ]),
   ],
-  motorcycle: [
-    brand("honda", "Honda", [
-      model(
-        "wave110i",
-        "Wave110i",
-        [
-          ["standard", "Standard"],
-          ["fi", "Fi"],
-        ],
-        45000,
-        {
-          carTypeByDoors: { "": "family" },
-          transmissions: ["manual"],
-          bodyTypes: ["standard"],
-        },
-      ),
-      model(
-        "click160i",
-        "Click160i",
-        [
-          ["standard", "Standard"],
-          ["abs", "ABS"],
-        ],
-        75000,
-        {
-          carTypeByDoors: { "": "scooter" },
-          transmissions: ["auto"],
-          bodyTypes: ["scooter"],
-        },
-      ),
-      model(
-        "pcx160",
-        "PCX160",
-        [
-          ["standard", "Standard"],
-          ["abs", "ABS"],
-        ],
-        100000,
-        {
-          carTypeByDoors: { "": "scooter" },
-          transmissions: ["auto"],
-          bodyTypes: ["scooter"],
-        },
-      ),
-      model(
-        "cbr150r",
-        "CBR150R",
-        [
-          ["standard", "Standard"],
-          ["abs", "ABS"],
-        ],
-        105000,
-        {
-          carTypeByDoors: { "": "sport" },
-          transmissions: ["manual"],
-          bodyTypes: ["sport"],
-        },
-      ),
-    ]),
-    brand("yamaha", "Yamaha", [
-      model(
-        "fino",
-        "Fino",
-        [
-          ["standard", "Standard"],
-          ["premium", "Premium"],
-        ],
-        48000,
-        {
-          carTypeByDoors: { "": "scooter" },
-          transmissions: ["auto"],
-          bodyTypes: ["scooter"],
-        },
-      ),
-      model(
-        "aerox155",
-        "Aerox155",
-        [
-          ["standard", "Standard"],
-          ["abs", "ABS"],
-        ],
-        75000,
-        {
-          carTypeByDoors: { "": "scooter" },
-          transmissions: ["auto"],
-          bodyTypes: ["scooter"],
-        },
-      ),
-      model(
-        "nmax",
-        "NMAX",
-        [
-          ["standard", "Standard"],
-          ["abs", "ABS"],
-        ],
-        90000,
-        {
-          carTypeByDoors: { "": "scooter" },
-          transmissions: ["auto"],
-          bodyTypes: ["scooter"],
-        },
-      ),
-      model(
-        "exciter155vva",
-        "Exciter155VVA",
-        [
-          ["standard", "Standard"],
-          ["gp", "GP"],
-        ],
-        95000,
-        {
-          carTypeByDoors: { "": "sport" },
-          transmissions: ["manual"],
-          bodyTypes: ["sport"],
-        },
-      ),
-    ]),
-    brand("suzuki", "Suzuki", [
-      model("smash", "Smash", [["standard", "Standard"]], 45000, {
-        carTypeByDoors: { "": "family" },
-        transmissions: ["manual"],
-        bodyTypes: ["standard"],
-      }),
-      model("address110", "Address110", [["standard", "Standard"]], 55000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("gsx-r150", "GSX-R150", [["standard", "Standard"]], 110000, {
-        carTypeByDoors: { "": "sport" },
-        transmissions: ["manual"],
-        bodyTypes: ["sport"],
-      }),
-    ]),
-    brand("kawasaki", "Kawasaki", [
-      model(
-        "ninja250",
-        "Ninja250",
-        [
-          ["standard", "Standard"],
-          ["se", "SE"],
-        ],
-        170000,
-        {
-          carTypeByDoors: { "": "big-bike" },
-          transmissions: ["manual"],
-          bodyTypes: ["sport"],
-        },
-      ),
-      model("z250", "Z250", [["standard", "Standard"]], 160000, {
-        carTypeByDoors: { "": "big-bike" },
-        transmissions: ["manual"],
-        bodyTypes: ["sport"],
-      }),
-      model("klx150", "KLX150", [["standard", "Standard"]], 110000, {
-        carTypeByDoors: { "": "adv" },
-        transmissions: ["manual"],
-        bodyTypes: ["adventure"],
-      }),
-    ]),
-    brand("vespa", "Vespa", [
-      model(
-        "primavera150",
-        "Primavera150",
-        [["standard", "Standard"]],
-        150000,
-        {
-          carTypeByDoors: { "": "scooter" },
-          transmissions: ["auto"],
-          bodyTypes: ["scooter"],
-        },
-      ),
-      model("sprint150", "Sprint150", [["standard", "Standard"]], 150000, {
-        carTypeByDoors: { "": "scooter" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-      model("gts300", "GTS300", [["standard", "Standard"]], 260000, {
-        carTypeByDoors: { "": "big-bike" },
-        transmissions: ["auto"],
-        bodyTypes: ["scooter"],
-      }),
-    ]),
-    brand("gpx", "GPX", [
-      model("demon150gr", "Demon150GR", [["standard", "Standard"]], 65000, {
-        carTypeByDoors: { "": "sport" },
-        transmissions: ["manual"],
-        bodyTypes: ["sport"],
-      }),
-      model("legend250", "Legend250", [["standard", "Standard"]], 130000, {
-        carTypeByDoors: { "": "big-bike" },
-        transmissions: ["manual"],
-        bodyTypes: ["cruiser"],
-      }),
-    ]),
-  ],
   truck: [
     brand("isuzu", "Isuzu", [
       model(
@@ -983,9 +793,9 @@ export function toVehicleCollateralType(
 export function getVehicleBrands(
   collateralType?: CollateralType | null,
 ): VehicleBrandOption[] {
-  return vehicleCatalogByCollateralType[
-    toVehicleCollateralType(collateralType)
-  ];
+  return (
+    vehicleCatalogByCollateralType[toVehicleCollateralType(collateralType)] ?? []
+  );
 }
 
 export function getVehicleModels(
@@ -1047,28 +857,7 @@ export function getVehicleCarType(
     ?.carTypeByDoors[doors ?? ""];
 }
 
-export function getVehicleBrandLabel(
-  collateralType: CollateralType | null | undefined,
-  brandValue?: string,
-): string {
-  return (
-    getVehicleBrands(collateralType).find(
-      (option) => option.value === brandValue,
-    )?.label ?? "-"
-  );
-}
 
-export function getVehicleModelLabel(
-  collateralType: CollateralType | null | undefined,
-  brandValue?: string,
-  modelValue?: string,
-): string {
-  return (
-    getVehicleModels(collateralType, brandValue).find(
-      (option) => option.value === modelValue,
-    )?.label ?? "-"
-  );
-}
 
 export function getVehicleModelBasePrice(
   collateralType: CollateralType | null | undefined,
@@ -1082,18 +871,6 @@ export function getVehicleModelBasePrice(
   );
 }
 
-export function getVehicleSubModelLabel(
-  collateralType: CollateralType | null | undefined,
-  brandValue?: string,
-  modelValue?: string,
-  subModelValue?: string,
-): string {
-  return (
-    getVehicleSubModels(collateralType, brandValue, modelValue).find(
-      (option) => option.value === subModelValue,
-    )?.label ?? "-"
-  );
-}
 
 export const carYearOptions: { value: string; label: string }[] = Array.from(
   { length: 15 },
@@ -1111,6 +888,8 @@ export const carConditionOptions: { value: string; label: string }[] = [
 
 export const carDoorsOptions: { value: string; label: string }[] = [
   { value: "2", label: "2 ประตู" },
+  // รถตู้ lists 3-door bodies, so the ratebook needs this one too.
+  { value: "3", label: "3 ประตู" },
   { value: "4", label: "4 ประตู" },
   { value: "5", label: "5 ประตู" },
 ];
@@ -1172,46 +951,18 @@ export const performanceStats: PerformanceStat[] = [
   },
 ];
 
-const CONDITION_MULTIPLIERS: Record<string, number> = {
-  excellent: 1,
-  good: 0.93,
-  fair: 0.83,
-  "needs-repair": 0.65,
-};
-
-const DEPRECIATION_RATE_PER_YEAR = 0.1;
-const MIN_DEPRECIATION_FACTOR = 0.2;
-
-function depreciationFactor(ageInYears: number): number {
-  const factor = (1 - DEPRECIATION_RATE_PER_YEAR) ** Math.max(ageInYears, 0);
-  return Math.max(factor, MIN_DEPRECIATION_FACTOR);
-}
-
 function roundToNearestThousand(amount: number): number {
   return Math.round(amount / 1000) * 1000;
 }
 
+/**
+ * ราคาประเมิน is no longer estimated: รถยนต์ and มอเตอร์ไซค์ read it off the
+ * ratebook row the user picked, and รถบรรทุก still gets the old depreciation
+ * estimate from vehicle-options.ts. Everything below is derived from it.
+ */
 export function getProductGuideData(
-  carInfo: CarInfo,
-  collateralType?: CollateralType | null,
+  appraisalPrice: number = 0,
 ): ProductGuideData {
-  const basePrice = getVehicleModelBasePrice(
-    collateralType,
-    carInfo.brand,
-    carInfo.model,
-  );
-  const latestCatalogYear = Math.max(
-    ...carYearOptions.map((option) => Number(option.value)),
-  );
-  const ageInYears =
-    latestCatalogYear - Number(carInfo.year ?? latestCatalogYear);
-  const conditionMultiplier =
-    CONDITION_MULTIPLIERS[carInfo.condition ?? ""] ?? 1;
-
-  const appraisalPrice = roundToNearestThousand(
-    basePrice * depreciationFactor(ageInYears) * conditionMultiplier,
-  );
-
   return {
     appraisalPrice,
     approvedRange: {

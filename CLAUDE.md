@@ -28,6 +28,9 @@ src/
   lib/
     db.ts               # postgres client
     mock.ts             # mock data (until DB is connected)
+    ratebook.ts         # loads + filters the generated ratebook rows
+    ratebook-index.ts   # GENERATED brand list (npm run generate:ratebook)
+    vehicle-options.ts  # one option shape over ratebook + mock catalogs
     actions/            # server actions, split by feature
   types/
 db/
@@ -48,6 +51,10 @@ CLAUDE.md
 - Database schema is in db/schema.sql (source of truth)
 - All DB access only in src/lib/ and Server Actions. Never in client components.
 - Use mock data in src/lib/mock.ts until told to connect the DB.
+- Vehicle options and ราคาประเมิน for รถยนต์/มอเตอร์ไซค์ are NOT mock: they come
+  from the ratebook workbooks in `Ratebook/*.xlsx`. Edit those, then run
+  `npm run generate:ratebook` — never hand-edit `public/ratebook/**` or
+  `src/lib/ratebook-index.ts`. รถบรรทุก/ที่ดิน still use src/lib/mock.ts.
 
 ## Code style
 - Keep it simple and flat. No extra abstraction layers, no state library unless asked.

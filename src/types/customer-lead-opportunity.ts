@@ -36,6 +36,9 @@ export type CustomerLeadOpportunity = {
   carTransmission: string | null;
   carBodyType: string | null;
   carSubModel: string | null;
+  carRatebookCode: string | null;
+  carAppraisalPrice: number | null;
+  carRatebookPrice: number | null;
   selectedProductId: string | null;
   requestedAmount: string | null;
   wantsWheelCard: "yes" | "no" | null;

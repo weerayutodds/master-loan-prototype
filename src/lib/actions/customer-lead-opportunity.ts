@@ -50,6 +50,9 @@ function mapRow(row: any): CustomerLeadOpportunity {
     carTransmission: row.car_transmission,
     carBodyType: row.car_body_type,
     carSubModel: row.car_sub_model,
+    carRatebookCode: row.car_ratebook_code,
+    carAppraisalPrice: row.car_appraisal_price,
+    carRatebookPrice: row.car_ratebook_price,
     selectedProductId: row.selected_product_id,
     requestedAmount: row.requested_amount,
     wantsWheelCard: row.wants_wheel_card,
@@ -289,6 +292,9 @@ export async function updateOpportunityCarInfo(
       car_transmission = ${input.transmission ?? null},
       car_body_type = ${input.bodyType ?? null},
       car_sub_model = ${input.subModel ?? null},
+      car_ratebook_code = ${input.ratebookCode ?? null},
+      car_appraisal_price = ${input.appraisalPrice ?? null},
+      car_ratebook_price = ${input.ratebookPrice ?? null},
       updated_at = now()
     where id = ${opportunityId}
     returning *
