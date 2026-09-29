@@ -317,14 +317,25 @@ export function CustomerCollateralPanel({
               <span className="text-sm text-muted-foreground">
                 เลขทะเบียน / เลขตัวถัง
               </span>
-              <Button
-                variant="outline"
-                size="xs"
-                className="min-w-14"
-                onClick={() => setCollateralModalOpen(true)}
-              >
-                {collateralIdentifier ? "แก้ไข" : "เพิ่ม"}
-              </Button>
+              {collateralIdentifier ? (
+                <button
+                  type="button"
+                  onClick={() => setCollateralModalOpen(true)}
+                  className="flex items-center gap-1 text-xs font-semibold text-primary-to"
+                >
+                  <Icon name="edit" className="size-3" />
+                  แก้ไข
+                </button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="xs"
+                  className="min-w-14"
+                  onClick={() => setCollateralModalOpen(true)}
+                >
+                  เพิ่ม
+                </Button>
+              )}
             </div>
             {collateralIdentifier && (
               <span className="text-sm font-medium text-foreground text-left">
