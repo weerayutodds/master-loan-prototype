@@ -20,10 +20,7 @@ import {
   updateOpportunityNcbGrade,
   updateOpportunitySelectedProduct,
 } from "@/lib/actions/customer-lead-opportunity"
-import {
-  getDefaultProductCatalogFilter,
-  getMaxApprovedAmount,
-} from "@/lib/loan-cal"
+import {getDefaultProductCatalogFilter} from "@/lib/loan-cal"
 import {
   collateralTypeOptions,
   existingFinanceOptions,
@@ -309,7 +306,7 @@ export function RatebookForm({
     window.scrollTo({top: 0, behavior: "instant"})
     const nextLoanInfo: LoanInfo = {
       ...loanInfo,
-      requestedAmount: loanInfo.requestedAmount || getMaxApprovedAmount(item),
+      requestedAmount: loanInfo.requestedAmount ?? 0,
     }
     setLoanInfo(nextLoanInfo)
 

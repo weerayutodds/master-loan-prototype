@@ -78,7 +78,7 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
 
   const requestedAmount = value.requestedAmount ?? maxApprovedAmount;
   const wantsWheelCard = value.wantsWheelCard ?? "yes";
-  const hasPpi = value.hasPpi ?? "yes";
+  const hasPpi = value.hasPpi ?? "no";
   const installmentTerm = value.installmentTerm ?? DEFAULT_INSTALLMENT_TERM;
 
   const monthlyPayment = calculateMonthlyPayment(
