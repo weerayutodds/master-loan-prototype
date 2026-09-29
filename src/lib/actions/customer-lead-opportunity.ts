@@ -8,7 +8,7 @@ import {
   MOCK_OPPORTUNITY_BRANCH_NAME,
   MOCK_OPPORTUNITY_STAFF_CODE,
   MOCK_OPPORTUNITY_STAFF_NAME,
-  mockCardCustomer,
+  mockKeyInCardCustomer,
 } from "@/lib/mock";
 import type { NcbGrade } from "@/types/customer-lead";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
@@ -151,7 +151,7 @@ export async function updateOpportunityCustomerInfo(
 /** Same as `updateCustomerLeadCardVerified`, on the opportunity's snapshot. */
 export async function updateOpportunityCardVerified(
   opportunityId: string,
-  idCardNumber: string = mockCardCustomer.idCardNumber,
+  idCardNumber: string = mockKeyInCardCustomer.idCardNumber,
 ): Promise<void> {
   await sql`
     update customer_lead_opportunity
@@ -169,7 +169,7 @@ export async function updateOpportunityCardVerified(
 export async function updateOpportunityNcbGrade(
   opportunityId: string,
   ncbGrade: NcbGrade,
-  idCardNumber: string = mockCardCustomer.idCardNumber,
+  idCardNumber: string = mockKeyInCardCustomer.idCardNumber,
 ): Promise<CustomerLeadOpportunity> {
   const [row] = await sql`
     update customer_lead_opportunity

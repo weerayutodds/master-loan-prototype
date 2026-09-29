@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import sql from "@/lib/db";
-import { mockCardCustomer } from "@/lib/mock";
+import { mockKeyInCardCustomer } from "@/lib/mock";
 import type { VerificationMethod } from "@/types/customer-form";
 import type { CustomerLead, Gender, NcbGrade } from "@/types/customer-lead";
 
@@ -16,6 +16,7 @@ type CreateCustomerLeadInput = {
   birthDate?: string | null;
 };
 
+/** เบอร์มือถือ alone identifies a customer: same phone = same lead (and same list), a different phone = a new one. */
 export async function createCustomerLead(
   input: CreateCustomerLeadInput,
 ): Promise<CustomerLead> {
@@ -55,7 +56,7 @@ export async function createCustomerLead(
 /** A Dipchip read on its own: card-verifies the lead but leaves `ncb_grade` for a later eNCB check. */
 export async function updateCustomerLeadCardVerified(
   leadId: string,
-  idCardNumber: string = mockCardCustomer.idCardNumber,
+  idCardNumber: string = mockKeyInCardCustomer.idCardNumber,
 ): Promise<void> {
   await sql`
     update customer_lead
@@ -75,7 +76,7 @@ export async function updateCustomerLeadCardVerified(
 export async function updateCustomerLeadNcbGrade(
   leadId: string,
   ncbGrade: NcbGrade,
-  idCardNumber: string = mockCardCustomer.idCardNumber,
+  idCardNumber: string = mockKeyInCardCustomer.idCardNumber,
 ): Promise<CustomerLead> {
   const [row] = await sql`
     update customer_lead

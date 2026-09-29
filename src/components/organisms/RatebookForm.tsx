@@ -29,7 +29,7 @@ import {
   getProductGuideData,
   getVehicleCarType,
   loanPurposeOptions,
-  mockCardCustomer,
+  mockKeyInCardCustomer,
   refinanceStatusOptions,
 } from "@/lib/mock"
 import type {VerificationMethod} from "@/types/customer-form"
@@ -256,15 +256,15 @@ export function RatebookForm({
 
   // The first card read (Dipchip or eNCB) fills the customer's own info from the card too.
   function applyCardRead(): string {
-    const cardIdNumber = idCardNumber || mockCardCustomer.idCardNumber
+    const cardIdNumber = idCardNumber || mockKeyInCardCustomer.idCardNumber
     if (verificationMethod !== "card") {
-      const [firstName, ...rest] = mockCardCustomer.name.split(" ")
+      const [firstName, ...rest] = mockKeyInCardCustomer.name.split(" ")
       setCustomer((current) => ({
         firstName,
         lastName: rest.join(" "),
         phone: current?.phone ?? "",
-        gender: mockCardCustomer.gender,
-        birthDate: mockCardCustomer.birthDate,
+        gender: mockKeyInCardCustomer.gender,
+        birthDate: mockKeyInCardCustomer.birthDate,
       }))
     }
     setIdCardNumber(cardIdNumber)

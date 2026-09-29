@@ -1127,6 +1127,14 @@ export const mockCardCustomer: CardCustomerData = {
   birthDate: "1990-05-20",
 };
 
+/** The card a keyed-in customer inserts later (sidebar "Dipchip" / "ตรวจ eNCB") — a different person from `mockCardCustomer`. */
+export const mockKeyInCardCustomer: CardCustomerData = {
+  name: "สมชาย ใจดี",
+  idCardNumber: "3-2345-67890-32-1",
+  gender: "male",
+  birthDate: "1990-05-20",
+};
+
 export const genderOptions: { value: Gender; label: string }[] = [
   { value: "male", label: "ชาย" },
   { value: "female", label: "หญิง" },
