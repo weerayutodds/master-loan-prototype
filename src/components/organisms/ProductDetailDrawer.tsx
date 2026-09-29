@@ -146,7 +146,10 @@ export function ProductDetailDrawer({
             </div>
           </section>
 
-          <ConditionGrid title="เงื่อนไขหลักประกัน - รถยนต์" items={detail.collateralConditions} />
+          <ConditionGrid
+            title={`เงื่อนไขหลักประกัน - ${detail.collateralLabel}`}
+            items={detail.collateralConditions}
+          />
           <div className="border-t border-divider pt-4">
             <ConditionGrid title="เงื่อนไขผู้กู้" items={detail.borrowerConditions} />
           </div>

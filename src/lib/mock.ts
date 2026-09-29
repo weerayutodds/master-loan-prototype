@@ -1534,17 +1534,44 @@ function toBorrowerNcbGradeLabel(ncbGradeLabel: string): string {
   return ncbGradeLabel;
 }
 
-function toProductDetail(rule: ProductRule): ProductCatalogDetail {
+// "ประเภทจดทะเบียน" (รย. book type) differs by vehicle: มอเตอร์ไซค์ books are รย.12/รย.17,
+// not the รย.1-3 used for รถยนต์/รถบรรทุก.
+function getCollateralLabelAndRegistrationTypes(
+  collateralType: CollateralType | null | undefined,
+): { label: string; registrationTypes: string } {
+  if (collateralType === "motorcycle") {
+    return { label: "รถจักรยานยนต์", registrationTypes: "ร.ย.12, ร.ย.17" };
+  }
+  return { label: "รถยนต์", registrationTypes: "ร.ย.1, ร.ย.2, ร.ย.3" };
+}
+
+function toProductDetail(
+  rule: ProductRule,
+  collateralType: CollateralType | null | undefined,
+): ProductCatalogDetail {
   const maxLtv = typeof rule.ltv === "number" ? rule.ltv : rule.ltv.max;
   const isAllGrades = rule.ncbGradeLabel === ALL_NCB_GRADES_LABEL;
+  const { label: collateralLabel, registrationTypes } =
+    getCollateralLabelAndRegistrationTypes(collateralType);
   return {
     ...productDetailTemplate,
-    // "เกรด NCB" must match the grade shown on the product card, not the mock's blanket A01 - A05.
-    borrowerConditions: productDetailTemplate.borrowerConditions.map((condition) =>
-      condition.label === "เกรด NCB"
-        ? { ...condition, value: toBorrowerNcbGradeLabel(rule.ncbGradeLabel) }
+    collateralLabel,
+    collateralConditions: productDetailTemplate.collateralConditions.map((condition) =>
+      condition.label === "ประเภทจดทะเบียน"
+        ? { ...condition, value: registrationTypes }
         : condition,
     ),
+    borrowerConditions: productDetailTemplate.borrowerConditions.map((condition) => {
+      // "เกรด NCB" must match the grade shown on the product card, not the mock's blanket A01 - A05.
+      if (condition.label === "เกรด NCB") {
+        return { ...condition, value: toBorrowerNcbGradeLabel(rule.ncbGradeLabel) };
+      }
+      // มอเตอร์ไซค์ allows a wider borrower age range than รถยนต์/รถบรรทุก.
+      if (condition.label === "อายุ" && collateralType === "motorcycle") {
+        return { ...condition, value: "20 - 75 ปี" };
+      }
+      return condition;
+    }),
     ltvGroups: isAllGrades
       ? allGradeLtvGroups
       : [
@@ -1568,6 +1595,7 @@ function toProductDetail(rule: ProductRule): ProductCatalogDetail {
 function toCatalogItem(
   rule: ProductRule,
   appraisalPrice: number,
+  collateralType: CollateralType | null | undefined,
 ): ProductCatalogItem {
   return {
     id: rule.id,
@@ -1589,7 +1617,7 @@ function toCatalogItem(
     } ${formatRange(rule.annualReduction, (value) => `${value}%`)} ต่อปี`,
     primaryActionLabel: rule.primaryActionLabel,
     primaryActionVariant: rule.primaryActionVariant,
-    detail: toProductDetail(rule),
+    detail: toProductDetail(rule, collateralType),
   };
 }
 
@@ -1622,7 +1650,7 @@ export function getProductCatalogData(
     gradeFilterLabel: "ทุกเกรด",
     items: rules
       .filter((rule) => isRuleEligible(rule, context))
-      .map((rule) => toCatalogItem(rule, context.appraisalPrice)),
+      .map((rule) => toCatalogItem(rule, context.appraisalPrice, context.collateralType)),
   };
 }
 
@@ -1637,7 +1665,7 @@ export function findProductCatalogItemById(
   const rule = productRulesByCollateralType[
     context.collateralType ?? "car"
   ].find((candidate) => candidate.id === productId);
-  return rule ? toCatalogItem(rule, context.appraisalPrice) : null;
+  return rule ? toCatalogItem(rule, context.appraisalPrice, context.collateralType) : null;
 }
 
 export const insuranceCompanyOptions: { value: string; label: string }[] = [

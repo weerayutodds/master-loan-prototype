@@ -39,6 +39,8 @@ export type ProductCatalogCondition = {
 };
 
 export type ProductCatalogDetail = {
+  /** e.g. "รถยนต์", "รถจักรยานยนต์" — used in the drawer's "เงื่อนไขหลักประกัน - {label}" title. */
+  collateralLabel: string;
   ltvGroups: ProductCatalogLtvGroup[];
   interestRows: ProductCatalogInterestRow[];
   collateralConditions: ProductCatalogCondition[];
