@@ -152,7 +152,9 @@ export function LoanCalBar({
   const [payoffAmount, setPayoffAmount] = useState(0);
   const [cashBackAmount, setCashBackAmount] = useState(0);
   const [isTLC, setIsTLC] = useState(
-    isMotorcycle || productCatalog.filterChips.includes("บัตรติดล้อ"),
+    bookStatus !== TRANSFER_BOOK_STATUS ||
+      isMotorcycle ||
+      productCatalog.filterChips.includes("บัตรติดล้อ"),
   );
   const [installmentTerm, setInstallmentTerm] = useState(
     defaultInstallmentTerm,
@@ -219,6 +221,7 @@ export function LoanCalBar({
   function handleBookStatusChange(value: string) {
     setBookStatus(value);
     if (value === TRANSFER_BOOK_STATUS) setIsTLC(false);
+    else handleToggleTLC(true);
     commitFilter({ bookStatus: value });
   }
 
