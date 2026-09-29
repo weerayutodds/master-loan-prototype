@@ -22,7 +22,7 @@ export function getDefaultProductCatalogFilter(
     bookStatus,
     requestedAmount: 0,
     requestedLtvPercent: 0,
-    wantsWheelCard: false,
+    wantsWheelCard: bookStatus !== TRANSFER_BOOK_STATUS,
   };
 }
 
