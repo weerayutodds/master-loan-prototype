@@ -45,9 +45,10 @@ Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also r
 
 ### PPI label in the calculation details
 
-- Select PPI in `LoanCalBar`, save the gender/birth-date popover, then click "คำนวณ" → `LoanCalDetailPopover` shows "เบี้ย PPI (ตลอดสัญญา)" directly above "ยอดจัดรวม" for both TLC and non-TLC calculations.
-- Uncheck PPI and click "คำนวณ" again → the PPI label is hidden. Details use the last calculated inputs, consistent with the displayed payment; toggling PPI alone does not recalculate the result.
-- The row displays `summary.ppiTotal`, formatted with Thai locale and the "บาท" suffix, on the right. Calculation formulas are unchanged: TLC returns `ppiTotal = 0` because its premium is billed separately as a monthly add-on; non-TLC includes the premium in the financed principal.
+- After clicking "คำนวณ", `LoanCalDetailPopover` shows "เบี้ย PPI (ตลอดสัญญา)" directly above "ยอดจัดรวม" only when PPI is selected and บัตรติดล้อ is not selected (`!isTLC && hasPpi`).
+- When บัตรติดล้อ is selected or PPI is not selected, this contract-total PPI row is hidden. The existing TLC monthly-premium breakdown is unchanged.
+- The row displays the total PPI premium (`summary.ppiTotal`) on the right, with thousands separators and the "บาท" unit.
+- Visibility and the displayed amount follow the last calculated inputs passed from `LoanCalBar`; changing the checkbox requires clicking "คำนวณ" again to update the details. This display change does not alter premium calculations.
 
 ## Out of scope for this phase (flagged, not silently built)
 

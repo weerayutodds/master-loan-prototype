@@ -65,11 +65,14 @@ export function LoanCalDetailPopover({
         </button>
       </div>
 
-      {hasPpi ? (
-        <DetailRow
-          label="เบี้ย PPI (ตลอดสัญญา)"
-          value={`${summary.ppiTotal.toLocaleString("th-TH")} บาท`}
-        />
+      {!isTLC && hasPpi ? (
+        <div className="flex items-center justify-between border-b border-divider px-3 py-2 text-xs">
+          <span className="text-muted-foreground">เบี้ย PPI (ตลอดสัญญา)</span>
+          <p className="font-semibold text-primary-to">
+            {summary.ppiTotal.toLocaleString("th-TH")}{" "}
+            <span className="font-normal text-price-label">บาท</span>
+          </p>
+        </div>
       ) : null}
       <DetailRow
         label="ยอดจัดรวม"
