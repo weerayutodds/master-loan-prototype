@@ -36,6 +36,14 @@ const FIELD_SEQUENCE: (keyof CarInfo)[] = [
   "doors",
 ];
 
+// มอเตอร์ไซค์ only asks for these four fields — no condition, doors, or optional row.
+const MOTORCYCLE_FIELD_SEQUENCE: (keyof CarInfo)[] = [
+  "brand",
+  "model",
+  "year",
+  "subModel",
+];
+
 const FIELD_LABELS: Record<keyof CarInfo, string> = {
   brand: "ยี่ห้อรถ",
   model: "รุ่นรถ",
@@ -81,9 +89,7 @@ export function CarInfoForm({
   onViewAppraisal,
 }: CarInfoFormProps) {
   const isMotorcycle = collateralType === "motorcycle";
-  const sequence = isMotorcycle
-    ? FIELD_SEQUENCE.filter((field) => field !== "doors")
-    : FIELD_SEQUENCE;
+  const sequence = isMotorcycle ? MOTORCYCLE_FIELD_SEQUENCE : FIELD_SEQUENCE;
 
   const vehicleCollateralType = toVehicleCollateralType(collateralType);
   const brandOptions = getVehicleBrands(collateralType);
@@ -178,80 +184,103 @@ export function CarInfoForm({
           </FormField>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <FormField label={<InfoLabel>รุ่นปี ค.ศ.</InfoLabel>}>
-            <Select
-              options={[PLACEHOLDER, ...carYearOptions]}
-              value={carInfo.year ?? ""}
-              disabled={!isUnlocked("year")}
-              onChange={(e) => update("year", e.target.value)}
-            />
-          </FormField>
-          <FormField label="สภาพรถ">
-            <Select
-              options={[PLACEHOLDER, ...carConditionOptions]}
-              value={carInfo.condition ?? ""}
-              disabled={!isUnlocked("condition")}
-              onChange={(e) => update("condition", e.target.value)}
-            />
-          </FormField>
-          <FormField label="จำนวนประตู">
-            <Select
-              options={[PLACEHOLDER, ...doorsOptions]}
-              value={carInfo.doors ?? ""}
-              disabled={isMotorcycle || !isUnlocked("doors")}
-              onChange={(e) => update("doors", e.target.value)}
-            />
-          </FormField>
-          <FormField label="ประเภทรถ (ระบบเลือกให้)">
-            <ReadOnlyValue value={optionLabel(carTypeOptions, derivedCarType)} />
-          </FormField>
-        </div>
+        {isMotorcycle ? (
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label={<InfoLabel>รุ่นปี ค.ศ.</InfoLabel>}>
+              <Select
+                options={[PLACEHOLDER, ...carYearOptions]}
+                value={carInfo.year ?? ""}
+                disabled={!isUnlocked("year")}
+                onChange={(e) => update("year", e.target.value)}
+              />
+            </FormField>
+            <FormField label="รุ่นย่อย">
+              <Select
+                options={[PLACEHOLDER, ...subModelOptions]}
+                value={carInfo.subModel ?? ""}
+                disabled={!isUnlocked("subModel")}
+                onChange={(e) => update("subModel", e.target.value)}
+              />
+            </FormField>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <FormField label={<InfoLabel>รุ่นปี ค.ศ.</InfoLabel>}>
+                <Select
+                  options={[PLACEHOLDER, ...carYearOptions]}
+                  value={carInfo.year ?? ""}
+                  disabled={!isUnlocked("year")}
+                  onChange={(e) => update("year", e.target.value)}
+                />
+              </FormField>
+              <FormField label="สภาพรถ">
+                <Select
+                  options={[PLACEHOLDER, ...carConditionOptions]}
+                  value={carInfo.condition ?? ""}
+                  disabled={!isUnlocked("condition")}
+                  onChange={(e) => update("condition", e.target.value)}
+                />
+              </FormField>
+              <FormField label="จำนวนประตู">
+                <Select
+                  options={[PLACEHOLDER, ...doorsOptions]}
+                  value={carInfo.doors ?? ""}
+                  disabled={!isUnlocked("doors")}
+                  onChange={(e) => update("doors", e.target.value)}
+                />
+              </FormField>
+              <FormField label="ประเภทรถ">
+                <ReadOnlyValue value={optionLabel(carTypeOptions, derivedCarType)} />
+              </FormField>
+            </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <FormField label="ขนาดเครื่องยนต์ (ไม่บังคับ)">
-            <Select
-              options={[PLACEHOLDER, ...carEngineCcOptions]}
-              value={carInfo.engineCc ?? ""}
-              disabled={!inputsComplete}
-              onChange={(e) => update("engineCc", e.target.value)}
-            />
-          </FormField>
-          <FormField label="ระบบเกียร์ (ไม่บังคับ)">
-            {fixedTransmission ? (
-              <ReadOnlyValue
-                value={optionLabel(carTransmissionOptions, fixedTransmission)}
-              />
-            ) : (
-              <Select
-                options={[PLACEHOLDER, ...carTransmissionOptions]}
-                value={carInfo.transmission ?? ""}
-                disabled={!inputsComplete}
-                onChange={(e) => update("transmission", e.target.value)}
-              />
-            )}
-          </FormField>
-          <FormField label="ประเภทตัวถัง (ไม่บังคับ)">
-            {fixedBodyType ? (
-              <ReadOnlyValue value={optionLabel(carBodyTypeOptions, fixedBodyType)} />
-            ) : (
-              <Select
-                options={[PLACEHOLDER, ...carBodyTypeOptions]}
-                value={carInfo.bodyType ?? ""}
-                disabled={!inputsComplete}
-                onChange={(e) => update("bodyType", e.target.value)}
-              />
-            )}
-          </FormField>
-          <FormField label="รุ่นย่อย (ไม่บังคับ)">
-            <Select
-              options={[PLACEHOLDER, ...subModelOptions]}
-              value={carInfo.subModel ?? ""}
-              disabled={!inputsComplete}
-              onChange={(e) => update("subModel", e.target.value)}
-            />
-          </FormField>
-        </div>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <FormField label="ขนาดเครื่องยนต์ (ไม่บังคับ)">
+                <Select
+                  options={[PLACEHOLDER, ...carEngineCcOptions]}
+                  value={carInfo.engineCc ?? ""}
+                  disabled={!inputsComplete}
+                  onChange={(e) => update("engineCc", e.target.value)}
+                />
+              </FormField>
+              <FormField label="ระบบเกียร์">
+                {fixedTransmission ? (
+                  <ReadOnlyValue
+                    value={optionLabel(carTransmissionOptions, fixedTransmission)}
+                  />
+                ) : (
+                  <Select
+                    options={[PLACEHOLDER, ...carTransmissionOptions]}
+                    value={carInfo.transmission ?? ""}
+                    disabled={!inputsComplete}
+                    onChange={(e) => update("transmission", e.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField label="ประเภทตัวถัง">
+                {fixedBodyType ? (
+                  <ReadOnlyValue value={optionLabel(carBodyTypeOptions, fixedBodyType)} />
+                ) : (
+                  <Select
+                    options={[PLACEHOLDER, ...carBodyTypeOptions]}
+                    value={carInfo.bodyType ?? ""}
+                    disabled={!inputsComplete}
+                    onChange={(e) => update("bodyType", e.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField label="รุ่นย่อย">
+                <Select
+                  options={[PLACEHOLDER, ...subModelOptions]}
+                  value={carInfo.subModel ?? ""}
+                  disabled={!inputsComplete}
+                  onChange={(e) => update("subModel", e.target.value)}
+                />
+              </FormField>
+            </div>
+          </>
+        )}
 
         <div className="border-t border-border" />
 
