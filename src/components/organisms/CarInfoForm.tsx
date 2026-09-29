@@ -149,11 +149,15 @@ export function CarInfoForm({
   const derivedCarType = inputsComplete
     ? getVehicleCarType(collateralType, carInfo.brand, carInfo.model, carInfo.doors)
     : undefined;
-  const isComplete = inputsComplete && Boolean(derivedCarType);
+  // รุ่นย่อย is required to enable "ดูราคาประเมิน" even when it isn't part of the required
+  // chain (มอเตอร์ไซค์ already has it in `sequence`, so this only adds the check for car/truck).
+  const subModelMissing = !sequence.includes("subModel") && !carInfo.subModel;
+  const isComplete = inputsComplete && Boolean(derivedCarType) && !subModelMissing;
   // ประเภทรถ is deliberately absent — the user has no way to fill it in.
-  const missingFieldLabels = sequence
-    .filter((field) => !carInfo[field])
-    .map((field) => FIELD_LABELS[field]);
+  const missingFieldLabels = [
+    ...sequence.filter((field) => !carInfo[field]).map((field) => FIELD_LABELS[field]),
+    ...(inputsComplete && subModelMissing ? [FIELD_LABELS.subModel] : []),
+  ];
 
   return (
     <div className="space-y-4">
