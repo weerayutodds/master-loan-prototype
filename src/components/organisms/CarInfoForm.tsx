@@ -5,6 +5,8 @@ import { Icon } from "@/components/atoms/Icon";
 import { ReadOnlyValue } from "@/components/atoms/ReadOnlyValue";
 import { Select } from "@/components/atoms/Select";
 import { FormField } from "@/components/molecules/FormField";
+import { CarModelInfoModal } from "@/components/organisms/CarModelInfoModal";
+import { CarYearInfoModal } from "@/components/organisms/CarYearInfoModal";
 import { updateOpportunityCarInfo } from "@/lib/actions/customer-lead-opportunity";
 import {
   carBodyTypeOptionsByCollateralType,
@@ -22,6 +24,7 @@ import {
   toVehicleCollateralType,
 } from "@/lib/mock";
 import type { CarInfo, CollateralType } from "@/types/ratebook";
+import { useState } from "react";
 
 const PLACEHOLDER = { value: "", label: "เลือกข้อมูล" };
 
@@ -57,11 +60,23 @@ const FIELD_LABELS: Record<keyof CarInfo, string> = {
   subModel: "รุ่นย่อย",
 };
 
-function InfoLabel({ children }: { children: React.ReactNode }) {
+function InfoLabel({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
   return (
     <span className="flex items-center gap-1">
       {children}
-      <Icon name="info" className="size-4 text-muted-foreground" />
+      {onClick ? (
+        <button type="button" onClick={onClick} aria-label="ข้อมูลเพิ่มเติม">
+          <Icon name="info" className="size-4 text-muted-foreground" />
+        </button>
+      ) : (
+        <Icon name="info" className="size-4 text-muted-foreground" />
+      )}
     </span>
   );
 }
@@ -90,6 +105,8 @@ export function CarInfoForm({
 }: CarInfoFormProps) {
   const isMotorcycle = collateralType === "motorcycle";
   const sequence = isMotorcycle ? MOTORCYCLE_FIELD_SEQUENCE : FIELD_SEQUENCE;
+  const [yearInfoOpen, setYearInfoOpen] = useState(false);
+  const [modelInfoOpen, setModelInfoOpen] = useState(false);
 
   const vehicleCollateralType = toVehicleCollateralType(collateralType);
   const brandOptions = getVehicleBrands(collateralType);
@@ -178,7 +195,7 @@ export function CarInfoForm({
               onChange={(e) => update("brand", e.target.value)}
             />
           </FormField>
-          <FormField label={<InfoLabel>รุ่นรถ</InfoLabel>}>
+          <FormField label={<InfoLabel onClick={() => setModelInfoOpen(true)}>รุ่นรถ</InfoLabel>}>
             <Select
               options={[PLACEHOLDER, ...modelOptions]}
               value={carInfo.model ?? ""}
@@ -190,7 +207,7 @@ export function CarInfoForm({
 
         {isMotorcycle ? (
           <div className="grid grid-cols-2 gap-4">
-            <FormField label={<InfoLabel>รุ่นปี ค.ศ.</InfoLabel>}>
+            <FormField label={<InfoLabel onClick={() => setYearInfoOpen(true)}>รุ่นปี ค.ศ.</InfoLabel>}>
               <Select
                 options={[PLACEHOLDER, ...carYearOptions]}
                 value={carInfo.year ?? ""}
@@ -210,7 +227,7 @@ export function CarInfoForm({
         ) : (
           <>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <FormField label={<InfoLabel>รุ่นปี ค.ศ.</InfoLabel>}>
+              <FormField label={<InfoLabel onClick={() => setYearInfoOpen(true)}>รุ่นปี ค.ศ.</InfoLabel>}>
                 <Select
                   options={[PLACEHOLDER, ...carYearOptions]}
                   value={carInfo.year ?? ""}
@@ -309,6 +326,9 @@ export function CarInfoForm({
           </Button>
         </div>
       </div>
+
+      <CarYearInfoModal open={yearInfoOpen} onClose={() => setYearInfoOpen(false)} />
+      <CarModelInfoModal open={modelInfoOpen} onClose={() => setModelInfoOpen(false)} />
     </div>
   );
 }
