@@ -1526,11 +1526,25 @@ const productDetailTemplate: Pick<
   ],
 };
 
+// The card shows the terse "Non A01-A03"; the drawer spells it out in Thai.
+function toBorrowerNcbGradeLabel(ncbGradeLabel: string): string {
+  if (ncbGradeLabel.startsWith("Non ")) {
+    return `ทุกเกรดยกเว้น ${ncbGradeLabel.slice("Non ".length)}`;
+  }
+  return ncbGradeLabel;
+}
+
 function toProductDetail(rule: ProductRule): ProductCatalogDetail {
   const maxLtv = typeof rule.ltv === "number" ? rule.ltv : rule.ltv.max;
   const isAllGrades = rule.ncbGradeLabel === ALL_NCB_GRADES_LABEL;
   return {
     ...productDetailTemplate,
+    // "เกรด NCB" must match the grade shown on the product card, not the mock's blanket A01 - A05.
+    borrowerConditions: productDetailTemplate.borrowerConditions.map((condition) =>
+      condition.label === "เกรด NCB"
+        ? { ...condition, value: toBorrowerNcbGradeLabel(rule.ncbGradeLabel) }
+        : condition,
+    ),
     ltvGroups: isAllGrades
       ? allGradeLtvGroups
       : [
