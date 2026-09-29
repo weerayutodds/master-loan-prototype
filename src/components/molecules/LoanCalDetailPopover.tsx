@@ -115,11 +115,16 @@ export function LoanCalDetailPopover({
             value={`${summary.ppiMonthly.toLocaleString("th-TH")} บาท/เดือน`}
           />
           <div className="flex items-center justify-between gap-1 border-t border-primary-to bg-pale-blue px-3 py-2">
-            <span className="flex items-center gap-1 text-xs font-medium text-foreground">
-              <Icon name="star" className="size-3 text-tag-amber" />
-              แนะนำผ่อนต่อเดือน
-            </span>
-            <p className="text-base font-semibold text-primary-to">
+            <div className="min-w-0">
+              <span className="flex items-center gap-1 text-xs font-medium text-foreground">
+                <Icon name="star" className="size-3 text-tag-amber" />
+                แนะนำผ่อนต่อเดือน
+              </span>
+              <p className="text-[10px] text-primary-to">
+                ยอดผ่อนต่อเดือน + PPI ต่อเดือน
+              </p>
+            </div>
+            <p className="shrink-0 text-base font-semibold text-primary-to">
               {summary.totalPayment.toLocaleString("th-TH")}{" "}
               <span className="text-xs font-normal text-price-label">บาท</span>
             </p>

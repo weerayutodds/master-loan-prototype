@@ -46,7 +46,7 @@ Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also r
 ### PPI label in the calculation details
 
 - After clicking "คำนวณ", `LoanCalDetailPopover` shows "เบี้ย PPI (ตลอดสัญญา)" directly above "ยอดจัดรวม" only when PPI is selected and บัตรติดล้อ is not selected (`!isTLC && hasPpi`).
-- When บัตรติดล้อ is selected or PPI is not selected, this contract-total PPI row is hidden. The existing TLC monthly-premium breakdown is unchanged.
+- When บัตรติดล้อ is selected or PPI is not selected, this contract-total PPI row is hidden. When both บัตรติดล้อ and PPI are selected (`isTLC && hasPpi`), the recommended-payment section shows "ยอดผ่อนต่อเดือน + PPI ต่อเดือน" below "แนะนำผ่อนต่อเดือน", explaining that the recommended payment includes the monthly PPI premium.
 - The row displays the total PPI premium (`summary.ppiTotal`) on the right, with thousands separators and the "บาท" unit.
 - Visibility and the displayed amount follow the last calculated inputs passed from `LoanCalBar`; changing the checkbox requires clicking "คำนวณ" again to update the details. This display change does not alter premium calculations.
 
