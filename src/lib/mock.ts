@@ -1086,10 +1086,9 @@ export const carYearOptions: { value: string; label: string }[] = Array.from(
 );
 
 export const carConditionOptions: { value: string; label: string }[] = [
-  { value: "excellent", label: "ดีเยี่ยม" },
-  { value: "good", label: "ดี" },
-  { value: "fair", label: "พอใช้" },
-  { value: "needs-repair", label: "ต้องซ่อมแซม" },
+  { value: "original", label: "สภาพเดิม" },
+  { value: "gas", label: "ติดตั้งแก๊ส/เคยติดตั้งแก๊ส" },
+  { value: "modified", label: "แต่งซิ่ง/ติดเครื่องเสียงพิเศษ" },
 ];
 
 export const carDoorsOptions: { value: string; label: string }[] = [
