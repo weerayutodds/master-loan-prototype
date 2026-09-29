@@ -289,6 +289,7 @@ export function CustomerCollateralPanel({
           ncbGrade={ncbGrade}
           onChecked={onNcbChecked}
           onCardRead={onDipchipRead}
+          cardAlreadyRead={verificationMethod === "card"}
         />
       </div>
 

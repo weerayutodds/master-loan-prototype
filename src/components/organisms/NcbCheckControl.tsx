@@ -14,6 +14,8 @@ type NcbCheckControlProps = {
   buttonSize?: "xs" | "sm";
   /** When set, "ตรวจ eNCB" only reads the card and then waits on "รีเฟรช" for the grade. */
   onCardRead?: () => unknown;
+  /** Card already read (Dipchip-verified): "ตรวจ eNCB" goes straight to "รีเฟรช" without the card modal. */
+  cardAlreadyRead?: boolean;
 };
 
 export function NcbCheckControl({
@@ -22,6 +24,7 @@ export function NcbCheckControl({
   buttonVariant = "outline",
   buttonSize = "xs",
   onCardRead,
+  cardAlreadyRead = false,
 }: NcbCheckControlProps) {
   const [checking, setChecking] = useState(false);
   const [cardRead, setCardRead] = useState(false);
@@ -63,7 +66,11 @@ export function NcbCheckControl({
           </Button>
         </div>
       ) : (
-        <Button variant={buttonVariant} size={buttonSize} onClick={() => setChecking(true)}>
+        <Button
+          variant={buttonVariant}
+          size={buttonSize}
+          onClick={() => (cardAlreadyRead ? setCardRead(true) : setChecking(true))}
+        >
           ตรวจ eNCB
         </Button>
       )}
