@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/atoms/Icon";
+import type { InterestRateType } from "@/lib/loan-cal";
 import type { Gender } from "@/types/customer-lead";
 
 export type LoanPurpose = "need-money" | "buy-car";
@@ -75,6 +76,9 @@ export type LoanInfo = {
   wantsWheelCard?: "yes" | "no";
   hasPpi?: "yes" | "no";
   installmentTerm?: number;
+  /** Not persisted — carried over from `LoanCalBar` for the current session only. */
+  interestRatePercent?: number;
+  rateType?: InterestRateType;
 };
 
 export type CarInsuranceInfo = {

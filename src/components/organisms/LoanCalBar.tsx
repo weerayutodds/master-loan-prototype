@@ -27,6 +27,7 @@ import type {
 import type {
   CollateralType,
   CustomerInfo,
+  LoanInfo,
   RefinanceStatus,
 } from "@/types/ratebook";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -110,6 +111,8 @@ type LoanCalBarProps = {
   /** Lives on `RatebookForm`'s `loanInfo` so the Lead Form's วงเงินที่ต้องการ can't drift from it. */
   requestedAmount: number;
   onRequestedAmountChange: (amount: number) => void;
+  /** Seeds the Lead Form's ผลิตภัณฑ์เสริม / เงื่อนไขการผ่อนชำระ defaults. Must be referentially stable. */
+  onLoanTermsChange: (terms: Omit<LoanInfo, "requestedAmount">) => void;
   onCustomerChange: (value: CustomerInfo) => void;
   onFilterChange: (filter: ProductCatalogFilter) => void;
 };
@@ -123,6 +126,7 @@ export function LoanCalBar({
   refinanceStatus,
   requestedAmount,
   onRequestedAmountChange,
+  onLoanTermsChange,
   onCustomerChange,
   onFilterChange,
 }: LoanCalBarProps) {
@@ -177,6 +181,28 @@ export function LoanCalBar({
 
   const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS;
   const isRefinance = refinanceStatus === "still-paying";
+  const effectiveIsTLC = isTransferBook ? false : isTLC;
+  const rateType: InterestRateType = isTransferBook ? "flat" : "reducing";
+  const interestRatePercent = parseRate(
+    isTransferBook ? flatRateInput : reducingRateInput,
+  );
+
+  useEffect(() => {
+    onLoanTermsChange({
+      wantsWheelCard: effectiveIsTLC ? "yes" : "no",
+      hasPpi: hasPpi ? "yes" : "no",
+      installmentTerm,
+      interestRatePercent,
+      rateType,
+    });
+  }, [
+    onLoanTermsChange,
+    effectiveIsTLC,
+    hasPpi,
+    installmentTerm,
+    interestRatePercent,
+    rateType,
+  ]);
 
   function commitFilter(overrides: Partial<ProductCatalogFilter> = {}) {
     onFilterChange({
@@ -312,12 +338,10 @@ export function LoanCalBar({
   function handleCalculate() {
     setCalculated({
       requestedAmount,
-      interestRatePercent: parseRate(
-        isTransferBook ? flatRateInput : reducingRateInput,
-      ),
-      rateType: isTransferBook ? "flat" : "reducing",
+      interestRatePercent,
+      rateType,
       installmentTerm,
-      isTLC: isTransferBook ? false : isTLC,
+      isTLC: effectiveIsTLC,
       hasPpi,
     });
     setShowDetail(true);

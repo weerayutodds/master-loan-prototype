@@ -49,7 +49,7 @@ import type {
   RefinanceStatus,
 } from "@/types/ratebook"
 import {useRouter} from "next/navigation"
-import {useState} from "react"
+import {useCallback, useState} from "react"
 
 type RatebookFormProps = {
   initialOpportunity: CustomerLeadOpportunity | null
@@ -175,6 +175,11 @@ export function RatebookForm({
               : undefined,
         }
       : {},
+  )
+  const handleLoanTermsChange = useCallback(
+    (terms: Omit<LoanInfo, "requestedAmount">) =>
+      setLoanInfo((current) => ({...current, ...terms})),
+    [],
   )
   const [carInsuranceInfo, setCarInsuranceInfo] = useState<CarInsuranceInfo>(
     initialOpportunity
@@ -484,6 +489,7 @@ export function RatebookForm({
                     requestedAmount: amount,
                   }))
                 }
+                onLoanTermsChange={handleLoanTermsChange}
                 onCustomerChange={setCustomer}
                 onFilterChange={setProductFilter}
               />

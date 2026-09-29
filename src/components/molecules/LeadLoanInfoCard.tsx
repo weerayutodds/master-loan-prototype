@@ -3,11 +3,13 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Card } from "@/components/molecules/Card";
 import { Select } from "@/components/atoms/Select";
+import { formatRatePercent } from "@/lib/format";
 import {
   DEFAULT_INSTALLMENT_TERM,
   INSTALLMENT_TERM_OPTIONS,
   PPI_ANNUAL_PREMIUM,
-  calculateMonthlyPayment,
+  calculateFlatRateEquivalent,
+  calculateLoanCalSummary,
   getMaxApprovedAmount,
 } from "@/lib/loan-cal";
 import type { ProductCatalogItem } from "@/types/product-catalog";
@@ -71,7 +73,7 @@ type LeadLoanInfoCardProps = {
 
 export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardProps) {
   const maxApprovedAmount = useMemo(() => getMaxApprovedAmount(product), [product]);
-  const monthlyRatePercent = useMemo(
+  const productMonthlyRatePercent = useMemo(
     () => parseMonthlyRatePercent(product.interestRateLabel),
     [product],
   );
@@ -80,15 +82,24 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
   const wantsWheelCard = value.wantsWheelCard ?? "yes";
   const hasPpi = value.hasPpi ?? "no";
   const installmentTerm = value.installmentTerm ?? DEFAULT_INSTALLMENT_TERM;
+  const rateType = value.rateType ?? "reducing";
+  const interestRatePercent =
+    value.interestRatePercent ?? productMonthlyRatePercent * 12;
 
-  const monthlyPayment = calculateMonthlyPayment(
+  function monthlyRatePercentFor(term: number): number {
+    if (value.interestRatePercent == null) return productMonthlyRatePercent;
+    if (rateType === "flat") return interestRatePercent;
+    return calculateFlatRateEquivalent(interestRatePercent, term);
+  }
+
+  const summary = calculateLoanCalSummary({
     requestedAmount,
-    monthlyRatePercent * 12,
+    interestRatePercent,
+    rateType,
     installmentTerm,
-  );
-  const totalInterest = Math.max(monthlyPayment * installmentTerm - requestedAmount, 0);
-  const ppiTotal = hasPpi === "yes" ? Math.round((PPI_ANNUAL_PREMIUM * installmentTerm) / 12) : 0;
-  const totalFinanced = requestedAmount + totalInterest + ppiTotal;
+    isTLC: wantsWheelCard === "yes",
+    hasPpi: hasPpi === "yes",
+  });
 
   return (
     <Card>
@@ -188,7 +199,7 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
             <Select
               options={INSTALLMENT_TERM_OPTIONS.map((term) => ({
                 value: String(term),
-                label: `${term} งวด (ดอกเบี้ย ${monthlyRatePercent}% ต่อเดือน)`,
+                label: `${term} งวด (ดอกเบี้ย ${formatRatePercent(monthlyRatePercentFor(term))}% ต่อเดือน)`,
               }))}
               value={String(installmentTerm)}
               disabled={wantsWheelCard === "yes"}
@@ -202,7 +213,7 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">งวดละ :</span>
           <span className="text-lg font-semibold text-success">
-            {monthlyPayment.toLocaleString("th-TH")} บาท
+            {summary.totalPayment.toLocaleString("th-TH")} บาท
           </span>
         </div>
 
@@ -210,10 +221,10 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-primary-to">ยอดจัดสินเชื่อรวม:</p>
-              <p className="text-xs text-muted-foreground">วงเงิน + ดอกเบี้ย + เบี้ยประกัน</p>
+              <p className="text-xs text-muted-foreground">วงเงิน + เบี้ยประกัน</p>
             </div>
             <p className="text-2xl font-semibold text-primary-to">
-              {totalFinanced.toLocaleString("th-TH")} <span className="text-sm">บาท</span>
+              {summary.financedAmount.toLocaleString("th-TH")} <span className="text-sm">บาท</span>
             </p>
           </div>
         </div>
