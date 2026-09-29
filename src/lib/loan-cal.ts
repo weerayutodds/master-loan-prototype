@@ -17,10 +17,12 @@ export function getBookStatusOptions(productCatalog: ProductCatalogData): string
 export function getDefaultProductCatalogFilter(
   productCatalog: ProductCatalogData,
 ): ProductCatalogFilter {
+  const bookStatus = getBookStatusOptions(productCatalog)[0] ?? "";
   return {
-    bookStatus: getBookStatusOptions(productCatalog)[0] ?? "",
+    bookStatus,
     requestedAmount: 0,
     requestedLtvPercent: 0,
+    wantsWheelCard: false,
   };
 }
 

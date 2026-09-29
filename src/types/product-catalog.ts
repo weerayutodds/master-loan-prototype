@@ -56,4 +56,6 @@ export type ProductCatalogFilter = {
   bookStatus: string;
   requestedAmount: number;
   requestedLtvPercent: number;
+  /** True once PPI is selected. Shows the "บัตรติดล้อ" chip. Display-only — does not filter cards. */
+  wantsWheelCard: boolean;
 };

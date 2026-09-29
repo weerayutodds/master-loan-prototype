@@ -143,14 +143,24 @@ export function ProductCatalog({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-foreground">ผลิตภัณฑ์ที่ตรงตามเงื่อนไขลูกค้า</h2>
         <div className="flex flex-wrap items-center gap-2">
-          {data.filterChips.map((chip) => (
-            <span
-              key={chip}
-              className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground"
-            >
-              {chip}
+          {filter.bookStatus ? (
+            <span className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground">
+              {filter.bookStatus}
             </span>
-          ))}
+          ) : null}
+          {data.filterChips.map((chip) => (
+              <span
+                key={chip}
+                className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground"
+              >
+                {chip}
+              </span>
+            ))}
+          {filter.wantsWheelCard ? (
+            <span className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground">
+              บัตรติดล้อ
+            </span>
+          ) : null}
           {filter.requestedLtvPercent > 0 ? (
             <span className="rounded-full border border-secondary-border bg-surface px-3 py-1 text-xs font-medium text-foreground">
               {filter.requestedLtvPercent} %LTV

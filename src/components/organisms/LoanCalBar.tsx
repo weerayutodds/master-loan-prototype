@@ -155,11 +155,6 @@ export function LoanCalBar({
   );
   const [payoffAmount, setPayoffAmount] = useState(0);
   const [cashBackAmount, setCashBackAmount] = useState(0);
-  const [isTLC, setIsTLC] = useState(
-    bookStatus !== TRANSFER_BOOK_STATUS ||
-      isMotorcycle ||
-      productCatalog.filterChips.includes("บัตรติดล้อ"),
-  );
   const [installmentTerm, setInstallmentTerm] = useState(
     defaultInstallmentTerm,
   );
@@ -181,7 +176,7 @@ export function LoanCalBar({
 
   const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS;
   const isRefinance = refinanceStatus === "still-paying";
-  const effectiveIsTLC = isTransferBook ? false : isTLC;
+  const effectiveIsTLC = !isTransferBook && hasPpi;
   const rateType: InterestRateType = isTransferBook ? "flat" : "reducing";
   const interestRatePercent = parseRate(
     isTransferBook ? flatRateInput : reducingRateInput,
@@ -209,6 +204,7 @@ export function LoanCalBar({
       bookStatus,
       requestedAmount,
       requestedLtvPercent,
+      wantsWheelCard: hasPpi,
       ...overrides,
     });
   }
@@ -256,8 +252,9 @@ export function LoanCalBar({
 
   function handleBookStatusChange(value: string) {
     setBookStatus(value);
-    if (value === TRANSFER_BOOK_STATUS) setIsTLC(false);
-    else handleToggleTLC(true);
+    if (value !== TRANSFER_BOOK_STATUS && hasPpi) {
+      setInstallmentTerm(defaultInstallmentTerm);
+    }
     commitFilter({ bookStatus: value });
   }
 
@@ -274,11 +271,6 @@ export function LoanCalBar({
   function handleRateBlur() {
     if (isTransferBook) setFlatRateInput(formatRate);
     else setReducingRateInput(formatRate);
-  }
-
-  function handleToggleTLC(nextChecked: boolean) {
-    setIsTLC(nextChecked);
-    if (nextChecked) setInstallmentTerm(defaultInstallmentTerm);
   }
 
   useEffect(() => {
@@ -321,6 +313,7 @@ export function LoanCalBar({
   function handleTogglePpi(nextChecked: boolean) {
     if (!nextChecked) {
       setHasPpi(false);
+      commitFilter({ wantsWheelCard: false });
       return;
     }
     openGenderAgePopover();
@@ -364,6 +357,10 @@ export function LoanCalBar({
     onCustomerChange(nextCustomer);
     setGenderAgeOpen(false);
     setHasPpi(true);
+    if (bookStatus !== TRANSFER_BOOK_STATUS) {
+      setInstallmentTerm(defaultInstallmentTerm);
+    }
+    commitFilter({ wantsWheelCard: true });
     if (opportunityId) {
       await updateOpportunityCustomerInfo(opportunityId, nextCustomer);
     }
@@ -482,13 +479,6 @@ export function LoanCalBar({
 
           <div className="h-9 w-px shrink-0 bg-primary/60" />
 
-          <ToggleChip
-            label="บัตรติดล้อ"
-            checked={isTLC}
-            disabled={isTransferBook}
-            onChange={handleToggleTLC}
-          />
-
           <div className="w-fit shrink-0">
             <FieldLabel>งวดผ่อน</FieldLabel>
             <Select
@@ -496,7 +486,7 @@ export function LoanCalBar({
                 label: `${term} งวด`,
                 value: String(term),
               }))}
-              disabled={isTLC || isMotorcycle}
+              disabled={effectiveIsTLC || isMotorcycle}
               value={String(installmentTerm)}
               onChange={(e) => setInstallmentTerm(Number(e.target.value))}
               className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"

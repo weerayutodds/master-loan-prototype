@@ -1853,8 +1853,6 @@ export function getProductCatalogData(
       refinanceStatusOptions.find(
         (option) => option.value === context.refinanceStatus,
       )?.description ?? "ไม่ใช่รีไฟแนนซ์",
-      // LoanCalBar keys its default บัตรติดล้อ checkbox off this exact literal.
-      "บัตรติดล้อ",
     ],
     gradeFilterLabel: "ทุกเกรด",
     items: rules
