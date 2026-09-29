@@ -231,7 +231,10 @@ export function CarInfoForm({
                 />
               </FormField>
               <FormField label="ประเภทรถ">
-                <ReadOnlyValue value={optionLabel(carTypeOptions, derivedCarType)} />
+                <ReadOnlyValue
+                  value={optionLabel(carTypeOptions, derivedCarType)}
+                  borderless
+                />
               </FormField>
             </div>
 
