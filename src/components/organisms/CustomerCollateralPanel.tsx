@@ -304,54 +304,70 @@ export function CustomerCollateralPanel({
         <span className="text-sm text-foreground">ข้อมูลหลักประกัน</span>
       </div>
 
-      {collateralType && collateralType !== "land" ? (
+      {collateralType !== "land" ? (
         <>
           <div
             className={`flex rounded-lg bg-surface-muted min-h-11 px-3 py-2.5 ${
-              collateralIdentifier
+              collateralType && collateralIdentifier
                 ? "flex-col items-start gap-1"
                 : "items-center justify-between"
             }`}
           >
-            <div className="flex flex-row justify-between w-full">
+            {collateralType ? (
+              <>
+                <div className="flex flex-row justify-between w-full">
+                  <span className="text-sm text-muted-foreground">
+                    เลขทะเบียน / เลขตัวถัง
+                  </span>
+                  {collateralIdentifier ? (
+                    <button
+                      type="button"
+                      onClick={() => setCollateralModalOpen(true)}
+                      className="flex items-center gap-1 text-xs font-semibold text-primary-to"
+                    >
+                      <Icon name="edit" className="size-3" />
+                      แก้ไข
+                    </button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      className="min-w-14"
+                      onClick={() => setCollateralModalOpen(true)}
+                    >
+                      เพิ่ม
+                    </Button>
+                  )}
+                </div>
+                {collateralIdentifier && (
+                  <span className="text-sm font-medium text-foreground text-left">
+                    {formatCollateralIdentifier(collateralIdentifier)}
+                  </span>
+                )}
+              </>
+            ) : (
               <span className="text-sm text-muted-foreground">
-                เลขทะเบียน / เลขตัวถัง
-              </span>
-              {collateralIdentifier ? (
-                <button
-                  type="button"
-                  onClick={() => setCollateralModalOpen(true)}
-                  className="flex items-center gap-1 text-xs font-semibold text-primary-to"
-                >
-                  <Icon name="edit" className="size-3" />
-                  แก้ไข
-                </button>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="xs"
-                  className="min-w-14"
-                  onClick={() => setCollateralModalOpen(true)}
-                >
-                  เพิ่ม
-                </Button>
-              )}
-            </div>
-            {collateralIdentifier && (
-              <span className="text-sm font-medium text-foreground text-left">
-                {formatCollateralIdentifier(collateralIdentifier)}
+                กรุณาเลือกประเภทหลักประกัน
               </span>
             )}
           </div>
           <div className="flex flex-col items-start gap-1 rounded-lg bg-surface-muted min-h-11 px-3 py-2.5">
-            <div className="flex flex-row justify-between w-full">
+            {collateralType && brandModelDisplay ? (
+              <>
+                <div className="flex flex-row justify-between w-full">
+                  <span className="text-sm text-muted-foreground">
+                    ยี่ห้อ / รุ่น
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-foreground text-left">
+                  {brandModelDisplay}
+                </span>
+              </>
+            ) : (
               <span className="text-sm text-muted-foreground">
-                ยี่ห้อ / รุ่น
+                กรุณาเลือกยี่ห้อ / รุ่น
               </span>
-            </div>
-            <span className="text-sm font-medium text-foreground text-left">
-              {brandModelDisplay}
-            </span>
+            )}
           </div>
         </>
       ) : null}
