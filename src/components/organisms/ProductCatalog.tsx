@@ -92,14 +92,15 @@ export function ProductCatalog({
   const [checkingNcb, setCheckingNcb] = useState(false);
   const [previewNcbGrade, setPreviewNcbGrade] = useState<NcbGrade | null>(null);
   const effectiveNcbGrade = ncbGrade ?? previewNcbGrade;
-  // "ตรวจ eNCB" (outline) products only become selectable once the grade is known.
-  const items = ncbGrade
-    ? data.items.map((item) =>
-        item.primaryActionVariant === "outline"
-          ? { ...item, primaryActionLabel: "เลือก", primaryActionVariant: "filled" as const }
-          : item,
-      )
-    : data.items;
+  // Previewing a grade does not satisfy a product's requirement for an NCB result.
+  const items = data.items.map<ProductCatalogItem>((item) => {
+    const requiresNcbCheck = ncbGrade === null && item.ncbGradeLabel.trim() !== "ทุกเกรด";
+    return {
+      ...item,
+      primaryActionLabel: requiresNcbCheck ? "ตรวจ eNCB" : "เลือก",
+      primaryActionVariant: requiresNcbCheck ? "outline" : "filled",
+    };
+  });
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
   const [detailItemId, setDetailItemId] = useState<string | null>(null);
