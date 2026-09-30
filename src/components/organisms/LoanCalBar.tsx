@@ -105,12 +105,14 @@ function ToggleChip({
 }
 
 type LoanCalBarProps = {
-  productCatalog: ProductCatalogData
-  appraisalPrice: number
-  collateralType: CollateralType | null
-  customer: CustomerInfo | null
-  opportunityId: string | null
-  refinanceStatus: RefinanceStatus | null
+  productCatalog: ProductCatalogData;
+  appraisalPrice: number;
+  collateralType: CollateralType | null;
+  customer: CustomerInfo | null;
+  opportunityId: string | null;
+  refinanceStatus: RefinanceStatus | null;
+  /** Dipchip already verified — PPI can skip the gender/age popover. */
+  cardAlreadyRead?: boolean;
   /** Lives on `RatebookForm`'s `loanInfo` so the Lead Form's วงเงินที่ต้องการ can't drift from it. */
   requestedAmount: number
   onRequestedAmountChange: (amount: number) => void
@@ -127,6 +129,7 @@ export function LoanCalBar({
   customer,
   opportunityId,
   refinanceStatus,
+  cardAlreadyRead = false,
   requestedAmount,
   onRequestedAmountChange,
   onLoanTermsChange,
@@ -327,7 +330,13 @@ export function LoanCalBar({
       setHasPpi(false)
       return
     }
-    openGenderAgePopover()
+    // Only Dipchip-verified gender/DOB skips the popover. A prior PPI save
+    // still re-opens it so the user can reconfirm without Dipchip.
+    if (cardAlreadyRead && customer?.gender && customer?.birthDate) {
+      setHasPpi(true);
+      return;
+    }
+    openGenderAgePopover();
   }
 
   const summary = useMemo(

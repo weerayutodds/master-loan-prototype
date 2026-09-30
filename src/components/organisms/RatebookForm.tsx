@@ -498,6 +498,7 @@ export function RatebookForm({
                   customer={customer}
                   opportunityId={opportunityId}
                   refinanceStatus={refinanceStatus}
+                  cardAlreadyRead={verificationMethod === "card"}
                   requestedAmount={loanInfo.requestedAmount ?? 0}
                   onRequestedAmountChange={(amount) =>
                     setLoanInfo((current) => ({

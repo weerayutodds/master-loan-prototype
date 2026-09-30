@@ -45,6 +45,7 @@ Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also r
 
 ### PPI label in the calculation details
 
+- Checking PPI opens `GenderAgePopover` unless Dipchip already verified the lead (`verificationMethod === "card"`) and gender + birth date are on `customer` — then the checkbox turns on with no popover. Without Dipchip, the popover opens every time PPI is checked (even if gender/DOB were saved earlier from that popover).
 - After clicking "คำนวณ", `LoanCalDetailPopover` shows "เบี้ย PPI (ตลอดสัญญา)" directly above "ยอดจัดรวม" only when PPI is selected without บัตรติดล้อ (`!isTLC && hasPpi` — always the case on โอนเล่ม).
 - When PPI is off, or PPI is selected together with บัตรติดล้อ, this contract-total PPI row is hidden. When both are selected (`isTLC && hasPpi`), the recommended-payment section shows "ยอดผ่อนต่อเดือน + PPI ต่อเดือน" below "แนะนำผ่อนต่อเดือน", explaining that the recommended payment includes the monthly PPI premium.
 - The row displays the total PPI premium (`summary.ppiTotal`) on the right, with thousands separators and the "บาท" unit.
