@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Watermark } from "@/components/atoms/Watermark";
+import { ErrorModal } from "@/components/organisms/ErrorModal";
 import type { ProductCatalogCondition, ProductCatalogItem } from "@/types/product-catalog";
 
 const INTEREST_COLUMNS = ["NCB Grade / LTV", "ต่ำกว่า 50%", "50% - 60%", "60% ขึ้นไป"];
@@ -73,6 +74,7 @@ export function ProductDetailDrawer({
   onCheckNcb,
 }: ProductDetailDrawerProps) {
   const open = item !== null;
+  const [salesGuideErrorOpen, setSalesGuideErrorOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -90,8 +92,10 @@ export function ProductDetailDrawer({
   // Portalled to <body> so the sticky sidebar's own stacking context (it
   // sits in a sibling "relative z-50" column) can't trap this above it.
   // z-[110] clears AppShell's sticky top nav (z-[100]) too.
-  return createPortal(
-    <div className="fixed inset-0 z-[110] flex justify-end bg-foreground/40" onClick={onClose}>
+  return (
+    <>
+      {createPortal(
+        <div className="fixed inset-0 z-[110] flex justify-end bg-foreground/40" onClick={onClose}>
       <div
         className="flex h-full w-full max-w-5xl flex-col bg-surface shadow-secondary-m"
         onClick={(event) => event.stopPropagation()}
@@ -99,7 +103,11 @@ export function ProductDetailDrawer({
         <div className="flex items-center justify-between gap-4 border-b border-divider px-4 py-3">
           <h2 className="text-lg font-semibold text-primary-to">{item.title}</h2>
           <div className="flex shrink-0 items-center gap-4">
-            <Button variant="secondary" size="sm">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setSalesGuideErrorOpen(true)}
+            >
               <Icon name="document" className="mr-1 size-4" />
               ดูคู่มือการขาย
             </Button>
@@ -191,7 +199,19 @@ export function ProductDetailDrawer({
           </div>
         </div>
       </div>
-    </div>,
-    document.body,
+        </div>,
+        document.body,
+      )}
+
+      {/* Sibling, not a descendant of the backdrop's onClick={onClose} above --
+          otherwise a click inside this modal would bubble up and close the drawer too. */}
+      <ErrorModal
+        open={salesGuideErrorOpen}
+        onClose={() => setSalesGuideErrorOpen(false)}
+        title="ระบบกำลังพัฒนา"
+        description="ฟังก์ชันดูคู่มือการขายกำลังอยู่ในช่วงการพัฒนา"
+        buttonText="ตกลง"
+      />
+    </>
   );
 }
