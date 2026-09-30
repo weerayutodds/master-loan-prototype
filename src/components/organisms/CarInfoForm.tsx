@@ -98,9 +98,21 @@ export function CarInfoForm({
   // Open one field at a time: everything before it that the form actually asks
   // for has an answer. Fields outside `sequence` (ขนาดเครื่องยนต์ on รถบรรทุก)
   // do not gate the ones after them.
+  //
+  // ขนาดเครื่องยนต์/ระบบเกียร์/ประเภทตัวถัง/รุ่นย่อย open together as soon as
+  // ประเภทรถ is known (i.e. จำนวนประตู is answered) rather than one at a time.
+  const CAR_GROUP_FIELDS: VehicleFieldKey[] = [
+    "engineCc",
+    "transmission",
+    "bodyType",
+    "ratebookCode",
+  ];
+
   function isUnlocked(field: VehicleFieldKey) {
+    const gateField =
+      !isMotorcycle && CAR_GROUP_FIELDS.includes(field) ? "doors" : field;
     return vehicle.resetOrder
-      .slice(0, vehicle.resetOrder.indexOf(field))
+      .slice(0, vehicle.resetOrder.indexOf(gateField) + (gateField === field ? 0 : 1))
       .filter((earlier) => vehicle.sequence.includes(earlier))
       .every((earlier) => Boolean(valueOf(earlier)));
   }
@@ -120,6 +132,16 @@ export function CarInfoForm({
     if (!value) return undefined;
     return vehicle.options[field].find((option) => option.value === value)
       ?.label;
+  }
+
+  // The vehicle only has one answer for this field -- show it filled in
+  // instead of making the user pick the only option.
+  function fieldControl(field: VehicleFieldKey) {
+    return vehicle.locked[field] ? (
+      <ReadOnlyValue value={lockedLabel(field)} />
+    ) : (
+      <Select {...selectProps(field)} />
+    );
   }
 
   const missingFields = vehicle.sequence.filter((field) => !valueOf(field));
@@ -150,7 +172,7 @@ export function CarInfoForm({
               </InfoLabel>
             }
           >
-            <Select {...selectProps("model")} />
+            {fieldControl("model")}
           </FormField>
         </div>
 
@@ -163,10 +185,10 @@ export function CarInfoForm({
                 </InfoLabel>
               }
             >
-              <Select {...selectProps("year")} />
+              {fieldControl("year")}
             </FormField>
             <FormField label={FIELD_LABELS.ratebookCode}>
-              <Select {...selectProps("ratebookCode")} />
+              {fieldControl("ratebookCode")}
             </FormField>
           </div>
         ) : (
@@ -179,13 +201,13 @@ export function CarInfoForm({
                   </InfoLabel>
                 }
               >
-                <Select {...selectProps("year")} />
+                {fieldControl("year")}
               </FormField>
               <FormField label={FIELD_LABELS.condition}>
-                <Select {...selectProps("condition")} />
+                {fieldControl("condition")}
               </FormField>
               <FormField label={FIELD_LABELS.doors}>
-                <Select {...selectProps("doors")} />
+                {fieldControl("doors")}
               </FormField>
               <FormField label="ประเภทรถ">
                 <ReadOnlyValue
@@ -219,21 +241,13 @@ export function CarInfoForm({
                 )}
               </FormField>
               <FormField label={FIELD_LABELS.transmission}>
-                {vehicle.locked.transmission ? (
-                  <ReadOnlyValue value={lockedLabel("transmission")} />
-                ) : (
-                  <Select {...selectProps("transmission")} />
-                )}
+                {fieldControl("transmission")}
               </FormField>
               <FormField label={FIELD_LABELS.bodyType}>
-                {vehicle.locked.bodyType ? (
-                  <ReadOnlyValue value={lockedLabel("bodyType")} />
-                ) : (
-                  <Select {...selectProps("bodyType")} />
-                )}
+                {fieldControl("bodyType")}
               </FormField>
               <FormField label={FIELD_LABELS.ratebookCode}>
-                <Select {...selectProps("ratebookCode")} />
+                {fieldControl("ratebookCode")}
               </FormField>
             </div>
           </>

@@ -199,7 +199,7 @@ function buildRatebookOptions(
       options[key] = list;
 
       // A field with one answer is not a question -- fill it in and keep going.
-      if (!selection[field] && list.length === 1 && (field === "transmission" || field === "bodyType")) {
+      if (!selection[field] && list.length === 1) {
         selection[field] = list[0].value;
         locked[key] = list[0].value;
       }
