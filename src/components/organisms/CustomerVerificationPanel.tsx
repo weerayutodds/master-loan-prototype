@@ -183,12 +183,10 @@ export function CustomerVerificationPanel({
                       }}
                     />
 
-                    {/* ข้อมูลลูกค้า (วางซ้อนทับภาพตกแต่ง) */}
                     <div className="relative z-10 flex w-full items-center gap-[5.27px]">
-                      {/* ไอคอน user-circle ดึงมาจาก dipchip_avatar.svg */}
                       <Icon
                         name="user-circle"
-                        className="size-[48px] shrink-0 text-[#828387]"
+                        className="size-12 shrink-0 text-[#828387]"
                       />
                       <div className="flex flex-col items-start gap-[1.32px]">
                         <p className="text-[18px] font-medium leading-[160%] tracking-[0.01em] text-[#334ED1]">
@@ -224,7 +222,7 @@ export function CustomerVerificationPanel({
                   type="button"
                   onClick={handleCardTap}
                   disabled={cardStatus === "loading"}
-                  className="relative box-border h-[155px] w-[340px] rounded-lg border-2 border-dashed border-[#E5E5E6] bg-gradient-to-t from-[#F7F7F7] to-[#FCFCFC] disabled:cursor-not-allowed disabled:opacity-70"
+                  className="relative box-border h-38.75 w-85 rounded-lg border-2 border-dashed border-[#E5E5E6] bg-gradient-to-t from-[#F7F7F7] to-[#FCFCFC] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {/* Dipchip Image */}
                   <img
@@ -283,14 +281,16 @@ export function CustomerVerificationPanel({
             )}
           </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            className="mt-auto w-full"
-            disabled={continueDisabled || isSubmitting}
-          >
-            ดำเนินการต่อ
-          </Button>
+          {(verificationMethod === "manual" || cardStatus === "success") && (
+            <Button
+              type="submit"
+              variant="primary"
+              className="mt-auto w-full"
+              disabled={continueDisabled || isSubmitting}
+            >
+              ดำเนินการต่อ
+            </Button>
+          )}
         </form>
       </Card>
 
