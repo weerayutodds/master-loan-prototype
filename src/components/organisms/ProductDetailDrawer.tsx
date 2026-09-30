@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import type { ProductCatalogCondition, ProductCatalogItem } from "@/types/product-catalog";
@@ -68,8 +69,11 @@ export function ProductDetailDrawer({
   if (!item) return null;
   const { detail } = item;
 
-  return (
-    <div className="fixed inset-0 z-30 flex justify-end bg-foreground/40" onClick={onClose}>
+  // Portalled to <body> so the sticky sidebar's own stacking context (it
+  // sits in a sibling "relative z-50" column) can't trap this above it.
+  // z-[110] clears AppShell's sticky top nav (z-[100]) too.
+  return createPortal(
+    <div className="fixed inset-0 z-[110] flex justify-end bg-foreground/40" onClick={onClose}>
       <div
         className="flex h-full w-full max-w-5xl flex-col bg-surface shadow-secondary-m"
         onClick={(event) => event.stopPropagation()}
@@ -165,6 +169,7 @@ export function ProductDetailDrawer({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
