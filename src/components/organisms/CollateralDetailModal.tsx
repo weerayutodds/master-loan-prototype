@@ -19,11 +19,23 @@ const schema = z
     licensePlateNumber: z.string().optional(),
     licensePlateProvince: z.string().optional(),
     chassisNumber: z.string().optional(),
+    // Not a real input -- just a slot for the "fill in one or the other"
+    // banner message when every field is empty.
+    general: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     const hasPlate = !!data.licensePlateNumber?.trim()
     const hasProvince = !!data.licensePlateProvince?.trim()
     const hasChassis = !!data.chassisNumber?.trim()
+
+    if (!hasPlate && !hasProvince && !hasChassis) {
+      ctx.addIssue({
+        path: ["general"],
+        message: "กรุณากรอกข้อมูลเลขทะเบียนรถและจังหวัดที่จดทะเบียน หรือ เลขตัวถัง",
+        code: z.ZodIssueCode.custom,
+      })
+      return
+    }
 
     if (hasProvince && !hasPlate) {
       ctx.addIssue({
@@ -36,25 +48,7 @@ const schema = z
     if (hasPlate && !hasProvince) {
       ctx.addIssue({
         path: ["licensePlateProvince"],
-        message: "กรุณาเลือกจังหวัด",
-        code: z.ZodIssueCode.custom,
-      })
-    }
-
-    if (!hasPlate && !hasProvince && !hasChassis) {
-      ctx.addIssue({
-        path: ["licensePlateNumber"],
-        message: "กรุณากรอกเลขทะเบียน",
-        code: z.ZodIssueCode.custom,
-      })
-      ctx.addIssue({
-        path: ["licensePlateProvince"],
-        message: "กรุณาเลือกจังหวัด",
-        code: z.ZodIssueCode.custom,
-      })
-      ctx.addIssue({
-        path: ["chassisNumber"],
-        message: "กรุณากรอกเลขตัวถัง หรือข้อมูลทะเบียนรถ",
+        message: "กรุณาเลือกจังหวัดที่จดทะเบียน",
         code: z.ZodIssueCode.custom,
       })
     }
@@ -122,6 +116,7 @@ export function CollateralDetailModal({
           >
             <Input
               placeholder="EX. 1กก1234"
+              invalid={!!errors.licensePlateNumber}
               {...register("licensePlateNumber")}
             />
           </FormField>
@@ -132,6 +127,7 @@ export function CollateralDetailModal({
           >
             <Select
               options={[{value: "", label: "เลือกข้อมูล"}, ...provinceOptions]}
+              invalid={!!errors.licensePlateProvince}
               {...register("licensePlateProvince")}
             />
           </FormField>
@@ -160,6 +156,15 @@ export function CollateralDetailModal({
         >
           <Input placeholder="กรอกข้อมูล" {...register("chassisNumber")} />
         </FormField>
+
+        {errors.general?.message ? (
+          <div className="flex items-start gap-2 rounded-lg bg-badge-danger-bg px-4 py-3 text-sm text-badge-danger-fg">
+            <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-danger text-[10px] font-bold text-white">
+              !
+            </span>
+            <span>{errors.general.message}</span>
+          </div>
+        ) : null}
 
         <div className="border-t border-divider" />
 
