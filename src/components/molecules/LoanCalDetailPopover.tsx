@@ -55,7 +55,7 @@ export function LoanCalDetailPopover({
   })
 
   const rateLabelPrefix = isTLC ? "แบบ" : "อัตราดอกเบี้ย "
-  // Hide งวดผ่อน + show the continuous-payment footnote only for new-loan TLC without PPI.
+  // Continuous-payment footnote only for new-loan TLC without PPI.
   const showNewLoanTlcRemark = isTLC && !hasPpi && !isRefinance
   // Empty input shows 0; otherwise negative when the new installment is higher than the old one.
   const installmentDifference = existingInstallment
@@ -112,7 +112,7 @@ export function LoanCalDetailPopover({
           />
         </>
       )}
-      {!showNewLoanTlcRemark && !(isTLC && hasPpi) ? (
+      {isRefinance || !isTLC ? (
         <DetailRow label="งวดผ่อน" value={`${installmentTerm} งวด`} />
       ) : null}
 
