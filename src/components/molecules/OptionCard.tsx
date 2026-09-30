@@ -1,15 +1,16 @@
-import Image from "next/image";
-import { Icon, type IconName } from "@/components/atoms/Icon";
+import {Icon, type IconName} from "@/components/atoms/Icon"
+import Image from "next/image"
 
 type OptionCardProps = {
-  label: string;
-  description?: string;
-  icon?: IconName;
-  image?: string;
-  imageClassName?: string;
-  selected: boolean;
-  onSelect: () => void;
-};
+  label: string
+  description?: string
+  icon?: IconName
+  image?: string
+  imageClassName?: string
+  selected: boolean
+  textCenter?: boolean
+  onSelect: () => void
+}
 
 export function OptionCard({
   label,
@@ -18,6 +19,7 @@ export function OptionCard({
   image,
   imageClassName,
   selected,
+  textCenter = false,
   onSelect,
 }: OptionCardProps) {
   return (
@@ -25,7 +27,7 @@ export function OptionCard({
       type="button"
       aria-pressed={selected}
       onClick={onSelect}
-      className={`relative rounded-xl border p-4 text-left transition-colors ${
+      className={`relative rounded-xl border p-4 transition-colors ${textCenter ? "text-center" : "text-left"} ${
         icon || image
           ? "flex flex-col items-center justify-center gap-2 text-center"
           : "flex flex-col gap-1"
@@ -56,5 +58,5 @@ export function OptionCard({
         <span className="text-xs text-muted-foreground">{description}</span>
       ) : null}
     </button>
-  );
+  )
 }

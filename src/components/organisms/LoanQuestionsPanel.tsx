@@ -1,29 +1,29 @@
-"use client";
+"use client"
 
-import { Card } from "@/components/molecules/Card";
-import { OptionCard } from "@/components/molecules/OptionCard";
-import { SearchableSelect } from "@/components/molecules/SearchableSelect";
+import {Card} from "@/components/molecules/Card"
+import {OptionCard} from "@/components/molecules/OptionCard"
+import {SearchableSelect} from "@/components/molecules/SearchableSelect"
 import type {
   CollateralType,
   LoanPurpose,
   OptionCardData,
   RefinanceStatus,
-} from "@/types/ratebook";
+} from "@/types/ratebook"
 
 type LoanQuestionsPanelProps = {
-  loanPurposeOptions: OptionCardData<LoanPurpose>[];
-  collateralTypeOptions: OptionCardData<CollateralType>[];
-  refinanceStatusOptions: OptionCardData<RefinanceStatus>[];
-  loanPurpose: LoanPurpose | null;
-  onLoanPurposeChange: (value: LoanPurpose) => void;
-  collateralType: CollateralType | null;
-  onCollateralTypeChange: (value: CollateralType) => void;
-  refinanceStatus: RefinanceStatus | null;
-  onRefinanceStatusChange: (value: RefinanceStatus) => void;
-  existingFinanceOptions: { value: string; label: string }[];
-  existingFinance: string | null;
-  onExistingFinanceChange: (value: string) => void;
-};
+  loanPurposeOptions: OptionCardData<LoanPurpose>[]
+  collateralTypeOptions: OptionCardData<CollateralType>[]
+  refinanceStatusOptions: OptionCardData<RefinanceStatus>[]
+  loanPurpose: LoanPurpose | null
+  onLoanPurposeChange: (value: LoanPurpose) => void
+  collateralType: CollateralType | null
+  onCollateralTypeChange: (value: CollateralType) => void
+  refinanceStatus: RefinanceStatus | null
+  onRefinanceStatusChange: (value: RefinanceStatus) => void
+  existingFinanceOptions: {value: string; label: string}[]
+  existingFinance: string | null
+  onExistingFinanceChange: (value: string) => void
+}
 
 export function LoanQuestionsPanel({
   loanPurposeOptions,
@@ -42,10 +42,13 @@ export function LoanQuestionsPanel({
   return (
     <Card className="space-y-6">
       <div>
-        <p className="text-sm font-medium text-foreground">ลูกค้าต้องการเงินหรืออยากซื้อรถ?</p>
+        <p className="text-sm font-medium text-foreground">
+          ลูกค้าต้องการเงินหรืออยากซื้อรถ?
+        </p>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {loanPurposeOptions.map((option) => (
             <OptionCard
+              textCenter
               key={option.value}
               label={option.label}
               description={option.description}
@@ -104,5 +107,5 @@ export function LoanQuestionsPanel({
         ) : null}
       </div>
     </Card>
-  );
+  )
 }

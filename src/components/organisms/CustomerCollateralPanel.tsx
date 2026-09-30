@@ -38,7 +38,7 @@ import type {
 } from "@/types/ratebook"
 import {useRouter} from "next/navigation"
 import {setTimeout} from "node:timers"
-import {useEffect, useState} from "react"
+import {useState} from "react"
 import {ProgressRing} from "../atoms/ProgressRing"
 
 const TOTAL_SECTIONS = 4
@@ -145,7 +145,6 @@ export function CustomerCollateralPanel({
   )
   const [savedToastOpen, setSavedToastOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-
 
   async function handleSaveLead() {
     if (!customer) return
@@ -309,7 +308,7 @@ export function CustomerCollateralPanel({
         <span className="text-sm text-foreground">ข้อมูลหลักประกัน</span>
       </div>
 
-      {collateralType && collateralType !== "land" ? (
+      {collateralType !== "land" ? (
         <>
           <div
             className={`flex rounded-lg bg-surface-muted min-h-11 px-3 py-2.5 ${
@@ -356,24 +355,26 @@ export function CustomerCollateralPanel({
               </span>
             )}
           </div>
-          <div className="flex flex-col items-start gap-1 rounded-lg bg-surface-muted min-h-11 px-3 py-2.5">
-            {collateralType && brandModelDisplay ? (
-              <>
-                <div className="flex flex-row justify-between w-full">
-                  <span className="text-sm text-muted-foreground">
-                    ยี่ห้อ / รุ่น
+          {collateralType && (
+            <div className="flex flex-col items-start gap-1 rounded-lg bg-surface-muted min-h-11 px-3 py-2.5">
+              {brandModelDisplay ? (
+                <>
+                  <div className="flex flex-row justify-between w-full">
+                    <span className="text-sm text-muted-foreground">
+                      ยี่ห้อ / รุ่น
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-foreground text-left">
+                    {brandModelDisplay}
                   </span>
-                </div>
-                <span className="text-sm font-medium text-foreground text-left">
-                  {brandModelDisplay}
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  กรุณาเลือกยี่ห้อ / รุ่น
                 </span>
-              </>
-            ) : (
-              <span className="text-sm text-muted-foreground">
-                กรุณาเลือกยี่ห้อ / รุ่น
-              </span>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </>
       ) : null}
       {tags.length > 0 ? (

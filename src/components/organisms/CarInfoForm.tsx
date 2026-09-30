@@ -1,26 +1,27 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
-import { ReadOnlyValue } from "@/components/atoms/ReadOnlyValue";
-import { Select } from "@/components/atoms/Select";
-import { FormField } from "@/components/molecules/FormField";
-import { CarModelInfoModal } from "@/components/organisms/CarModelInfoModal";
-import { CarYearInfoModal } from "@/components/organisms/CarYearInfoModal";
-import { updateOpportunityCarInfo } from "@/lib/actions/customer-lead-opportunity";
+import {Button} from "@/components/atoms/Button"
+import {Icon} from "@/components/atoms/Icon"
+import {ReadOnlyValue} from "@/components/atoms/ReadOnlyValue"
+import {Select} from "@/components/atoms/Select"
+import {FormField} from "@/components/molecules/FormField"
+import {CarModelInfoModal} from "@/components/organisms/CarModelInfoModal"
+import {CarYearInfoModal} from "@/components/organisms/CarYearInfoModal"
+import {ErrorModal} from "@/components/organisms/ErrorModal" // Adjust import path if needed
+import {updateOpportunityCarInfo} from "@/lib/actions/customer-lead-opportunity"
 import {
   carTypeOptionsByCollateralType,
   toVehicleCollateralType,
-} from "@/lib/mock";
+} from "@/lib/mock"
 import {
   clearAfter,
   useVehicleOptions,
   type VehicleFieldKey,
-} from "@/lib/vehicle-options";
-import type { CarInfo, CollateralType, LoanPurpose } from "@/types/ratebook";
-import { useState } from "react";
+} from "@/lib/vehicle-options"
+import type {CarInfo, CollateralType, LoanPurpose} from "@/types/ratebook"
+import {useState} from "react"
 
-const PLACEHOLDER = { value: "", label: "เลือกข้อมูล" };
+const PLACEHOLDER = {value: "", label: "เลือกข้อมูล"}
 
 const FIELD_LABELS: Record<VehicleFieldKey, string> = {
   brand: "ยี่ห้อรถ",
@@ -32,14 +33,14 @@ const FIELD_LABELS: Record<VehicleFieldKey, string> = {
   transmission: "ระบบเกียร์",
   bodyType: "ประเภทตัวถัง",
   ratebookCode: "รุ่นย่อย",
-};
+}
 
 function InfoLabel({
   children,
   onClick,
 }: {
-  children: React.ReactNode;
-  onClick?: () => void;
+  children: React.ReactNode
+  onClick?: () => void
 }) {
   return (
     <span className="flex items-center gap-1">
@@ -52,18 +53,18 @@ function InfoLabel({
         <Icon name="info" className="size-4 text-muted-foreground" />
       )}
     </span>
-  );
+  )
 }
 
 type CarInfoFormProps = {
-  opportunityId: string | null;
-  carInfo: CarInfo;
-  collateralType: CollateralType | null;
+  opportunityId: string | null
+  carInfo: CarInfo
+  collateralType: CollateralType | null
   /** Picks the LOANTYPE the ratebook is read at: อยากได้เงิน = จำนำทะเบียน, อยากซื้อรถ = ดีลเลอร์. */
-  loanPurpose: LoanPurpose | null;
-  onCarInfoChange: (carInfo: CarInfo) => void;
-  onViewAppraisal: () => void;
-};
+  loanPurpose: LoanPurpose | null
+  onCarInfoChange: (carInfo: CarInfo) => void
+  onViewAppraisal: () => void
+}
 
 export function CarInfoForm({
   opportunityId,
@@ -73,26 +74,28 @@ export function CarInfoForm({
   onCarInfoChange,
   onViewAppraisal,
 }: CarInfoFormProps) {
-  const isMotorcycle = collateralType === "motorcycle";
-  const [yearInfoOpen, setYearInfoOpen] = useState(false);
-  const [modelInfoOpen, setModelInfoOpen] = useState(false);
-  const vehicle = useVehicleOptions(collateralType, carInfo, loanPurpose);
+  const isMotorcycle = collateralType === "motorcycle"
+  const [yearInfoOpen, setYearInfoOpen] = useState(false)
+  const [modelInfoOpen, setModelInfoOpen] = useState(false)
+  const [scanErrorOpen, setScanErrorOpen] = useState(false)
+
+  const vehicle = useVehicleOptions(collateralType, carInfo, loanPurpose)
   const carTypeOptions =
-    carTypeOptionsByCollateralType[toVehicleCollateralType(collateralType)];
+    carTypeOptionsByCollateralType[toVehicleCollateralType(collateralType)]
 
   // Locked fields are answers the vehicle only has one of, so they count as filled.
   function valueOf(field: VehicleFieldKey): string {
-    return carInfo[field] ?? vehicle.locked[field] ?? "";
+    return carInfo[field] ?? vehicle.locked[field] ?? ""
   }
 
   function update(field: VehicleFieldKey, value: string) {
     // Later answers were narrowed by this one, so they cannot survive the change.
     const next = clearAfter(
       vehicle.resetOrder,
-      { ...carInfo, [field]: value },
+      {...carInfo, [field]: value},
       field,
-    );
-    onCarInfoChange(vehicle.resolve(next));
+    )
+    onCarInfoChange(vehicle.resolve(next))
   }
 
   // Open one field at a time: everything before it that the form actually asks
@@ -114,7 +117,7 @@ export function CarInfoForm({
     return vehicle.resetOrder
       .slice(0, vehicle.resetOrder.indexOf(gateField) + (gateField === field ? 0 : 1))
       .filter((earlier) => vehicle.sequence.includes(earlier))
-      .every((earlier) => Boolean(valueOf(earlier)));
+      .every((earlier) => Boolean(valueOf(earlier)))
   }
 
   function selectProps(field: VehicleFieldKey) {
@@ -124,14 +127,14 @@ export function CarInfoForm({
       disabled: !isUnlocked(field) || vehicle.isLoading,
       onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
         update(field, event.target.value),
-    };
+    }
   }
 
   function lockedLabel(field: VehicleFieldKey): string | undefined {
-    const value = vehicle.locked[field];
-    if (!value) return undefined;
+    const value = vehicle.locked[field]
+    if (!value) return undefined
     return vehicle.options[field].find((option) => option.value === value)
-      ?.label;
+      ?.label
   }
 
   // The vehicle only has one answer for this field -- show it filled in
@@ -146,15 +149,20 @@ export function CarInfoForm({
 
   const missingFields = vehicle.sequence.filter((field) => !valueOf(field));
   const isComplete =
-    missingFields.length === 0 && carInfo.appraisalPrice != null;
+    missingFields.length === 0 && carInfo.appraisalPrice != null
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-base font-semibold text-foreground">กรอกข้อมูลรถ</p>
         {!isMotorcycle && (
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Icon name="scan" className="size-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setScanErrorOpen(true)}
+          >
+            <Icon name="camera-scan" className="size-4" />
             สแกนเล่มทะเบียน
           </Button>
         )}
@@ -267,8 +275,8 @@ export function CarInfoForm({
             disabled={!isComplete}
             onClick={() => {
               if (opportunityId)
-                void updateOpportunityCarInfo(opportunityId, carInfo);
-              onViewAppraisal();
+                void updateOpportunityCarInfo(opportunityId, carInfo)
+              onViewAppraisal()
             }}
           >
             ดูราคาประเมิน
@@ -284,6 +292,14 @@ export function CarInfoForm({
         open={modelInfoOpen}
         onClose={() => setModelInfoOpen(false)}
       />
+
+      <ErrorModal
+        open={scanErrorOpen}
+        onClose={() => setScanErrorOpen(false)}
+        title="ระบบกำลังพัฒนา"
+        description="ฟังก์ชันสแกนเล่มทะเบียนกำลังอยู่ในช่วงการพัฒนา"
+        buttonText="ตกลง"
+      />
     </div>
-  );
+  )
 }
