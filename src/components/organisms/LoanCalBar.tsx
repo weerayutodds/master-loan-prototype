@@ -31,7 +31,8 @@ import type {
   LoanInfo,
   RefinanceStatus,
 } from "@/types/ratebook"
-import {useEffect, useMemo, useRef, useState} from "react"
+import {useEffect, useLayoutEffect, useMemo, useRef, useState} from "react"
+import {createPortal} from "react-dom"
 
 type CalculatedInputs = {
   requestedAmount: number
@@ -174,9 +175,9 @@ export function LoanCalBar({
   const [isCalculating, setIsCalculating] = useState(false)
   const [allowOverMaxRate, setAllowOverMaxRate] = useState(false)
   const [genderAgeOpen, setGenderAgeOpen] = useState(false)
-  const [genderAgePosition, setGenderAgePosition] = useState<{
+  const [genderAgePoint, setGenderAgePoint] = useState<{
     left: number
-    bottom: number
+    top: number
   } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const genderAgeAnchorRef = useRef<HTMLDivElement>(null)
@@ -305,24 +306,40 @@ export function LoanCalBar({
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node
       if (
-        !genderAgeAnchorRef.current?.contains(target) &&
-        !genderAgePopoverRef.current?.contains(target)
+        genderAgeAnchorRef.current?.contains(target) ||
+        genderAgePopoverRef.current?.contains(target)
       ) {
-        setGenderAgeOpen(false)
+        return
       }
+      setGenderAgeOpen(false)
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [genderAgeOpen])
 
-  function openGenderAgePopover() {
-    const rect = genderAgeAnchorRef.current?.getBoundingClientRect()
-    if (rect) {
-      setGenderAgePosition({
-        left: rect.left,
-        bottom: window.innerHeight - rect.top + 12,
+  useLayoutEffect(() => {
+    if (!genderAgeOpen) return
+
+    function place() {
+      const anchor = genderAgeAnchorRef.current
+      if (!anchor) return
+      const rect = anchor.getBoundingClientRect()
+      setGenderAgePoint({
+        left: rect.left + rect.width / 2,
+        top: rect.top,
       })
     }
+
+    place()
+    window.addEventListener("resize", place)
+    window.addEventListener("scroll", place, true)
+    return () => {
+      window.removeEventListener("resize", place)
+      window.removeEventListener("scroll", place, true)
+    }
+  }, [genderAgeOpen])
+
+  function openGenderAgePopover() {
     setGenderAgeOpen(true)
   }
 
@@ -390,7 +407,7 @@ export function LoanCalBar({
     <>
       <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 md:px-20">
         <div className="loan-cal-bar flex w-full max-w-341 items-end justify-between gap-6 rounded-xl px-4 py-2.5">
-          <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1">
+          <div className="flex min-w-0 flex-1 items-end gap-2 overflow-x-auto pb-1">
             <div className="w-fit shrink-0">
               <FieldLabel>เล่มทะเบียน</FieldLabel>
               <Select
@@ -520,38 +537,21 @@ export function LoanCalBar({
                 className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
               />
             </div>
-            <div ref={genderAgeAnchorRef} className="w-20 shrink-0">
+            <div className="w-20 shrink-0">
               {customer?.gender && customer?.birthDate ? (
                 <span className="mb-1 block shrink-0 self-center text-[10px] text-pale-blue w-full">
                   {`เพศ ${GENDER_LABELS[customer.gender]} | ${calculateAge(customer.birthDate)} ปี`}
                 </span>
               ) : null}
 
-              <ToggleChip
-                label="PPI"
-                checked={hasPpi}
-                onChange={handleTogglePpi}
-              />
-            </div>
-
-            {genderAgeOpen && genderAgePosition ? (
-              <div
-                ref={genderAgePopoverRef}
-                style={{
-                  position: "fixed",
-                  left: genderAgePosition.left,
-                  bottom: genderAgePosition.bottom,
-                }}
-                className="z-1000"
-              >
-                <GenderAgePopover
-                  initialGender={customer?.gender ?? null}
-                  initialBirthDate={customer?.birthDate ?? null}
-                  onSave={handleSaveGenderAge}
-                  onCancel={() => setGenderAgeOpen(false)}
+              <div ref={genderAgeAnchorRef}>
+                <ToggleChip
+                  label="PPI"
+                  checked={hasPpi}
+                  onChange={handleTogglePpi}
                 />
               </div>
-            ) : null}
+            </div>
             <div className="w-fit shrink-0">
               <FieldLabel>
                 {isTransferBook
@@ -657,6 +657,24 @@ export function LoanCalBar({
         title="กำลังคำนวณ"
         description="กรุณารอสักครู่..."
       />
+
+      {genderAgeOpen && genderAgePoint
+        ? createPortal(
+            <div
+              ref={genderAgePopoverRef}
+              className="fixed z-1000 -translate-x-1/2 -translate-y-full pb-3"
+              style={{left: genderAgePoint.left, top: genderAgePoint.top}}
+            >
+              <GenderAgePopover
+                initialGender={customer?.gender ?? null}
+                initialBirthDate={customer?.birthDate ?? null}
+                onSave={handleSaveGenderAge}
+                onCancel={() => setGenderAgeOpen(false)}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   )
 }
