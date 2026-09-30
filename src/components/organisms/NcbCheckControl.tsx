@@ -1,24 +1,23 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
-import { MOCK_NCB_GRADE, NcbCheckModal } from "@/components/organisms/NcbCheckModal";
-import type { NcbGrade } from "@/types/customer-lead";
+import {Badge} from "@/components/atoms/Badge"
+import {Button} from "@/components/atoms/Button"
+import {NcbCheckModal} from "@/components/organisms/NcbCheckModal"
+import type {NcbGrade} from "@/types/customer-lead"
+import {useState} from "react"
 
 type NcbCheckControlProps = {
-  ncbGrade: NcbGrade | null;
-  onChecked: (ncbGrade: NcbGrade) => unknown;
-  buttonVariant?: "primary" | "outline";
-  buttonSize?: "xs" | "sm";
+  ncbGrade: NcbGrade | null
+  onChecked: (ncbGrade: NcbGrade) => unknown
+  buttonVariant?: "primary" | "outline"
+  buttonSize?: "xs" | "sm"
   /** When set, "ตรวจ eNCB" only reads the card; the parent then sets `awaitingRefresh`. */
-  onCardRead?: () => unknown;
+  onCardRead?: () => unknown
   /** Shows "รอผล..." + "รีเฟรช"; "รีเฟรช" gives the grade. */
-  awaitingRefresh?: boolean;
+  awaitingRefresh?: boolean
   /** Card already read (Dipchip-verified): "ตรวจ eNCB" skips the card modal. */
-  cardAlreadyRead?: boolean;
-};
+  cardAlreadyRead?: boolean
+}
 
 export function NcbCheckControl({
   ncbGrade,
@@ -29,28 +28,29 @@ export function NcbCheckControl({
   awaitingRefresh = false,
   cardAlreadyRead = false,
 }: NcbCheckControlProps) {
-  const [checking, setChecking] = useState(false);
+  const [checking, setChecking] = useState(false)
   // Covers the gap until a server-rendered parent re-renders with the saved grade.
-  const [checkedGrade, setCheckedGrade] = useState<NcbGrade | null>(null);
-  const grade = ncbGrade ?? checkedGrade;
+  const [checkedGrade, setCheckedGrade] = useState<NcbGrade | null>(null)
+  const grade = ncbGrade ?? checkedGrade
 
   async function applyGrade(nextGrade: NcbGrade) {
-    await onChecked(nextGrade);
-    setCheckedGrade(nextGrade);
+    await onChecked(nextGrade)
+    setCheckedGrade(nextGrade)
   }
 
   async function handleComplete(nextGrade: NcbGrade) {
-    if (onCardRead) {
-      await onCardRead();
-    } else {
-      await applyGrade(nextGrade);
-    }
-    setChecking(false);
+    // if (onCardRead) {
+    //   await onCardRead()
+    // } else {
+    //   await applyGrade(nextGrade)
+    // }
+    await applyGrade(nextGrade)
+    setChecking(false)
   }
 
   function handleCheckClick() {
-    if (cardAlreadyRead && onCardRead) onCardRead();
-    else setChecking(true);
+    // if (cardAlreadyRead && onCardRead) onCardRead(); else
+    setChecking(true)
   }
 
   if (grade) {
@@ -58,12 +58,12 @@ export function NcbCheckControl({
       <Badge tone="success" className="px-3 py-1 text-sm font-semibold">
         เกรด {grade}
       </Badge>
-    );
+    )
   }
 
   return (
     <>
-      {awaitingRefresh ? (
+      {/* {awaitingRefresh ? (
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground">รอผล...</span>
           <Button variant="secondary" size="sm" onClick={() => applyGrade(MOCK_NCB_GRADE)}>
@@ -75,8 +75,16 @@ export function NcbCheckControl({
         <Button variant={buttonVariant} size={buttonSize} onClick={handleCheckClick}>
           ตรวจ eNCB
         </Button>
-      )}
+      )} */}
+
+      <Button
+        variant={buttonVariant}
+        size={buttonSize}
+        onClick={handleCheckClick}
+      >
+        ตรวจ eNCB
+      </Button>
       <NcbCheckModal open={checking} onComplete={handleComplete} />
     </>
-  );
+  )
 }

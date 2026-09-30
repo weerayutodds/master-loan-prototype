@@ -21,7 +21,7 @@ export function Toast({open, message, onClose, duration = 2500}: ToastProps) {
 
   return createPortal(
     <div className="pointer-events-none fixed inset-0 z-1000 flex items-center justify-center">
-      <div className="flex w-62.5 flex-col items-center justify-center gap-2 rounded-lg bg-toast p-6 shadow-secondary-xs">
+      <div className="flex min-h-37.75 min-w-75.25 flex-col items-center justify-center gap-2 rounded-lg bg-toast p-6 shadow-secondary-xs">
         <svg
           width="40"
           height="40"

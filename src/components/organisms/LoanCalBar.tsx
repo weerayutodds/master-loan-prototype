@@ -533,7 +533,7 @@ export function LoanCalBar({
               />
             </div>
           ) : null}
-          <div className="w-28 shrink-0">
+          <div className="w-30 shrink-0">
             <FieldLabel>
               {isTransferBook
                 ? "อัตราดอกเบี้ยคงที่"
@@ -597,7 +597,7 @@ export function LoanCalBar({
           </p>
 
           {showDetail && summary !== null && calculated !== null ? (
-            <div className="absolute bottom-full right-0 z-1000 mb-2">
+            <div className="absolute bottom-0 right-0 z-1000">
               <LoanCalDetailPopover
                 requestedAmount={calculated.requestedAmount}
                 interestRatePercent={calculated.interestRatePercent}

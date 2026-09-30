@@ -28,7 +28,7 @@ const FIELD_LABELS: Record<VehicleFieldKey, string> = {
   year: "รุ่นปี ค.ศ.",
   condition: "สภาพรถ",
   doors: "จำนวนประตู",
-  engineCc: "ขนาดเครื่องยนต์ (ไม่บังคับ)",
+  engineCc: "ขนาดเครื่องยนต์",
   transmission: "ระบบเกียร์",
   bodyType: "ประเภทตัวถัง",
   ratebookCode: "รุ่นย่อย",

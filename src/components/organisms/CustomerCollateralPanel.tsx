@@ -1,15 +1,16 @@
-"use client";
+"use client"
 
-import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
-import { Card } from "@/components/molecules/Card";
-import { Toast } from "@/components/molecules/Toast";
-import { CollateralDetailModal } from "@/components/organisms/CollateralDetailModal";
-import { CustomerInfoModal } from "@/components/organisms/CustomerInfoModal";
-import { NcbCheckControl } from "@/components/organisms/NcbCheckControl";
-import { NcbCheckModal } from "@/components/organisms/NcbCheckModal";
-import { PhoneNumberModal } from "@/components/organisms/PhoneNumberModal";
+import {Badge} from "@/components/atoms/Badge"
+import {Button} from "@/components/atoms/Button"
+import {Icon} from "@/components/atoms/Icon"
+import {Card} from "@/components/molecules/Card"
+import {LoadingToast} from "@/components/molecules/LoadingToast"
+import {Toast} from "@/components/molecules/Toast"
+import {CollateralDetailModal} from "@/components/organisms/CollateralDetailModal"
+import {CustomerInfoModal} from "@/components/organisms/CustomerInfoModal"
+import {NcbCheckControl} from "@/components/organisms/NcbCheckControl"
+import {NcbCheckModal} from "@/components/organisms/NcbCheckModal"
+import {PhoneNumberModal} from "@/components/organisms/PhoneNumberModal"
 import {
   createCustomerLeadOpportunity,
   updateOpportunityCarInfo,
@@ -19,12 +20,12 @@ import {
   updateOpportunityLoanInfo,
   updateOpportunityLoanQuestions,
   updateOpportunitySelectedProduct,
-} from "@/lib/actions/customer-lead-opportunity";
-import { calculateAge, maskIdCardNumber } from "@/lib/format";
-import { provinceOptions } from "@/lib/mock";
-import type { VerificationMethod } from "@/types/customer-form";
-import type { NcbGrade } from "@/types/customer-lead";
-import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
+} from "@/lib/actions/customer-lead-opportunity"
+import {calculateAge, maskIdCardNumber} from "@/lib/format"
+import {provinceOptions} from "@/lib/mock"
+import type {VerificationMethod} from "@/types/customer-form"
+import type {NcbGrade} from "@/types/customer-lead"
+import type {CustomerLeadOpportunity} from "@/types/customer-lead-opportunity"
 import type {
   CarInfo,
   CarInsuranceInfo,
@@ -34,63 +35,63 @@ import type {
   LoanInfo,
   LoanPurpose,
   RefinanceStatus,
-} from "@/types/ratebook";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+} from "@/types/ratebook"
+import {useRouter} from "next/navigation"
+import {setTimeout} from "node:timers"
+import {useState} from "react"
 
 type CustomerCollateralPanelProps = {
-  initialOpportunity?: CustomerLeadOpportunity | null;
-  opportunityId: string | null;
-  leadId: string | null;
-  tags: string[];
-  carInfo: CarInfo;
-  collateralType: CollateralType | null;
-  loanPurpose: LoanPurpose | null;
-  refinanceStatus: RefinanceStatus | null;
-  existingFinance: string | null;
-  selectedProductId: string | null;
-  hasSelectedProduct?: boolean;
-  loanInfo?: LoanInfo;
-  carInsuranceInfo?: CarInsuranceInfo;
-  customer: CustomerInfo | null;
-  onCustomerChange: (value: CustomerInfo) => void;
-  ncbGrade: NcbGrade | null;
-  idCardNumber: string;
-  verificationMethod: VerificationMethod | null;
-  onNcbChecked: (value: NcbGrade) => unknown;
-  onDipchipRead: () => unknown;
-  ncbAwaitingRefresh: boolean;
-  onNcbCardRead: () => unknown;
-};
+  initialOpportunity?: CustomerLeadOpportunity | null
+  opportunityId: string | null
+  leadId: string | null
+  tags: string[]
+  carInfo: CarInfo
+  collateralType: CollateralType | null
+  loanPurpose: LoanPurpose | null
+  refinanceStatus: RefinanceStatus | null
+  existingFinance: string | null
+  selectedProductId: string | null
+  hasSelectedProduct?: boolean
+  loanInfo?: LoanInfo
+  carInsuranceInfo?: CarInsuranceInfo
+  customer: CustomerInfo | null
+  onCustomerChange: (value: CustomerInfo) => void
+  ncbGrade: NcbGrade | null
+  idCardNumber: string
+  verificationMethod: VerificationMethod | null
+  onNcbChecked: (value: NcbGrade) => unknown
+  onDipchipRead: () => unknown
+  ncbAwaitingRefresh: boolean
+  onNcbCardRead: () => unknown
+}
 
 function formatCollateralIdentifier(identifier: CollateralIdentifier): string {
   const province = provinceOptions.find(
     (option) => option.value === identifier.licensePlateProvince,
-  );
+  )
   const licensePlate =
     identifier.licensePlateNumber && province
       ? `${identifier.licensePlateNumber} ${province.label}`
-      : undefined;
-  return [licensePlate, identifier.chassisNumber].filter(Boolean).join(" · ");
+      : undefined
+  return [licensePlate, identifier.chassisNumber].filter(Boolean).join(" · ")
 }
 
 function formatBrandModelYear(
   carInfo: CarInfo,
   opportunity: CustomerLeadOpportunity | null,
 ): string {
-  const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined;
-  const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined;
-  const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined;
+  const brandValue = carInfo.brand ?? opportunity?.carBrand ?? undefined
+  const modelValue = carInfo.model ?? opportunity?.carModel ?? undefined
+  const yearValue = carInfo.year ?? opportunity?.carYear ?? undefined
 
-  // Already the ratebook's own wording -- nothing to resolve.
-  const parts = [brandValue, modelValue].filter((part): part is string =>
-    Boolean(part),
-  ).map((part) => part.toUpperCase());
+  const parts = [brandValue, modelValue]
+    .filter((part): part is string => Boolean(part))
+    .map((part) => part.toUpperCase())
   if (yearValue) {
-    const buddhistYear = Number(yearValue) + 543;
-    parts.push(`${yearValue} (${buddhistYear})`);
+    const buddhistYear = Number(yearValue) + 543
+    parts.push(`${yearValue} (${buddhistYear})`)
   }
-  return parts.join(" • ");
+  return parts.join(" • ")
 }
 
 export function CustomerCollateralPanel({
@@ -117,8 +118,8 @@ export function CustomerCollateralPanel({
   ncbAwaitingRefresh,
   onNcbCardRead,
 }: CustomerCollateralPanelProps) {
-  const router = useRouter();
-  const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter()
+  const [modalOpen, setModalOpen] = useState(false)
   const [collateralIdentifier, setCollateralIdentifier] =
     useState<CollateralIdentifier | null>(
       initialOpportunity &&
@@ -132,29 +133,33 @@ export function CustomerCollateralPanel({
             chassisNumber: initialOpportunity.chassisNumber ?? undefined,
           }
         : null,
-    );
-  const [collateralModalOpen, setCollateralModalOpen] = useState(false);
-  const [phoneModalOpen, setPhoneModalOpen] = useState(false);
-  const [dipchipChecking, setDipchipChecking] = useState(false);  const [brandModel, setBrandModel] = useState(
+    )
+  const [collateralModalOpen, setCollateralModalOpen] = useState(false)
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false)
+  const [dipchipChecking, setDipchipChecking] = useState(false)
+  const [brandModel, setBrandModel] = useState(
     initialOpportunity?.brandModel ?? "",
-  );
-  const [editingBrandModel, setEditingBrandModel] = useState(false);
-  const [savedToastOpen, setSavedToastOpen] = useState(false);
+  )
+  const [savedToastOpen, setSavedToastOpen] = useState(false)
+
+  const [isSaving, setIsSaving] = useState(false)
 
   async function handleSaveLead() {
-    if (!customer) return;
+    if (!customer) return
     try {
-      let currentOpportunityId = opportunityId;
+      setIsSaving(true)
+
+      let currentOpportunityId = opportunityId
       if (!currentOpportunityId) {
-        if (!leadId) return;
-        const created = await createCustomerLeadOpportunity(leadId);
-        currentOpportunityId = created.id;
+        if (!leadId) return
+        const created = await createCustomerLeadOpportunity(leadId)
+        currentOpportunityId = created.id
       }
 
       const financeAnswered =
-        refinanceStatus === "still-paying" ? Boolean(existingFinance) : true;
+        refinanceStatus === "still-paying" ? Boolean(existingFinance) : true
       const loanQuestionsAnswered =
-        loanPurpose && collateralType && refinanceStatus && financeAnswered;
+        loanPurpose && collateralType && refinanceStatus && financeAnswered
 
       await Promise.all([
         updateOpportunityCustomerInfo(currentOpportunityId, customer),
@@ -188,18 +193,22 @@ export function CustomerCollateralPanel({
               selectedProductId,
             )
           : null,
-      ]);
+      ])
 
       if (currentOpportunityId !== opportunityId) {
-        router.replace(`/ratebook?opportunityId=${currentOpportunityId}`);
+        router.replace(`/ratebook?opportunityId=${currentOpportunityId}`)
       }
-      setSavedToastOpen(true);
+      setTimeout(() => {
+        setSavedToastOpen(true)
+      }, 100)
     } catch (error) {
-      console.error("Failed to save lead", error);
+      console.error("Failed to save lead", error)
+    } finally {
+      setIsSaving(false)
     }
   }
 
-  const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity);
+  const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity)
 
   return (
     <Card className="space-y-4 border-2">
@@ -265,8 +274,8 @@ export function CustomerCollateralPanel({
           <NcbCheckModal
             open={dipchipChecking}
             onComplete={async () => {
-              await onDipchipRead();
-              setDipchipChecking(false);
+              await onDipchipRead()
+              setDipchipChecking(false)
             }}
           />
         </div>
@@ -396,7 +405,7 @@ export function CustomerCollateralPanel({
       )}
 
       <Toast
-        open={savedToastOpen}
+        open={savedToastOpen && !isSaving}
         message="บันทึก Lead เรียบร้อยแล้ว"
         onClose={() => setSavedToastOpen(false)}
       />
@@ -406,8 +415,8 @@ export function CustomerCollateralPanel({
         initialValue={customer ?? undefined}
         onClose={() => setModalOpen(false)}
         onSave={(info) => {
-          onCustomerChange({ ...customer, ...info });
-          setModalOpen(false);
+          onCustomerChange({...customer, ...info})
+          setModalOpen(false)
         }}
       />
 
@@ -416,8 +425,8 @@ export function CustomerCollateralPanel({
         initialValue={collateralIdentifier ?? undefined}
         onClose={() => setCollateralModalOpen(false)}
         onSave={(value) => {
-          setCollateralIdentifier(value);
-          setCollateralModalOpen(false);
+          setCollateralIdentifier(value)
+          setCollateralModalOpen(false)
         }}
       />
 
@@ -426,10 +435,16 @@ export function CustomerCollateralPanel({
         initialValue={customer?.phone}
         onClose={() => setPhoneModalOpen(false)}
         onSave={(phone) => {
-          if (customer) onCustomerChange({ ...customer, phone });
-          setPhoneModalOpen(false);
+          if (customer) onCustomerChange({...customer, phone})
+          setPhoneModalOpen(false)
         }}
       />
+
+      <LoadingToast
+        open={isSaving}
+        title="กำลังบันทึกข้อมูล"
+        description="กรุณารอสักครู่..."
+      />
     </Card>
-  );
+  )
 }

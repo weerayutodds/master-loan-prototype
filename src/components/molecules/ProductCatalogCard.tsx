@@ -1,10 +1,10 @@
-import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
+import {Badge} from "@/components/atoms/Badge"
+import {Button} from "@/components/atoms/Button"
+import {Icon} from "@/components/atoms/Icon"
 import type {
   ProductCatalogItem,
   ProductCatalogTagTone,
-} from "@/types/product-catalog";
+} from "@/types/product-catalog"
 
 const TAG_TONE_CLASSNAMES: Record<ProductCatalogTagTone, string> = {
   green: "bg-success",
@@ -12,7 +12,7 @@ const TAG_TONE_CLASSNAMES: Record<ProductCatalogTagTone, string> = {
   purple: "bg-tag-purple",
   amber: "bg-tag-amber",
   pink: "bg-tag-pink",
-};
+}
 
 const NCB_GRADE_TONE_CLASSNAMES: Record<
   ProductCatalogItem["ncbGradeTone"],
@@ -20,14 +20,14 @@ const NCB_GRADE_TONE_CLASSNAMES: Record<
 > = {
   blue: "text-primary",
   green: "text-success",
-};
+}
 
 type ProductCatalogCardProps = {
-  item: ProductCatalogItem;
-  onSelect?: () => void;
-  onCheckNcb?: () => void;
-  onViewDetail?: () => void;
-};
+  item: ProductCatalogItem
+  onSelect?: () => void
+  onCheckNcb?: () => void
+  onViewDetail?: () => void
+}
 
 export function ProductCatalogCard({
   item,
@@ -70,23 +70,26 @@ export function ProductCatalogCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:items-center sm:gap-6">
+        <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:items-center sm:gap-3">
           <div className="sm:w-20 sm:shrink-0">
             <p className="text-muted-foreground">เล่มทะเบียน</p>
             <p className="font-medium text-price-label">
               {item.bookStatusLabel}
             </p>
           </div>
-          <div className="hidden w-px self-stretch bg-secondary-border sm:block" />
-          <div className="sm:w-40 sm:shrink-0">
+
+          <div className="hidden w-px shrink-0 self-stretch bg-secondary-border sm:block" />
+
+          <div className="sm:w-42 sm:shrink-0">
             <p className="text-muted-foreground">อัตราดอกเบี้ย</p>
             <p className="text-unit-label">{item.interestRateLabel}</p>
             <p className="text-price-label">{item.interestReductionLabel}</p>
           </div>
-          <div className="hidden w-px self-stretch bg-secondary-border sm:block" />
+
+          <div className="hidden w-px shrink-0 self-stretch bg-secondary-border sm:block" />
 
           <div className="sm:w-20 sm:shrink-0">
-            <p className="text-muted-foreground">เฉพาะ NCB</p>
+            <p className="text-muted-foreground font-light">เฉพาะ NCB</p>
             <p
               className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}
             >
@@ -113,5 +116,5 @@ export function ProductCatalogCard({
         </div>
       </div>
     </div>
-  );
+  )
 }
