@@ -148,6 +148,7 @@ export type RatebookField =
   | "year"
   | "condition"
   | "doors"
+  | "engineCc"
   | "transmission"
   | "bodyType"
   | "code";
@@ -157,6 +158,7 @@ const CAR_FIELDS: RatebookField[] = [
   "year",
   "condition",
   "doors",
+  "engineCc",
   "transmission",
   "bodyType",
   "code",
@@ -236,7 +238,7 @@ function distinct(rows: RatebookRow[], field: RatebookField): string[] {
 
 /**
  * Distinct values of a free-form field (รุ่น, ปี, ตัวถัง): newest year first,
- * otherwise alphabetical.
+ * smallest ขนาดเครื่องยนต์ first, otherwise alphabetical.
  */
 export function toOptions(
   rows: RatebookRow[],
@@ -245,7 +247,11 @@ export function toOptions(
 ): { value: string; label: string }[] {
   const values = distinct(rows, field);
   values.sort((a, b) =>
-    field === "year" ? Number(b) - Number(a) : a.localeCompare(b, "th"),
+    field === "year"
+      ? Number(b) - Number(a)
+      : field === "engineCc"
+        ? Number(a) - Number(b)
+        : a.localeCompare(b, "th"),
   );
   return values.map((value) => ({ value, label: label(value) }));
 }
@@ -264,6 +270,14 @@ export function toKnownOptions(
 }
 
 /**
+ * รุ่นย่อย strings end with " (nnnnซีซี)" -- now shown on its own in the
+ * ขนาดเครื่องยนต์ dropdown, so it's redundant here.
+ */
+export function stripEngineCcSuffix(label: string): string {
+  return label.replace(/\s*\(\d+ซีซี\)\s*$/, "");
+}
+
+/**
  * รุ่นย่อย. Keyed on the ratebook Code because a Sub-Model can cover several
  * priced rows; those get their `Model Description` appended so the two are
  * telling apart on screen.
@@ -276,12 +290,15 @@ export function toSubModelOptions(
     shared.set(row.subModel, (shared.get(row.subModel) ?? 0) + 1);
   }
   return rows
-    .map((row) => ({
-      value: row.code,
-      label:
-        (shared.get(row.subModel) ?? 0) > 1 && row.description
-          ? `${row.subModel} · ${row.description}`
-          : row.subModel,
-    }))
+    .map((row) => {
+      const subModel = stripEngineCcSuffix(row.subModel);
+      return {
+        value: row.code,
+        label:
+          (shared.get(row.subModel) ?? 0) > 1 && row.description
+            ? `${subModel} · ${row.description}`
+            : subModel,
+      };
+    })
     .sort((a, b) => a.label.localeCompare(b.label, "th"));
 }

@@ -27,6 +27,7 @@ import {
   loadBrandRows,
   ratebookFields,
   resolveLoanTypeId,
+  stripEngineCcSuffix,
   toKnownOptions,
   toOptions,
   toSubModelOptions,
@@ -68,6 +69,20 @@ const CAR_SEQUENCE: VehicleFieldKey[] = [
   "year",
   "condition",
   "doors",
+  "transmission",
+  "bodyType",
+  "ratebookCode",
+];
+
+// ขนาดเครื่องยนต์ is optional (not in CAR_SEQUENCE) but still sits in the
+// cascade between จำนวนประตู and ระบบเกียร์, so picking it narrows รุ่นย่อย.
+const CAR_RESET_ORDER: VehicleFieldKey[] = [
+  "brand",
+  "model",
+  "year",
+  "condition",
+  "doors",
+  "engineCc",
   "transmission",
   "bodyType",
   "ratebookCode",
@@ -149,6 +164,7 @@ function toSelection(carInfo: CarInfo): RatebookSelection {
     year: carInfo.year,
     condition: carInfo.condition,
     doors: carInfo.doors,
+    engineCc: carInfo.engineCc,
     transmission: carInfo.transmission,
     bodyType: carInfo.bodyType,
     code: carInfo.ratebookCode,
@@ -164,6 +180,8 @@ function buildRatebookOptions(
 ): VehicleOptions {
   const sequence =
     collateralType === "motorcycle" ? MOTORCYCLE_SEQUENCE : CAR_SEQUENCE;
+  const resetOrder =
+    collateralType === "motorcycle" ? MOTORCYCLE_SEQUENCE : CAR_RESET_ORDER;
   const loanTypeId = availableLoanTypeId(rows, resolveLoanTypeId(loanPurpose));
   const fields = ratebookFields(collateralType);
 
@@ -192,7 +210,9 @@ function buildRatebookOptions(
                       ? bodyTypeLabel(value)
                       : field === "year"
                         ? `${value} (${Number(value) + 543})`
-                        : value,
+                        : field === "engineCc"
+                          ? `${value} ซีซี`
+                          : value,
                   );
 
       const key: VehicleFieldKey = field === "code" ? "ratebookCode" : field;
@@ -224,7 +244,7 @@ function buildRatebookOptions(
 
   return {
     sequence,
-    resetOrder: sequence,
+    resetOrder,
     options: current.options,
     locked: current.locked,
     isLoading,
@@ -234,8 +254,10 @@ function buildRatebookOptions(
         ...source,
         ...locked,
         carType,
-        engineCc: row?.engineCc,
-        subModel: row?.subModel,
+        // ขนาดเครื่องยนต์ is now a pickable field -- keep the user's (or the
+        // auto-locked) answer rather than blanking it while row isn't unique yet.
+        engineCc: locked.engineCc ?? source.engineCc ?? row?.engineCc,
+        subModel: row?.subModel ? stripEngineCcSuffix(row.subModel) : row?.subModel,
         appraisalPrice: row?.appraisalPrice,
         ratebookPrice: row?.ratebookPrice,
       };

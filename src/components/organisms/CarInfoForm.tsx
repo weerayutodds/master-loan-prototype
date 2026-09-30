@@ -231,16 +231,7 @@ export function CarInfoForm({
 
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <FormField label={`${FIELD_LABELS.engineCc} (ไม่บังคับ)`}>
-                {vehicle.options.engineCc.length > 0 ? (
-                  <Select {...selectProps("engineCc")} />
-                ) : (
-                  // Read off the chosen ratebook row -- the รุ่นย่อย already names it.
-                  <ReadOnlyValue
-                    value={
-                      carInfo.engineCc ? `${carInfo.engineCc} ซีซี` : undefined
-                    }
-                  />
-                )}
+                {fieldControl("engineCc")}
               </FormField>
               <FormField label={FIELD_LABELS.transmission}>
                 {fieldControl("transmission")}
