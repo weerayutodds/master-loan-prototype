@@ -16,7 +16,7 @@ export function ProductGuide({ data }: ProductGuideProps) {
   return (
     <div
       id="product-guide"
-      className="product-guide-hero relative overflow-hidden rounded-xl p-6 shadow-primary-s"
+      className="product-guide-hero relative scroll-mt-32 overflow-hidden rounded-xl p-6 shadow-primary-s"
     >
       <div className="pointer-events-none absolute -top-16 left-[9%] size-64 rounded-full bg-primary blur-[100px] mix-blend-screen" />
 
