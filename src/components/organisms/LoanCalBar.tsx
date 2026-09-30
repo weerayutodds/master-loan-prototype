@@ -161,6 +161,7 @@ export function LoanCalBar({
   )
   const [payoffAmount, setPayoffAmount] = useState(0)
   const [cashBackAmount, setCashBackAmount] = useState(0)
+  const [existingInstallment, setExistingInstallment] = useState(0)
   const [isTLC, setIsTLC] = useState(bookStatus !== TRANSFER_BOOK_STATUS)
   const [installmentTerm, setInstallmentTerm] = useState(defaultInstallmentTerm)
   const [hasPpi, setHasPpi] = useState(false)
@@ -641,6 +642,8 @@ export function LoanCalBar({
                   isTLC={calculated.isTLC}
                   hasPpi={calculated.hasPpi}
                   isRefinance={isRefinance}
+                  existingInstallment={existingInstallment}
+                  onExistingInstallmentChange={setExistingInstallment}
                   onClose={() => setShowDetail(false)}
                 />
               </div>

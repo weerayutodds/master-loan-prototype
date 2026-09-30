@@ -27,6 +27,8 @@ type LoanCalDetailPopoverProps = {
   hasPpi: boolean
   /** New loan (ผ่อนหมดแล้ว) — not refinance. */
   isRefinance?: boolean
+  existingInstallment?: number
+  onExistingInstallmentChange?: (amount: number) => void
   onClose: () => void
 }
 
@@ -39,6 +41,8 @@ export function LoanCalDetailPopover({
   isTLC,
   hasPpi,
   isRefinance = false,
+  existingInstallment = 0,
+  onExistingInstallmentChange,
   onClose,
 }: LoanCalDetailPopoverProps) {
   const summary = calculateLoanCalSummary({
@@ -53,6 +57,10 @@ export function LoanCalDetailPopover({
   const rateLabelPrefix = isTLC ? "แบบ" : "อัตราดอกเบี้ย "
   // Hide งวดผ่อน + show the continuous-payment footnote only for new-loan TLC without PPI.
   const showNewLoanTlcRemark = isTLC && !hasPpi && !isRefinance
+  // Empty input shows 0; otherwise negative when the new installment is higher than the old one.
+  const installmentDifference = existingInstallment
+    ? existingInstallment - summary.totalPayment
+    : 0
 
   return (
     <div className="w-66.25 overflow-hidden rounded-lg border border-secondary-border bg-surface shadow-secondary-m">
@@ -104,7 +112,7 @@ export function LoanCalDetailPopover({
           />
         </>
       )}
-      {!showNewLoanTlcRemark ? (
+      {!showNewLoanTlcRemark && !(isTLC && hasPpi) ? (
         <DetailRow label="งวดผ่อน" value={`${installmentTerm} งวด`} />
       ) : null}
 
@@ -155,7 +163,13 @@ export function LoanCalDetailPopover({
           </p>
         </div>
       ) : (
-        <div className="loan-cal-result-box flex items-center justify-between px-3 py-2">
+        <div
+          className={`flex items-center justify-between px-3 py-2 ${
+            isRefinance
+              ? "border-t border-primary-to bg-pale-blue"
+              : "loan-cal-result-box"
+          }`}
+        >
           <span className="text-xs text-foreground">ยอดผ่อนต่อเดือน</span>
           <p className="text-lg font-semibold text-primary-to">
             {summary.totalPayment.toLocaleString("th-TH")}{" "}
@@ -163,6 +177,40 @@ export function LoanCalDetailPopover({
           </p>
         </div>
       )}
+
+      {isRefinance ? (
+        <div className="flex flex-col gap-3 bg-linear-to-br from-primary to-primary-to px-3 py-3">
+          <div className="flex h-10 items-center gap-2 rounded-lg border border-secondary-border bg-surface px-3">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={
+                existingInstallment
+                  ? existingInstallment.toLocaleString("th-TH")
+                  : ""
+              }
+              placeholder="ยอดผ่อนไฟแนนซ์เดิม"
+              onChange={(e) =>
+                onExistingInstallmentChange?.(
+                  Number(e.target.value.replace(/\D/g, "")) || 0,
+                )
+              }
+              aria-label="ยอดผ่อนไฟแนนซ์เดิม"
+              className="w-full min-w-0 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            />
+            <span className="shrink-0 text-sm font-medium text-foreground">
+              บาท
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-primary-foreground">
+            <span className="text-xs">ส่วนต่างจากไฟแนนซ์เดิม</span>
+            <p className="text-lg font-semibold">
+              {installmentDifference.toLocaleString("th-TH")}{" "}
+              <span className="text-xs font-normal">บาท</span>
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
