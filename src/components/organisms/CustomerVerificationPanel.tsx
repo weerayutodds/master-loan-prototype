@@ -20,7 +20,7 @@ import type {
 } from "@/types/customer-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useRouter} from "next/navigation"
-import {useEffect, useRef, useState} from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
 import {useForm, type Resolver} from "react-hook-form"
 import {z} from "zod"
 import {SnackbarToast} from "../molecules/SnackbarToast"
@@ -75,7 +75,6 @@ export function CustomerVerificationPanel({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const {
-    setValue,
     register,
     handleSubmit,
     formState: {errors, isSubmitting},
@@ -93,15 +92,6 @@ export function CustomerVerificationPanel({
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [])
-
-  useEffect(() => {
-    if (verificationMethod === "manual" && cardCustomer) {
-      const [firstName, ...rest] = (cardCustomer.name ?? "").split(" ")
-
-      setValue("firstName", firstName, {shouldValidate: true})
-      setValue("lastName", rest.join(" "), {shouldValidate: true})
-    }
-  }, [verificationMethod, cardCustomer, setValue])
 
   function handleCardTap() {
     if (cardStatus === "loading") return
@@ -146,15 +136,24 @@ export function CustomerVerificationPanel({
   const continueDisabled =
     hasErrors || (verificationMethod === "card" && cardStatus !== "success")
 
+  const dynamicOptions = useMemo(() => {
+    return verificationMethodOptions.map((option) => ({
+      ...option,
+      disabled: !!cardCustomer && option.value === "manual",
+    }))
+  }, [verificationMethodOptions, cardCustomer])
+
+  useEffect(() => {
+    if (cardCustomer && verificationMethod === "manual") {
+      setVerificationMethod("card")
+    }
+  }, [cardCustomer, verificationMethod])
+
   return (
     <>
-      <Card className="mx-auto flex w-[384px] flex-col rounded-xl border-2 border-[#ECF1F9] bg-white p-[20px] shadow-[0px_4px_12px_rgba(63,116,245,0.16)]">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[16px]"
-        >
-          {/* Customer Type */}
-          <div className="w-[160px]">
+      <Card className="mx-auto flex w-[384px] flex-col rounded-xl border-2 border-[#ECF1F9] bg-white p-5 shadow-primary-s">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="w-40">
             <FormField label="ประเภทลูกค้า">
               <Select
                 options={customerTypeOptions}
@@ -174,7 +173,7 @@ export function CustomerVerificationPanel({
 
           <div className="flex w-85 flex-col gap-4">
             <SegmentedControl
-              options={verificationMethodOptions}
+              options={dynamicOptions}
               value={verificationMethod}
               onChange={setVerificationMethod}
             />
@@ -231,7 +230,7 @@ export function CustomerVerificationPanel({
                   type="button"
                   onClick={handleCardTap}
                   disabled={cardStatus === "loading"}
-                  className="relative box-border h-38.75 w-85 rounded-lg border-2 border-dashed border-[#E5E5E6] bg-gradient-to-t from-[#F7F7F7] to-[#FCFCFC] disabled:cursor-not-allowed disabled:opacity-70"
+                  className="relative box-border h-38.75 w-85 rounded-lg border-2 border-dashed border-[#E5E5E6] bg-linear-to-t from-[#F7F7F7] to-[#FCFCFC] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <img
                     src="/assets/images/dipchip.png"
