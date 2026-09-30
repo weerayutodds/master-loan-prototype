@@ -33,12 +33,12 @@ export function OptionCard({
           : "flex flex-col gap-1"
       } shadow-primary-s ${
         selected
-          ? "border-primary bg-surface"
+          ? "border-2 border-[#334ED1] bg-surface"
           : "border-card-border bg-surface hover:border-primary/40"
       }`}
     >
       {selected ? (
-        <span className="absolute right-2 top-2 flex size-4 items-center justify-center rounded-full bg-primary text-white">
+        <span className="absolute right-2 top-2 flex size-4 items-center justify-center rounded-full  bg-[#334ED1] text-white">
           <Icon name="check" className="size-2.5" />
         </span>
       ) : null}

@@ -45,7 +45,7 @@ export function LoanQuestionsPanel({
         <p className="text-sm font-medium text-foreground">
           ลูกค้าต้องการเงินหรืออยากซื้อรถ?
         </p>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4">
           {loanPurposeOptions.map((option) => (
             <OptionCard
               textCenter
@@ -78,7 +78,7 @@ export function LoanQuestionsPanel({
 
       <div>
         <p className="text-sm font-medium text-foreground">รถผ่อนหมดหรือยัง?</p>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4">
           {refinanceStatusOptions.map((option) => (
             <OptionCard
               key={option.value}
@@ -91,14 +91,14 @@ export function LoanQuestionsPanel({
         </div>
 
         {refinanceStatus === "still-paying" ? (
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <SearchableSelect
               options={existingFinanceOptions}
               value={existingFinance}
               onChange={onExistingFinanceChange}
               placeholder="เลือกไฟแนนซ์เดิม"
               emptyMessage="ไม่พบไฟแนนซ์ที่ค้นหา"
-              className="sm:w-[60%]"
+              className="sm:w-[50%]"
             />
             <p className="text-sm text-muted-foreground">
               รับเฉพาะไฟแนนซ์ที่มีในรายการเท่านั้น
