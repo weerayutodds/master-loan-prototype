@@ -2,6 +2,8 @@ export type ProductGuidePlan = {
   title: string;
   maxLtvLabel: string;
   maxAmount: number;
+  /** Plain-text line shown above `bullets`, e.g. a rule the bullets belong to. */
+  bulletsHeading?: string;
   bullets: string[];
 };
 

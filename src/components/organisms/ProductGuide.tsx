@@ -44,7 +44,11 @@ export function ProductGuide({ data }: ProductGuideProps) {
         </div>
       </div>
 
-      <div className="relative mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div
+        className={`relative mt-8 grid grid-cols-1 gap-4 ${
+          data.plans.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"
+        }`}
+      >
         {data.plans.map((plan, index) => (
           <ProductGuidePlanCard
             key={plan.title}

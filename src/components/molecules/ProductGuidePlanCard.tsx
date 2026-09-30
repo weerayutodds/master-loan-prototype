@@ -37,6 +37,11 @@ export function ProductGuidePlanCard({
 
       {/* 3. BOTTOM LAYER (Behind Middle) */}
       <div className="relative z-0 -mt-5 flex-1 rounded-b-2xl border-x border-b border-divider bg-surface px-4 pb-6 pt-9 shadow-[0px_4px_12px_rgba(23,32,84,0.06)]">
+        {plan.bulletsHeading ? (
+          <p className="mb-2 text-xs font-medium text-foreground">
+            {plan.bulletsHeading}
+          </p>
+        ) : null}
         <ul className="space-y-2">
           {plan.bullets.map((bullet) => (
             <li

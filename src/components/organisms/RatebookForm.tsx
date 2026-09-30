@@ -207,7 +207,11 @@ export function RatebookForm({
       ) !== null,
   )
   const [showProductGuide, setShowProductGuide] = useState(hasSavedProduct)
-  const productGuideData = getProductGuideData(carInfo.appraisalPrice)
+  const productGuideData = getProductGuideData(
+    carInfo.appraisalPrice,
+    collateralType,
+    refinanceStatus,
+  )
   const productCatalogContext = {
     carInfo,
     collateralType,

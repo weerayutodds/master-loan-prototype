@@ -22,7 +22,7 @@ import type {
   CustomerType,
   VerificationMethod,
 } from "@/types/customer-form";
-import type { ProductGuideData } from "@/types/product-guide";
+import type { ProductGuideData, ProductGuidePlan } from "@/types/product-guide";
 import type {
   ProductCatalogData,
   ProductCatalogDetail,
@@ -970,9 +970,53 @@ function roundToNearestThousand(amount: number): number {
  * ratebook row the user picked, and รถบรรทุก still gets the old depreciation
  * estimate from vehicle-options.ts. Everything below is derived from it.
  */
+function getMotorcycleGuidePlans(
+  appraisalPrice: number,
+  refinanceStatus: RefinanceStatus | null,
+): ProductGuidePlan[] {
+  const fullAmountPlan: ProductGuidePlan = {
+    title: "รับเงินเต็ม อนุมัติไว",
+    maxLtvLabel: "ไม่เกิน 100% LTV",
+    maxAmount: roundToNearestThousand(appraisalPrice * 1.0),
+    bullets:
+      refinanceStatus === "still-paying"
+        ? [
+            "ถ้าไม่ใช่เกรด NCB A01-A04, U02 ค่างวดใหม่ต้องลดลงอย่างน้อย 20% จากค่างวดเก่า",
+            "ทำบัตรติดล้อ (A01-A04, U02)",
+          ]
+        : ["รับ NCB ทุกเกรด", "วันครอบครองขั้นต่ำ ขึ้นอยู่กับ NCB Grade"],
+  };
+  const highLimitPlan: ProductGuidePlan = {
+    title: "วงเงินสูง อนุมัติไว",
+    maxLtvLabel: "101% - 130% LTV",
+    maxAmount: roundToNearestThousand(appraisalPrice * 1.3),
+    bullets: ["รับเฉพาะ NCB เกรด A01-A04, U02"],
+  };
+
+  if (refinanceStatus === "still-paying") return [fullAmountPlan, highLimitPlan];
+  return [
+    {
+      title: "อนุมัติง่าย เงื่อนไขน้อย",
+      maxLtvLabel: "ไม่เกิน 70% LTV",
+      maxAmount: roundToNearestThousand(appraisalPrice * 0.7),
+      bulletsHeading: "ลูกค้าต้องไม่เข้าเงื่อนไข ทั้ง 3 ข้อ พร้อมกัน",
+      bullets: [
+        "ไม่ใช่ A01-A04, U02",
+        "ไม่ใช่ ข้าราชการ พนักงานเอกชน พนักงานรัฐวิสาหกิจ",
+        "ครอบครองน้อยกว่า 45 วัน",
+      ],
+    },
+    fullAmountPlan,
+    highLimitPlan,
+  ];
+}
+
 export function getProductGuideData(
   appraisalPrice: number = 0,
+  collateralType: CollateralType | null = null,
+  refinanceStatus: RefinanceStatus | null = null,
 ): ProductGuideData {
+  const isCar = collateralType === "car";
   return {
     appraisalPrice,
     approvedRange: {
@@ -980,15 +1024,22 @@ export function getProductGuideData(
       max: roundToNearestThousand(appraisalPrice * 1.6),
     },
     approvedLtvBadges: ["70% LTV", "160% LTV"],
-    plans: [
+    plans: collateralType === "motorcycle"
+      ? getMotorcycleGuidePlans(appraisalPrice, refinanceStatus)
+      : [
       {
         title: "อนุมัติง่าย LTV ต่ำ",
         maxLtvLabel: "ไม่เกิน 70% LTV",
         maxAmount: roundToNearestThousand(appraisalPrice * 0.7),
-        bullets: [
-          "NCB A01-A03 ได้สูงสุด 70%LTV",
-          "วันครอบครอง 60-210 วัน ขึ้นอยู่กับเกรด NCB",
-        ],
+        bullets: isCar
+          ? [
+              "Max 70% LTV เฉพาะ NCB เกรด A01-A03",
+              "วันครอบครองอย่างน้อย 60-210 วัน ขึ้นอยู่กับเกรด NCB Grade",
+            ]
+          : [
+              "NCB A01-A03 ได้สูงสุด 70%LTV",
+              "วันครอบครอง 60-210 วัน ขึ้นอยู่กับเกรด NCB",
+            ],
       },
       {
         title: "วงเงินสูง ความเสี่ยงปกติ",
@@ -1000,7 +1051,9 @@ export function getProductGuideData(
         title: "วงเงินสูง ดอกเบี้ยต่ำ ความเสี่ยงต่ำ",
         maxLtvLabel: "ไม่เกิน 160% LTV",
         maxAmount: roundToNearestThousand(appraisalPrice * 1.6),
-        bullets: ["NCB A01-A02", "เอกสารแสดงรายได้", "งานนอกอำนาจ"],
+        bullets: isCar
+          ? ["รับเฉพาะ NCB เกรด A01, A02", "ต้องมีเอกสารแสดงรายได้", "งานนอกอำนาจ"]
+          : ["NCB A01-A02", "เอกสารแสดงรายได้", "งานนอกอำนาจ"],
       },
     ],
   };
