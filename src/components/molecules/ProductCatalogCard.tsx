@@ -1,10 +1,10 @@
-import {Badge} from "@/components/atoms/Badge"
-import {Button} from "@/components/atoms/Button"
-import {Icon} from "@/components/atoms/Icon"
+import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
+import { Icon } from "@/components/atoms/Icon";
 import type {
   ProductCatalogItem,
   ProductCatalogTagTone,
-} from "@/types/product-catalog"
+} from "@/types/product-catalog";
 
 const TAG_TONE_CLASSNAMES: Record<ProductCatalogTagTone, string> = {
   green: "bg-success",
@@ -12,7 +12,7 @@ const TAG_TONE_CLASSNAMES: Record<ProductCatalogTagTone, string> = {
   purple: "bg-tag-purple",
   amber: "bg-tag-amber",
   pink: "bg-tag-pink",
-}
+};
 
 const NCB_GRADE_TONE_CLASSNAMES: Record<
   ProductCatalogItem["ncbGradeTone"],
@@ -20,14 +20,14 @@ const NCB_GRADE_TONE_CLASSNAMES: Record<
 > = {
   blue: "text-primary",
   green: "text-success",
-}
+};
 
 type ProductCatalogCardProps = {
-  item: ProductCatalogItem
-  onSelect?: () => void
-  onCheckNcb?: () => void
-  onViewDetail?: () => void
-}
+  item: ProductCatalogItem;
+  onSelect?: () => void;
+  onCheckNcb?: () => void;
+  onViewDetail?: () => void;
+};
 
 export function ProductCatalogCard({
   item,
@@ -52,7 +52,7 @@ export function ProductCatalogCard({
       </div>
 
       <div className="flex flex-col gap-4 overflow-x-auto rounded-t-lg bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-50 sm:shrink-0">
+        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-52 sm:shrink-0">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-catalog-card-bg text-primary-to">
             <Icon name="money-bag" className="size-4" />
           </span>
@@ -113,5 +113,5 @@ export function ProductCatalogCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
