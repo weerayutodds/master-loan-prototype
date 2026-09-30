@@ -173,7 +173,7 @@ function buildRatebookOptions(
    */
   function walk(source: CarInfo) {
     const selection = toSelection(source);
-      const options = { ...NO_OPTIONS, brand: getRatebookBrands(collateralType) };
+    const options = { ...NO_OPTIONS, brand: getRatebookBrands(collateralType) };
     const locked: Partial<Record<VehicleFieldKey, string>> = {};
 
     for (const field of fields) {
@@ -206,7 +206,18 @@ function buildRatebookOptions(
     }
 
     const matched = filterRows(rows, collateralType, loanTypeId, selection);
-    return { options, locked, selection, row: matched.length === 1 ? matched[0] : undefined };
+    const row = matched.length === 1 ? matched[0] : undefined;
+    // CARTYPE can be known after doors even while several trims/prices remain.
+    const throughDoorsComplete = (["model", "year", "condition", "doors"] as const)
+      .every((field) => Boolean(selection[field]));
+    const carType = throughDoorsComplete && matched.length > 0 &&
+      matched.every((candidate) => candidate.carType === matched[0].carType)
+        ? matched[0].carType
+        : undefined;
+    return {
+      options, locked, selection, row,
+      carType: collateralType === "car" ? carType : row?.carType,
+    };
   }
 
   const current = walk(carInfo);
@@ -218,11 +229,11 @@ function buildRatebookOptions(
     locked: current.locked,
     isLoading,
     resolve(source) {
-      const { locked, row } = walk(source);
+      const { locked, row, carType } = walk(source);
       return {
         ...source,
         ...locked,
-        carType: row?.carType,
+        carType,
         engineCc: row?.engineCc,
         subModel: row?.subModel,
         appraisalPrice: row?.appraisalPrice,
