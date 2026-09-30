@@ -230,13 +230,7 @@ export function CarInfoForm({
             </div>
 
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <FormField
-                label={
-                  vehicle.options.engineCc.length > 0
-                    ? `${FIELD_LABELS.engineCc} (ไม่บังคับ)`
-                    : FIELD_LABELS.engineCc
-                }
-              >
+              <FormField label={`${FIELD_LABELS.engineCc} (ไม่บังคับ)`}>
                 {vehicle.options.engineCc.length > 0 ? (
                   <Select {...selectProps("engineCc")} />
                 ) : (

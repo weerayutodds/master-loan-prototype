@@ -50,7 +50,7 @@ export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollater
         { label: "สภาพรถ", value: optionLabel(carConditionOptions, carInfo.condition), bold: true },
         { label: "จำนวนประตู", value: doorsLabel },
         {
-          label: "ขนาดเครื่องยนต์",
+          label: "ขนาดเครื่องยนต์ (ไม่บังคับ)",
           value: carInfo.engineCc ? `${carInfo.engineCc} ซีซี` : "-",
         },
         { label: "ระบบเกียร์", value: optionLabel(carTransmissionOptions, carInfo.transmission) },
