@@ -188,7 +188,11 @@ function buildRatebookOptions(
               : field === "transmission"
                 ? toKnownOptions(reachable, field, carTransmissionOptions)
                 : toOptions(reachable, field, (value) =>
-                    field === "bodyType" ? bodyTypeLabel(value) : value,
+                    field === "bodyType"
+                      ? bodyTypeLabel(value)
+                      : field === "year"
+                        ? `${value} (${Number(value) + 543})`
+                        : value,
                   );
 
       const key: VehicleFieldKey = field === "code" ? "ratebookCode" : field;

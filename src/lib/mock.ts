@@ -877,7 +877,7 @@ export const carYearOptions: { value: string; label: string }[] = Array.from(
   { length: 15 },
   (_, index) => {
     const year = 2024 - index;
-    return { value: String(year), label: String(year) };
+    return { value: String(year), label: `${year} (${year + 543})` };
   },
 );
 
