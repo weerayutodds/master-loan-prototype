@@ -1026,6 +1026,8 @@ type ProductRule = {
   bookStatusLabel: string;
   primaryActionLabel: string;
   primaryActionVariant: ProductCatalogItem["primaryActionVariant"];
+  /** CSV "Nationality". Omitted means Thai — every kept row is Thai except mc-no-transfer. */
+  nationality?: "Thai" | "Other";
   minAppraisalPrice?: number;
   requiresTopTierBrand?: boolean;
 };
@@ -1183,6 +1185,7 @@ const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
       bookStatusLabel: "ไม่โอนเล่ม",
       primaryActionLabel: "ตรวจ eNCB",
       primaryActionVariant: "outline",
+      nationality: "Other",
     },
     {
       id: "mc-high-limit",
@@ -1463,6 +1466,7 @@ function isRuleEligible(
   rule: ProductRule,
   context: ProductCatalogContext,
 ): boolean {
+  if ((rule.nationality ?? "Thai") !== "Thai") return false;
   if (
     rule.minAppraisalPrice != null &&
     context.appraisalPrice < rule.minAppraisalPrice
