@@ -28,10 +28,25 @@ export function calculateAge(birthDate: string): number {
   return age;
 }
 
+const THAI_DATE_TIME_FORMAT = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Bangkok",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** Always Thai time (UTC+7) — the server renders in UTC on Vercel. */
 export function formatDateTime(isoString: string): string {
-  const date = new Date(isoString);
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const parts = Object.fromEntries(
+    THAI_DATE_TIME_FORMAT.formatToParts(new Date(isoString)).map((part) => [
+      part.type,
+      part.value,
+    ]),
+  );
+  return `${parts.day}/${parts.month}/${parts.year} ${parts.hour}:${parts.minute}`;
 }
 
 export function formatRatePercent(value: number): string {

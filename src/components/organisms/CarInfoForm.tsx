@@ -28,7 +28,7 @@ const FIELD_LABELS: Record<VehicleFieldKey, string> = {
   year: "รุ่นปี ค.ศ.",
   condition: "สภาพรถ",
   doors: "จำนวนประตู",
-  engineCc: "ขนาดเครื่องยนต์",
+  engineCc: "ขนาดเครื่องยนต์ (ไม่บังคับ)",
   transmission: "ระบบเกียร์",
   bodyType: "ประเภทตัวถัง",
   ratebookCode: "รุ่นย่อย",
@@ -154,7 +154,13 @@ export function CarInfoForm({
 
         {isMotorcycle ? (
           <div className="grid grid-cols-2 gap-4">
-            <FormField label={<InfoLabel onClick={() => setYearInfoOpen(true)}>{FIELD_LABELS.year}</InfoLabel>}>
+            <FormField
+              label={
+                <InfoLabel onClick={() => setYearInfoOpen(true)}>
+                  {FIELD_LABELS.year}
+                </InfoLabel>
+              }
+            >
               <Select {...selectProps("year")} />
             </FormField>
             <FormField label={FIELD_LABELS.ratebookCode}>
@@ -164,7 +170,13 @@ export function CarInfoForm({
         ) : (
           <>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <FormField label={<InfoLabel onClick={() => setYearInfoOpen(true)}>{FIELD_LABELS.year}</InfoLabel>}>
+              <FormField
+                label={
+                  <InfoLabel onClick={() => setYearInfoOpen(true)}>
+                    {FIELD_LABELS.year}
+                  </InfoLabel>
+                }
+              >
                 <Select {...selectProps("year")} />
               </FormField>
               <FormField label={FIELD_LABELS.condition}>
@@ -248,8 +260,14 @@ export function CarInfoForm({
         </div>
       </div>
 
-      <CarYearInfoModal open={yearInfoOpen} onClose={() => setYearInfoOpen(false)} />
-      <CarModelInfoModal open={modelInfoOpen} onClose={() => setModelInfoOpen(false)} />
+      <CarYearInfoModal
+        open={yearInfoOpen}
+        onClose={() => setYearInfoOpen(false)}
+      />
+      <CarModelInfoModal
+        open={modelInfoOpen}
+        onClose={() => setModelInfoOpen(false)}
+      />
     </div>
   );
 }
