@@ -31,21 +31,32 @@ export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollater
     ? `${optionLabel(carTypeOptionsByCollateralType[vehicleCollateralType], carInfo.carType)} ${doorsLabel}`
     : "-";
 
-  const fields: { label: string; value: string; bold?: boolean }[] = [
-    { label: "ยี่ห้อรถ", value: brandLabel },
-    { label: "รุ่นรถ", value: modelLabel },
-    { label: "ปีรถ", value: yearLabel },
-    { label: "ประเภทรถ", value: typeLabel },
-    { label: "สภาพรถ", value: optionLabel(carConditionOptions, carInfo.condition), bold: true },
-    { label: "จำนวนประตู", value: doorsLabel },
-    {
-      label: "ขนาดเครื่องยนต์",
-      value: carInfo.engineCc ? `${carInfo.engineCc} ซีซี` : "-",
-    },
-    { label: "ระบบเกียร์", value: optionLabel(carTransmissionOptions, carInfo.transmission) },
-    { label: "ประเภทตัวถัง", value: carInfo.bodyType ? bodyTypeLabel(carInfo.bodyType) : "-" },
-    { label: "รุ่นย่อย", value: carInfo.subModel ?? "-" },
-  ];
+  const isMotorcycle = collateralType === "motorcycle";
+
+  // มอเตอร์ไซค์ only ever asks ยี่ห้อ/รุ่น/ปี/รุ่นย่อย -- the rest of these
+  // fields don't apply (no สภาพรถ/ประตู/เครื่องยนต์/เกียร์/ตัวถัง for it).
+  const fields: { label: string; value: string; bold?: boolean }[] = isMotorcycle
+    ? [
+        { label: "ยี่ห้อรถ", value: brandLabel },
+        { label: "รุ่นรถ", value: modelLabel },
+        { label: "ปีรถ", value: yearLabel },
+        { label: "รุ่นย่อย", value: carInfo.subModel ?? "-" },
+      ]
+    : [
+        { label: "ยี่ห้อรถ", value: brandLabel },
+        { label: "รุ่นรถ", value: modelLabel },
+        { label: "ปีรถ", value: yearLabel },
+        { label: "ประเภทรถ", value: typeLabel },
+        { label: "สภาพรถ", value: optionLabel(carConditionOptions, carInfo.condition), bold: true },
+        { label: "จำนวนประตู", value: doorsLabel },
+        {
+          label: "ขนาดเครื่องยนต์",
+          value: carInfo.engineCc ? `${carInfo.engineCc} ซีซี` : "-",
+        },
+        { label: "ระบบเกียร์", value: optionLabel(carTransmissionOptions, carInfo.transmission) },
+        { label: "ประเภทตัวถัง", value: carInfo.bodyType ? bodyTypeLabel(carInfo.bodyType) : "-" },
+        { label: "รุ่นย่อย", value: carInfo.subModel ?? "-" },
+      ];
 
   return (
     <Card>
