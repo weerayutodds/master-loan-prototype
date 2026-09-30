@@ -1510,9 +1510,12 @@ function isTopTierBrand(
 ): boolean {
   // Land collateral has no brand to judge, so a brand gate can never exclude it.
   if (collateralType === "land") return true;
-  return topTierBrandsByCollateralType[
-    toVehicleCollateralType(collateralType)
-  ].includes(brandValue ?? "");
+  // รถยนต์/มอเตอร์ไซค์ brand values come from the ratebook in upper case
+  // (e.g. "TOYOTA"); รถบรรทุก's mock catalog uses lower case slugs.
+  const normalized = (brandValue ?? "").toLowerCase();
+  return topTierBrandsByCollateralType[toVehicleCollateralType(collateralType)].some(
+    (brand) => brand.toLowerCase() === normalized,
+  );
 }
 
 function isRuleEligible(
