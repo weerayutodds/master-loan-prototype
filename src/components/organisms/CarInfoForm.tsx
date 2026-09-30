@@ -102,9 +102,9 @@ export function CarInfoForm({
     onCarInfoChange(vehicle.resolve(next))
   }
 
-  // Open one field at a time: everything before it that the form actually asks
-  // for has an answer. Fields outside `sequence` (ขนาดเครื่องยนต์ on รถบรรทุก)
-  // do not gate the ones after them.
+  // ปี/สภาพรถ/จำนวนประตู open together once brand and model are answered.
+  // Other fields require earlier answers in `sequence`; optional fields do
+  // not gate the ones after them.
   //
   // ขนาดเครื่องยนต์/ระบบเกียร์/ประเภทตัวถัง/รุ่นย่อย open together as soon as
   // ประเภทรถ is known (i.e. จำนวนประตู is answered) rather than one at a time.
@@ -116,6 +116,13 @@ export function CarInfoForm({
   ];
 
   function isUnlocked(field: VehicleFieldKey) {
+    if (
+      !isMotorcycle &&
+      (field === "year" || field === "condition" || field === "doors")
+    ) {
+      return Boolean(valueOf("brand") && valueOf("model"))
+    }
+
     const gateField =
       !isMotorcycle && CAR_GROUP_FIELDS.includes(field) ? "doors" : field;
     return vehicle.resetOrder

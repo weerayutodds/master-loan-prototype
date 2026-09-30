@@ -10,6 +10,7 @@ Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also r
 - `npm run generate:ratebook` emits the code as the first number in every JSON tuple. The decoder and generated JSON must be deployed together; no format version is added.
 - Selecting vehicle fields keeps the existing cascade, automatic single-option selections and appraisal-button gating. After ยี่ห้อ → รุ่น → ปี → สภาพรถ → จำนวนประตู are filled (including automatic single-option selections), ประเภทรถ displays the shared CARTYPE of the matching rows immediately, without waiting for เกียร์, ตัวถัง or รุ่นย่อย. If no rows match or their CARTYPE values differ, it remains "-" until the selection identifies one type. Changing an earlier answer clears and recalculates the type; prices and other row-specific facts still require one resolved row. Motorcycle forms and summaries continue to hide this field. The collateral summary shows the type label separately from the existing จำนวนประตู row.
 - Existing save actions persist the CARTYPE code as text in `customer_lead_opportunity.car_type`. Legacy ratebook slugs (`sedan`, `pickup`, `van`, etc.) are not supported or migrated. Truck and land mock vehicles retain their current flow and slugs.
+- In the non-motorcycle form, รุ่นปี ค.ศ., สภาพรถ and จำนวนประตู become available together once ยี่ห้อรถ and รุ่นรถ are filled and the vehicle data has loaded. Automatic single-option selections and clearing later answers when an earlier answer changes still apply.
 
 ## Flow
 
