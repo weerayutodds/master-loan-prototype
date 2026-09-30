@@ -74,6 +74,16 @@ function meetsRequest(label: string, requested: number): boolean {
   return isAtOrAbove || isWithinRange;
 }
 
+/** Highest %LTV a label like "80% - 130% LTV" offers, for sorting สูงไปต่ำ. */
+function maxLtvPercent(item: ProductCatalogItem): number {
+  const [, max] = parseRange(item.ltvLabel);
+  return max;
+}
+
+function byLtvDescending(a: ProductCatalogItem, b: ProductCatalogItem): number {
+  return maxLtvPercent(b) - maxLtvPercent(a);
+}
+
 function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): boolean {
   if (filter.bookStatus && item.bookStatusLabel !== filter.bookStatus) return false;
   if (!meetsRequest(item.approvedAmount, filter.requestedAmount)) return false;
@@ -118,8 +128,12 @@ export function ProductCatalog({
   const gradeEligibleItems = effectiveNcbGrade
     ? items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, effectiveNcbGrade))
     : items;
-  const matchedItems = gradeEligibleItems.filter((item) => matchesFilter(item, filter));
-  const otherItems = gradeEligibleItems.filter((item) => !matchesFilter(item, filter));
+  const matchedItems = gradeEligibleItems
+    .filter((item) => matchesFilter(item, filter))
+    .sort(byLtvDescending);
+  const otherItems = gradeEligibleItems
+    .filter((item) => !matchesFilter(item, filter))
+    .sort(byLtvDescending);
 
   function emptyMessage() {
     if (data.items.length === 0) return "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้";

@@ -1151,7 +1151,7 @@ const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
       ],
       ltv: 130,
       monthlyRate: { min: 0.65, max: 2.05 },
-      annualReduction: { min: 7.8, max: 24.6 },
+      annualReduction: { min: 7.8, max: 24.0 },
       interestType: "flat",
       ncbGradeLabel: "ทุกเกรด",
       ncbGradeTone: "green",
@@ -1615,7 +1615,11 @@ function toCatalogItem(
     )} ต่อเดือน)`,
     interestReductionLabel: `${
       rule.interestType === "flat" ? "ดอกเบี้ยคงที่" : "ลดต้นลดดอก"
-    } ${formatRange(rule.annualReduction, (value) => `${value}%`)} ต่อปี`,
+    } ${formatRange(
+      rule.annualReduction,
+      // 24.6 shows as 24 -- display-only, the underlying rate is untouched.
+      (value) => `${value === 24.6 ? 24 : value}%`,
+    )} ต่อปี`,
     primaryActionLabel: rule.primaryActionLabel,
     primaryActionVariant: rule.primaryActionVariant,
     detail: toProductDetail(rule, collateralType),
