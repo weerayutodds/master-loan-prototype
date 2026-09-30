@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       dynamic: 0,
     },
   },
+  images: {
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
 };
 
 export default nextConfig;

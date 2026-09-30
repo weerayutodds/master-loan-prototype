@@ -129,6 +129,7 @@ export const collateralTypeOptions: OptionCardData<CollateralType>[] = [
     value: "motorcycle",
     label: "มอเตอร์ไซค์",
     image: "/assets/collateral/motorcycle.png",
+    imageClassName: "-scale-x-100",
   },
   {
     value: "car",
@@ -136,7 +137,7 @@ export const collateralTypeOptions: OptionCardData<CollateralType>[] = [
     image: "/assets/collateral/car.png",
   },
   { value: "truck", label: "บรรทุก", image: "/assets/collateral/truck.png" },
-  { value: "land", label: "ที่ดิน", image: "/assets/collateral/land.png" },
+  { value: "land", label: "ที่ดิน", image: "/assets/collateral/land.svg" },
 ];
 
 export const refinanceStatusOptions: OptionCardData<RefinanceStatus>[] = [

@@ -65,6 +65,7 @@ export function LoanQuestionsPanel({
               label={option.label}
               icon={option.icon}
               image={option.image}
+              imageClassName={option.imageClassName}
               selected={collateralType === option.value}
               onSelect={() => onCollateralTypeChange(option.value)}
             />

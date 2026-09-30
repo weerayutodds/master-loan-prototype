@@ -42,6 +42,7 @@ export type OptionCardData<T extends string> = {
   description?: string;
   icon?: IconName;
   image?: string;
+  imageClassName?: string;
 };
 
 export type CustomerInfo = {

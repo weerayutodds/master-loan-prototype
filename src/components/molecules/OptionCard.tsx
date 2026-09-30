@@ -6,6 +6,7 @@ type OptionCardProps = {
   description?: string;
   icon?: IconName;
   image?: string;
+  imageClassName?: string;
   selected: boolean;
   onSelect: () => void;
 };
@@ -15,6 +16,7 @@ export function OptionCard({
   description,
   icon,
   image,
+  imageClassName,
   selected,
   onSelect,
 }: OptionCardProps) {
@@ -39,7 +41,13 @@ export function OptionCard({
         </span>
       ) : null}
       {image ? (
-        <Image src={image} alt="" width={94} height={55} className="h-13.75 w-23.5 object-contain" />
+        <Image
+          src={image}
+          alt=""
+          width={94}
+          height={55}
+          className={`h-13.75 w-23.5 object-contain ${imageClassName ?? ""}`}
+        />
       ) : icon ? (
         <Icon name={icon} className="size-6 text-foreground" />
       ) : null}
