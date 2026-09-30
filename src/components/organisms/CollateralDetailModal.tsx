@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
-import { Input } from "@/components/atoms/Input";
-import { Select } from "@/components/atoms/Select";
-import { FormField } from "@/components/molecules/FormField";
-import { Modal } from "@/components/molecules/Modal";
-import { ChassisNumberInfoModal } from "@/components/organisms/ChassisNumberInfoModal";
-import { provinceOptions } from "@/lib/mock";
-import type { CollateralIdentifier } from "@/types/ratebook";
+import {Button} from "@/components/atoms/Button"
+import {Icon} from "@/components/atoms/Icon"
+import {Input} from "@/components/atoms/Input"
+import {Select} from "@/components/atoms/Select"
+import {FormField} from "@/components/molecules/FormField"
+import {Modal} from "@/components/molecules/Modal"
+import {ChassisNumberInfoModal} from "@/components/organisms/ChassisNumberInfoModal"
+import {provinceOptions} from "@/lib/mock"
+import type {CollateralIdentifier} from "@/types/ratebook"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useEffect, useState} from "react"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
 
 const schema = z
   .object({
@@ -20,22 +20,54 @@ const schema = z
     licensePlateProvince: z.string().optional(),
     chassisNumber: z.string().optional(),
   })
-  .refine(
-    (data) => (!!data.licensePlateNumber && !!data.licensePlateProvince) || !!data.chassisNumber,
-    {
-      message: "กรุณากรอกเลขทะเบียนพร้อมจังหวัด หรือเลขตัวถัง",
-      path: ["chassisNumber"],
-    },
-  );
+  .superRefine((data, ctx) => {
+    const hasPlate = !!data.licensePlateNumber?.trim()
+    const hasProvince = !!data.licensePlateProvince?.trim()
+    const hasChassis = !!data.chassisNumber?.trim()
 
-type FormValues = z.infer<typeof schema>;
+    if (hasProvince && !hasPlate) {
+      ctx.addIssue({
+        path: ["licensePlateNumber"],
+        message: "กรุณากรอกเลขทะเบียนรถ",
+        code: z.ZodIssueCode.custom,
+      })
+    }
+
+    if (hasPlate && !hasProvince) {
+      ctx.addIssue({
+        path: ["licensePlateProvince"],
+        message: "กรุณาเลือกจังหวัด",
+        code: z.ZodIssueCode.custom,
+      })
+    }
+
+    if (!hasPlate && !hasProvince && !hasChassis) {
+      ctx.addIssue({
+        path: ["licensePlateNumber"],
+        message: "กรุณากรอกเลขทะเบียน",
+        code: z.ZodIssueCode.custom,
+      })
+      ctx.addIssue({
+        path: ["licensePlateProvince"],
+        message: "กรุณาเลือกจังหวัด",
+        code: z.ZodIssueCode.custom,
+      })
+      ctx.addIssue({
+        path: ["chassisNumber"],
+        message: "กรุณากรอกเลขตัวถัง หรือข้อมูลทะเบียนรถ",
+        code: z.ZodIssueCode.custom,
+      })
+    }
+  })
+
+type FormValues = z.infer<typeof schema>
 
 type CollateralDetailModalProps = {
-  open: boolean;
-  initialValue?: CollateralIdentifier;
-  onClose: () => void;
-  onSave: (value: CollateralIdentifier) => void;
-};
+  open: boolean
+  initialValue?: CollateralIdentifier
+  onClose: () => void
+  onSave: (value: CollateralIdentifier) => void
+}
 
 export function CollateralDetailModal({
   open,
@@ -43,32 +75,37 @@ export function CollateralDetailModal({
   onClose,
   onSave,
 }: CollateralDetailModalProps) {
-  const [infoOpen, setInfoOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false)
+
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: {errors},
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { licensePlateNumber: "", licensePlateProvince: "", chassisNumber: "" },
-  });
+    defaultValues: {
+      licensePlateNumber: "",
+      licensePlateProvince: "",
+      chassisNumber: "",
+    },
+  })
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return
     reset({
       licensePlateNumber: initialValue?.licensePlateNumber ?? "",
       licensePlateProvince: initialValue?.licensePlateProvince ?? "",
       chassisNumber: initialValue?.chassisNumber ?? "",
-    });
-  }, [open, initialValue, reset]);
+    })
+  }, [open, initialValue, reset])
 
   function onSubmit(data: FormValues) {
     onSave({
       licensePlateNumber: data.licensePlateNumber?.trim() || undefined,
       licensePlateProvince: data.licensePlateProvince || undefined,
       chassisNumber: data.chassisNumber?.trim() || undefined,
-    });
+    })
   }
 
   return (
@@ -79,12 +116,22 @@ export function CollateralDetailModal({
         </h2>
 
         <div className="grid grid-cols-2 gap-4">
-          <FormField label="เลขทะเบียนรถ">
-            <Input placeholder="EX. 1กก1234" {...register("licensePlateNumber")} />
+          <FormField
+            label="เลขทะเบียนรถ"
+            error={errors.licensePlateNumber?.message}
+          >
+            <Input
+              placeholder="EX. 1กก1234"
+              {...register("licensePlateNumber")}
+            />
           </FormField>
-          <FormField label="จังหวัดที่จดทะเบียน">
+
+          <FormField
+            label="จังหวัดที่จดทะเบียน"
+            error={errors.licensePlateProvince?.message}
+          >
             <Select
-              options={[{ value: "", label: "เลือกข้อมูล" }, ...provinceOptions]}
+              options={[{value: "", label: "เลือกข้อมูล"}, ...provinceOptions]}
               {...register("licensePlateProvince")}
             />
           </FormField>
@@ -100,7 +147,11 @@ export function CollateralDetailModal({
           label={
             <span className="flex items-center gap-1">
               เลขตัวถัง
-              <button type="button" onClick={() => setInfoOpen(true)} aria-label="เลขตัวถังคืออะไร">
+              <button
+                type="button"
+                onClick={() => setInfoOpen(true)}
+                aria-label="เลขตัวถังคืออะไร"
+              >
                 <Icon name="info" className="size-4 text-muted-foreground" />
               </button>
             </span>
@@ -113,7 +164,13 @@ export function CollateralDetailModal({
         <div className="border-t border-divider" />
 
         <div className="flex gap-4">
-          <Button type="button" variant="secondary" size="lg" className="flex-1" onClick={onClose}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+            onClick={onClose}
+          >
             ยกเลิก
           </Button>
           <Button type="submit" variant="primary" size="lg" className="flex-1">
@@ -122,7 +179,10 @@ export function CollateralDetailModal({
         </div>
       </form>
 
-      <ChassisNumberInfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+      <ChassisNumberInfoModal
+        open={infoOpen}
+        onClose={() => setInfoOpen(false)}
+      />
     </Modal>
-  );
+  )
 }
