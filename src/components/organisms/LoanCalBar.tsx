@@ -641,6 +641,7 @@ export function LoanCalBar({
                   installmentTerm={calculated.installmentTerm}
                   isTLC={calculated.isTLC}
                   hasPpi={calculated.hasPpi}
+                  isRefinance={isRefinance}
                   onClose={() => setShowDetail(false)}
                 />
               </div>
