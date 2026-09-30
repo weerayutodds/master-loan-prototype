@@ -10,7 +10,12 @@ import { LeadLoanInfoCard } from "@/components/molecules/LeadLoanInfoCard";
 import { followUpTimelineMock } from "@/lib/mock";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type { ProductCatalogItem } from "@/types/product-catalog";
-import type { CarInfo, CarInsuranceInfo, LoanInfo } from "@/types/ratebook";
+import type {
+  CarInfo,
+  CarInsuranceInfo,
+  CollateralType,
+  LoanInfo,
+} from "@/types/ratebook";
 import { useState } from "react";
 
 const COLLATERAL_LOAN_LABEL: Record<string, string> = {
@@ -35,6 +40,7 @@ function leadNoDisplay(opportunity: CustomerLeadOpportunity): string {
 type LeadContentProps = {
   initialOpportunity: CustomerLeadOpportunity;
   carInfo: CarInfo;
+  collateralType: CollateralType | null;
   selectedProduct: ProductCatalogItem;
   loanInfo: LoanInfo;
   onLoanInfoChange: (value: LoanInfo) => void;
@@ -45,6 +51,7 @@ type LeadContentProps = {
 export function LeadContent({
   initialOpportunity,
   carInfo,
+  collateralType,
   selectedProduct,
   loanInfo,
   onLoanInfoChange,
@@ -52,8 +59,11 @@ export function LeadContent({
   onCarInsuranceInfoChange,
 }: LeadContentProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("loan");
+  // initialOpportunity.collateralType is the last-saved DB snapshot; the live
+  // selection (not yet saved) is what the rest of the form is showing.
+  const effectiveCollateralType = collateralType ?? initialOpportunity.collateralType;
   const loanLabel =
-    COLLATERAL_LOAN_LABEL[initialOpportunity.collateralType ?? "car"] ?? "สินเชื่อรถยนต์";
+    COLLATERAL_LOAN_LABEL[effectiveCollateralType ?? "car"] ?? "สินเชื่อรถยนต์";
 
   return (
     <div className="space-y-6">
@@ -102,7 +112,7 @@ export function LeadContent({
           <p className="text-sm text-muted-foreground">{loanLabel}</p>
           <LeadCollateralInfoCard
             carInfo={carInfo}
-            collateralType={initialOpportunity.collateralType}
+            collateralType={effectiveCollateralType}
           />
           <LeadLoanInfoCard
             product={selectedProduct}

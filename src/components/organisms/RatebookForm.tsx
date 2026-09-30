@@ -432,6 +432,7 @@ export function RatebookForm({
           <LeadContent
             initialOpportunity={initialOpportunity}
             carInfo={carInfo}
+            collateralType={collateralType}
             selectedProduct={selectedProduct}
             loanInfo={loanInfo}
             onLoanInfoChange={setLoanInfo}
