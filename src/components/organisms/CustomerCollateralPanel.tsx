@@ -38,7 +38,10 @@ import type {
 } from "@/types/ratebook"
 import {useRouter} from "next/navigation"
 import {setTimeout} from "node:timers"
-import {useState} from "react"
+import {useEffect, useState} from "react"
+import {ProgressRing} from "../atoms/ProgressRing"
+
+const TOTAL_SECTIONS = 4
 
 type CustomerCollateralPanelProps = {
   initialOpportunity?: CustomerLeadOpportunity | null
@@ -141,8 +144,8 @@ export function CustomerCollateralPanel({
     initialOpportunity?.brandModel ?? "",
   )
   const [savedToastOpen, setSavedToastOpen] = useState(false)
-
   const [isSaving, setIsSaving] = useState(false)
+
 
   async function handleSaveLead() {
     if (!customer) return
@@ -209,6 +212,13 @@ export function CustomerCollateralPanel({
   }
 
   const brandModelDisplay = formatBrandModelYear(carInfo, initialOpportunity)
+  const filledSections = [
+    Boolean(customer?.firstName && customer?.lastName),
+    Boolean(customer?.phone),
+    collateralIdentifier !== null,
+    brandModelDisplay !== "",
+  ]
+  const filledSectionCount = filledSections.filter(Boolean).length
 
   return (
     <Card className="space-y-4 border-2">
@@ -238,6 +248,7 @@ export function CustomerCollateralPanel({
               ) : null}
             </div>
           </div>
+          <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
         </div>
       ) : (
         <div className="flex items-center justify-between">
@@ -298,7 +309,7 @@ export function CustomerCollateralPanel({
         <span className="text-sm text-foreground">ข้อมูลหลักประกัน</span>
       </div>
 
-     {collateralType && collateralType !== "land" ? (
+      {collateralType && collateralType !== "land" ? (
         <>
           <div
             className={`flex rounded-lg bg-surface-muted min-h-11 px-3 py-2.5 ${

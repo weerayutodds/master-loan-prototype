@@ -23,6 +23,7 @@ import {useRouter} from "next/navigation"
 import {useEffect, useRef, useState} from "react"
 import {useForm, type Resolver} from "react-hook-form"
 import {z} from "zod"
+import {SnackbarToast} from "../molecules/SnackbarToast"
 
 const CARD_READ_DELAY_MS = 1500
 
@@ -63,9 +64,18 @@ export function CustomerVerificationPanel({
     null,
   )
 
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
+
+  useEffect(() => {
+    if (verificationMethod === "card" && cardStatus === "success") {
+      setShowSuccessToast(true)
+    }
+  }, [verificationMethod, cardStatus])
+
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const {
+    setValue,
     register,
     handleSubmit,
     formState: {errors, isSubmitting},
@@ -83,6 +93,15 @@ export function CustomerVerificationPanel({
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (verificationMethod === "manual" && cardCustomer) {
+      const [firstName, ...rest] = (cardCustomer.name ?? "").split(" ")
+
+      setValue("firstName", firstName, {shouldValidate: true})
+      setValue("lastName", rest.join(" "), {shouldValidate: true})
+    }
+  }, [verificationMethod, cardCustomer, setValue])
 
   function handleCardTap() {
     if (cardStatus === "loading") return
@@ -144,8 +163,7 @@ export function CustomerVerificationPanel({
             </FormField>
           </div>
 
-          {/* Customer Info Headers */}
-          <div className="flex flex-col gap-[2px]">
+          <div className="flex flex-col gap-0.5">
             <p className="text-[16px] font-medium leading-[160%] tracking-[0.01em] text-[#414243]">
               ข้อมูลลูกค้า
             </p>
@@ -154,15 +172,7 @@ export function CustomerVerificationPanel({
             </p>
           </div>
 
-          {verificationMethod === "card" && cardStatus === "success" ? (
-            <div className="flex items-center gap-2 rounded-lg bg-success/10 px-4 py-3 text-sm font-medium text-success">
-              <Icon name="check" className="size-5" />
-              อ่านข้อมูลบัตรสำเร็จ
-            </div>
-          ) : null}
-
-          {/* Action Stack (Selector & Active Area) */}
-          <div className="flex w-[340px] flex-col gap-[16px]">
+          <div className="flex w-85 flex-col gap-4">
             <SegmentedControl
               options={verificationMethodOptions}
               value={verificationMethod}
@@ -173,7 +183,6 @@ export function CustomerVerificationPanel({
               cardStatus === "success" && cardCustomer ? (
                 <div key="card-success" className="space-y-4">
                   <div className="relative box-border flex h-[81.29px] w-full items-center overflow-hidden rounded-xl border-[2.63px] border-white bg-[#EFF5FF] px-[12px] py-[10px] shadow-[0px_4px_12px_rgba(63,116,245,0.16)]">
-                    {/* พื้นหลังตกแต่งรูปวงรี (Ellipse 1810) */}
                     <div
                       className="absolute bottom-[0.28px] right-[-72.21px] h-[67.19px] w-[138.33px] rounded-full"
                       style={{
@@ -224,21 +233,19 @@ export function CustomerVerificationPanel({
                   disabled={cardStatus === "loading"}
                   className="relative box-border h-38.75 w-85 rounded-lg border-2 border-dashed border-[#E5E5E6] bg-gradient-to-t from-[#F7F7F7] to-[#FCFCFC] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {/* Dipchip Image */}
                   <img
                     src="/assets/images/dipchip.png"
                     alt="Dipchip reader"
-                    className="absolute left-[106px] top-[24px] h-[80px] w-[128px]"
+                    className="absolute left-26.5 top-6 h-20 w-32"
                   />
 
-                  {/* Status Indicator */}
-                  <div className="absolute top-[116px] flex w-full items-center justify-center gap-[3px]">
+                  <div className="absolute top-29 flex w-full items-center justify-center gap-0.75">
                     <span className="text-[12px] font-medium leading-[160%] tracking-[0.01em] text-[#616166]">
                       เครื่องเสียบบัตร :
                     </span>
-                    <div className="flex items-center gap-[4px] pl-[2px] pr-[6px]">
-                      <div className="flex h-[12px] w-[12px] items-center justify-center rounded-full bg-[#03AA3C]">
-                        <Icon name="check" className="size-[8px] text-white" />
+                    <div className="flex items-center gap-1 pl-0.5 pr-1.5">
+                      <div className="flex h-3 w-3 items-center justify-center rounded-full bg-[#03AA3C]">
+                        <Icon name="check" className="size-2 text-white" />
                       </div>
                       <span className="text-[10px] font-normal leading-[160%] tracking-[0.01em] text-[#616166]">
                         พร้อมใช้งาน
@@ -293,6 +300,12 @@ export function CustomerVerificationPanel({
           )}
         </form>
       </Card>
+
+      <SnackbarToast
+        open={showSuccessToast}
+        message="อ่านข้อมูลบัตรสำเร็จ"
+        onClose={() => setShowSuccessToast(false)}
+      />
 
       <LoadingToast
         open={cardStatus === "loading" || isSubmitting}
