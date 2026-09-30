@@ -130,10 +130,12 @@ export function CarInfoForm({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-base font-semibold text-foreground">กรอกข้อมูลรถ</p>
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <Icon name="scan" className="size-4" />
-          สแกนเล่มทะเบียน
-        </Button>
+        {!isMotorcycle && (
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Icon name="scan" className="size-4" />
+            สแกนเล่มทะเบียน
+          </Button>
+        )}
       </div>
 
       <div className="space-y-4 rounded-xl border-2 border-card-border bg-surface p-5 shadow-primary-s">
