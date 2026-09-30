@@ -2,17 +2,20 @@
 
 import {Button} from "@/components/atoms/Button"
 import {Icon} from "@/components/atoms/Icon"
-import {LoadingToast} from "@/components/molecules/LoadingToast"
+import {EncbDevelopmentNotice} from "@/components/molecules/EncbDevelopmentNotice"
 import {Modal} from "@/components/molecules/Modal"
 import {formatThaiPhone} from "@/lib/format"
 import {mockEncbCheck} from "@/lib/mock"
 import type {NcbGrade} from "@/types/customer-lead"
 import Image from "next/image"
-import {useEffect, useState} from "react"
+import {useState} from "react"
 
-const CARD_READ_DURATION_MS = 2000
-
-type Step = "insert-card" | "reading-card" | "consent" | "face" | "otp"
+const STEP_LABELS = [
+  "เสียบบัตรและเลขหลังบัตร",
+  "ยืนยันตัวตนด้วยใบหน้า",
+  "ให้ความยินยอม",
+  "OTP ยืนยันตัวตน",
+]
 
 type EncbCheckFlowProps = {
   customerName: string
@@ -21,8 +24,6 @@ type EncbCheckFlowProps = {
   onComplete: (ncbGrade: NcbGrade) => unknown
 }
 
-function noop() {}
-
 /** Mount only while the check is running; unmounting resets it to the first step. */
 export function EncbCheckFlow({
   customerName,
@@ -30,16 +31,15 @@ export function EncbCheckFlow({
   onCancel,
   onComplete,
 }: EncbCheckFlowProps) {
-  const [step, setStep] = useState<Step>("insert-card")
+  const [stepIndex, setStepIndex] = useState(0)
   const [confirming, setConfirming] = useState(false)
+  const isLastStep = stepIndex === STEP_LABELS.length - 1
 
-  useEffect(() => {
-    if (step !== "reading-card") return
-    const timer = setTimeout(() => setStep("consent"), CARD_READ_DURATION_MS)
-    return () => clearTimeout(timer)
-  }, [step])
-
-  async function handleConfirmOtp() {
+  async function handleNext() {
+    if (!isLastStep) {
+      setStepIndex(stepIndex + 1)
+      return
+    }
     setConfirming(true)
     try {
       await onComplete(mockEncbCheck.ncbGrade)
@@ -48,172 +48,142 @@ export function EncbCheckFlow({
     }
   }
 
-  const isCardStep = step === "insert-card" || step === "reading-card"
-
   return (
-    <>
-      <Modal
-        open={isCardStep}
-        onClose={step === "insert-card" ? onCancel : noop}
-        size="lg"
-      >
-        <div className="flex flex-col items-center gap-5 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground">
-              กรุณาเสียบบัตรประชาชนผู้กู้
-            </h2>
-            <p className="text-base text-muted-foreground">
-              เลขบัตรประชาชน : {idCardNumber || "-"}
-            </p>
-            <p className="text-base text-muted-foreground">
-              {customerName || "-"}
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled={step === "reading-card"}
-            onClick={() => setStep("reading-card")}
-            className="flex w-full flex-col items-center gap-4 rounded-xl border-2 border-dashed border-secondary-border bg-surface-muted px-4 py-8 transition-colors hover:border-primary"
-          >
-            <Image
-              src="/assets/images/dipchip.png"
-              alt=""
-              width={192}
-              height={120}
-              priority
-              className="h-30 w-48 object-contain"
-            />
-            <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-              เครื่องเสียบบัตร :
-              <span className="inline-flex items-center gap-1 text-xs">
-                <Icon name="check-circle-solid" className="size-4 text-success" />
-                พร้อมใช้งาน
-              </span>
-            </span>
-          </button>
+    <Modal open onClose={onCancel} size="lg">
+      <div className="relative flex flex-col items-center gap-4">
+        <button
+          type="button"
+          aria-label="ปิด"
+          onClick={onCancel}
+          className="absolute -right-3 -top-3 text-muted-foreground hover:text-foreground"
+        >
+          <Icon name="close" className="size-6" />
+        </button>
+
+        <div className="w-full pt-4">
+          <EncbDevelopmentNotice />
         </div>
-      </Modal>
 
-      <LoadingToast
-        open={step === "reading-card"}
-        title="กำลังอ่านข้อมูลบัตร..."
-        description="อย่าเพิ่งดึงบัตรออก จนกว่าจะเสร็จสิ้น"
-      />
+        <div className="relative w-full max-w-sm">
+          <div className="h-56 overflow-hidden rounded-2xl border-2 border-card-border bg-surface p-4 shadow-primary-s">
+            {stepIndex === 0 ? (
+              <div className="flex flex-col items-center gap-3 text-center">
+                <div>
+                  <p className="text-base font-semibold text-foreground">
+                    กรุณาเสียบบัตรประชาชนผู้กู้
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    เลขบัตรประชาชน : {idCardNumber || "-"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {customerName || "-"}
+                  </p>
+                </div>
+                <div className="flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed border-secondary-border bg-surface-muted px-4 py-5">
+                  <Image
+                    src="/assets/images/dipchip.png"
+                    alt=""
+                    width={128}
+                    height={80}
+                    priority
+                    className="h-20 w-32 object-contain"
+                  />
+                  <span className="flex items-center gap-1 text-xs text-foreground">
+                    เครื่องเสียบบัตร :
+                    <Icon
+                      name="check-circle-solid"
+                      className="size-3.5 text-success"
+                    />
+                    พร้อมใช้งาน
+                  </span>
+                </div>
+              </div>
+            ) : null}
 
-      <Modal open={step === "consent"} onClose={onCancel} variant="info">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <span className="flex size-16 items-center justify-center rounded-full bg-tag-amber text-3xl font-bold text-white">
-            !
+            {stepIndex === 1 ? (
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-sm font-medium text-foreground">
+                  ยืนยันตัวตนด้วยใบหน้า
+                </p>
+                <div className="w-44 overflow-hidden rounded-lg border-4 border-primary-to">
+                  <Image
+                    src="/assets/images/encb-face-verify.png"
+                    alt="ภาพยืนยันตัวตนด้วยใบหน้า"
+                    width={548}
+                    height={736}
+                    priority
+                    className="h-auto w-full"
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {stepIndex === 2 ? (
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-sm font-medium text-foreground">
+                  ยินยอมตรวจ eNCB
+                </p>
+                <div className="space-y-2 rounded-2xl border border-secondary-border p-4 text-foreground">
+                  <p className="text-lg font-semibold">
+                    ข้อมูลส่วนบุคคลที่มีความสำคัญต่อการให้บริการ
+                  </p>
+                  <p className="text-sm leading-relaxed">
+                    บริษัท เงินติดล้อ จำกัด (มหาชน) ซึ่งต่อไปนี้จะเรียกว่า
+                    “บริษัทฯ” จัดทำบริการ Application NgernTidLor (เงินติดล้อ) นี้
+                    เพื่อให้ข้อมูลเกี่ยวกับผลิตภัณฑ์และบริการต่าง ๆ ของบริษัทฯ
+                    เพื่ออำนวยความสะดวกในการติดต่อสื่อสารระหว่างผู้ใช้บริการกับบริษัทฯ
+                  </p>
+                </div>
+              </div>
+            ) : null}
+
+            {stepIndex === 3 ? (
+              <div className="flex flex-col items-center gap-3 text-center">
+                <p className="text-sm font-medium text-foreground">
+                  กรอกรหัส OTP เพื่อยืนยันตัวตน
+                </p>
+                <div className="flex flex-col items-center">
+                  <p className="text-sm text-foreground">
+                    เราได้ส่งรหัส OTP ไปที่เบอร์
+                  </p>
+                  <p className="text-lg font-semibold text-primary">
+                    {formatThaiPhone(mockEncbCheck.otpPhone)}
+                  </p>
+                  <span className="text-sm font-semibold text-primary underline">
+                    เปลี่ยนเบอร์
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  {Array.from({length: 6}, (_, index) => (
+                    <span
+                      key={index}
+                      className="size-10 rounded-lg border border-secondary-border"
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+          <div className="pointer-events-none absolute -inset-x-2 -bottom-1 h-20 bg-linear-to-t from-surface to-transparent" />
+        </div>
+
+        <p className="flex items-center gap-2 text-base text-foreground">
+          <span className="font-medium text-primary">
+            {stepIndex + 1}/{STEP_LABELS.length}
           </span>
-          <h2 className="text-xl font-semibold text-foreground">
-            ยินยอมการขอสินเชื่อและตรวจ eNCB
-          </h2>
-          <p className="text-base text-price-label">
-            หมายเหตุ: ต้องได้รับความยินยอมก่อนจึงจะสามารถตรวจ eNCB ได้
-          </p>
-        </div>
-        <div className="mt-8 flex gap-4">
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1"
-            onClick={onCancel}
-          >
-            ยกเลิก
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            className="flex-1"
-            onClick={() => setStep("face")}
-          >
-            ยืนยัน
-          </Button>
-        </div>
-      </Modal>
+          {STEP_LABELS[stepIndex]}
+        </p>
 
-      <Modal open={step === "face"} onClose={noop} size="lg">
-        <div className="flex flex-col items-center gap-5">
-          <h2 className="text-xl font-semibold text-foreground">
-            ยืนยันตัวตนด้วยใบหน้า
-          </h2>
-          <div className="w-full max-w-80 overflow-hidden rounded-2xl border-4 border-primary-to">
-            <Image
-              src="/assets/images/encb-face-verify.png"
-              alt="ภาพยืนยันตัวตนด้วยใบหน้า"
-              width={548}
-              height={736}
-              priority
-              className="h-auto w-full"
-            />
-          </div>
-          <Button
-            variant="primary"
-            size="lg"
-            className="min-w-40"
-            onClick={() => setStep("otp")}
-          >
-            ถัดไป
-          </Button>
-        </div>
-      </Modal>
-
-      <Modal open={step === "otp"} onClose={noop} size="lg">
-        <div className="flex flex-col items-center gap-5 text-center">
-          <h2 className="text-xl font-semibold text-foreground">
-            กรอกรหัส OTP เพื่อยืนยันตัวตน
-          </h2>
-          <div className="flex flex-col items-center gap-1">
-            <p className="text-base text-foreground">
-              เราได้ส่งรหัส OTP ไปที่เบอร์
-            </p>
-            <p className="text-lg font-semibold text-primary">
-              {formatThaiPhone(mockEncbCheck.otpPhone)}
-            </p>
-            <button
-              type="button"
-              disabled
-              className="text-sm font-semibold text-primary underline disabled:cursor-not-allowed"
-            >
-              เปลี่ยนเบอร์
-            </button>
-          </div>
-          <div className="flex gap-2">
-            {mockEncbCheck.otpCode.split("").map((digit, index) => (
-              <span
-                key={index}
-                className="flex size-12 items-center justify-center rounded-lg border border-secondary-border text-2xl font-medium text-foreground"
-              >
-                {digit}
-              </span>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Ref. {mockEncbCheck.otpRef} รหัสมีอายุการใช้งาน 5 นาที
-          </p>
-          <button
-            type="button"
-            disabled
-            className="inline-flex items-center gap-1 text-base font-semibold text-primary disabled:cursor-not-allowed"
-          >
-            <Icon name="refresh" className="size-5" />
-            ขอรหัส OTP ใหม่
-          </button>
-          <div className="flex w-full max-w-sm flex-col gap-3">
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={confirming}
-              onClick={handleConfirmOtp}
-            >
-              ยืนยัน
-            </Button>
-            <Button variant="secondary" size="lg" disabled>
-              ยกเลิก
-            </Button>
-          </div>
-        </div>
-      </Modal>
-    </>
+        <Button
+          variant="primary"
+          size="lg"
+          className="min-w-40"
+          disabled={confirming}
+          onClick={handleNext}
+        >
+          {isLastStep ? "รับทราบ" : "ถัดไป"}
+        </Button>
+      </div>
+    </Modal>
   )
 }
