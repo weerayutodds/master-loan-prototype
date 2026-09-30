@@ -7,6 +7,7 @@ import { LeadCarInsuranceCard } from "@/components/molecules/LeadCarInsuranceCar
 import { LeadCollateralInfoCard } from "@/components/molecules/LeadCollateralInfoCard";
 import { LeadFollowUpTimeline } from "@/components/molecules/LeadFollowUpTimeline";
 import { LeadLoanInfoCard } from "@/components/molecules/LeadLoanInfoCard";
+import { ErrorModal } from "@/components/organisms/ErrorModal";
 import { followUpTimelineMock } from "@/lib/mock";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type { ProductCatalogItem } from "@/types/product-catalog";
@@ -61,6 +62,7 @@ export function LeadContent({
   onEditCollateral,
 }: LeadContentProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("loan");
+  const [errorActionTitle, setErrorActionTitle] = useState<string | null>(null);
   // initialOpportunity.collateralType is the last-saved DB snapshot; the live
   // selection (not yet saved) is what the rest of the form is showing.
   const effectiveCollateralType = collateralType ?? initialOpportunity.collateralType;
@@ -80,11 +82,21 @@ export function LeadContent({
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setErrorActionTitle("นัดหมาย")}
+            >
               <Icon name="calendar-check" className="size-4" />
               นัดหมาย
             </Button>
-            <Button variant="outline" size="sm" className="gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setErrorActionTitle("จัดการ Lead")}
+            >
               จัดการ Lead
               <Icon name="arrow-down" className="size-3.5" />
             </Button>
@@ -134,6 +146,14 @@ export function LeadContent({
           ข้อมูล Lead — อยู่ระหว่างการพัฒนา
         </div>
       )}
+
+      <ErrorModal
+        open={!!errorActionTitle}
+        onClose={() => setErrorActionTitle(null)}
+        title="ระบบกำลังพัฒนา"
+        description={`ฟังก์ชัน "${errorActionTitle}" กำลังอยู่ในช่วงการพัฒนา`}
+        buttonText="ตกลง"
+      />
     </div>
   );
 }
