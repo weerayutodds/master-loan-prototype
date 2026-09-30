@@ -33,7 +33,7 @@ export function OptionCard({
           : "flex flex-col gap-1"
       } shadow-primary-s ${
         selected
-          ? "border-primary bg-primary/5"
+          ? "border-primary bg-surface"
           : "border-card-border bg-surface hover:border-primary/40"
       }`}
     >
