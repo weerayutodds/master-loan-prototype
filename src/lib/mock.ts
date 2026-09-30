@@ -55,11 +55,11 @@ export const ncbGradeList = [
 
 export const navItems: NavItem[] = [
   { href: "/", label: "หน้าแรก", icon: "home", active: true },
-  { href: "/loans", label: "สินเชื่อ", icon: "credit-card" },
-  { href: "/insurance", label: "ประกัน", icon: "shield" },
-  { href: "/crm", label: "CRM", icon: "users" },
-  { href: "/tasks", label: "งานติดตาม", icon: "calendar-check" },
-  { href: "/encb", label: "eNCB", icon: "bar-chart" },
+  { href: "/", label: "สินเชื่อ", icon: "credit-card" },
+  { href: "/", label: "ประกัน", icon: "shield" },
+  { href: "/", label: "CRM", icon: "users" },
+  { href: "/", label: "งานติดตาม", icon: "calendar-check" },
+  { href: "/", label: "eNCB", icon: "bar-chart" },
 ];
 
 export const currentUser: BranchUser = {
@@ -77,7 +77,7 @@ export const quickActions: QuickAction[] = [
   {
     title: "eNCB",
     subtitle: "ตรวจสอบข้อมูลเครดิตบูโร",
-    href: "/encb",
+    href: "/",
   },
 ];
 

@@ -284,7 +284,6 @@ export function RatebookForm({
   async function handleNcbCardRead() {
     if (verificationMethod !== "card") await handleDipchipRead()
     setNcbAwaitingRefresh(true)
-  
   }
 
   async function handleNcbChecked(nextGrade: NcbGrade) {
@@ -403,7 +402,7 @@ export function RatebookForm({
   return (
     <>
       <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-        <div className="lg:sticky lg:top-19">
+        <div className="relative z-50 lg:sticky lg:top-19">
           <CustomerCollateralPanel
             initialOpportunity={initialOpportunity}
             opportunityId={opportunityId}
@@ -440,7 +439,7 @@ export function RatebookForm({
             onCarInsuranceInfoChange={setCarInsuranceInfo}
           />
         ) : (
-          <div className="space-y-6">
+          <div className="relative z-10 space-y-6">
             <LoanQuestionsPanel
               loanPurposeOptions={loanPurposeOptions}
               collateralTypeOptions={collateralTypeOptions}

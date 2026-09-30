@@ -40,7 +40,7 @@ export function LoanQuestionsPanel({
   onExistingFinanceChange,
 }: LoanQuestionsPanelProps) {
   return (
-    <Card className="space-y-6">
+    <Card className="relative z-10 space-y-6">
       <div>
         <p className="text-sm font-medium text-foreground">
           ลูกค้าต้องการเงินหรืออยากซื้อรถ?

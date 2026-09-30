@@ -1,11 +1,12 @@
-"use client";
+"use client"
 
-import { Icon } from "@/components/atoms/Icon";
-import { Select } from "@/components/atoms/Select";
-import { LoanCalDetailPopover } from "@/components/molecules/LoanCalDetailPopover";
-import { GenderAgePopover } from "@/components/organisms/GenderAgePopover";
-import { updateOpportunityCustomerInfo } from "@/lib/actions/customer-lead-opportunity";
-import { calculateAge, formatRatePercent } from "@/lib/format";
+import {Icon} from "@/components/atoms/Icon"
+import {Select} from "@/components/atoms/Select"
+import {LoadingToast} from "@/components/molecules/LoadingToast"
+import {LoanCalDetailPopover} from "@/components/molecules/LoanCalDetailPopover"
+import {GenderAgePopover} from "@/components/organisms/GenderAgePopover"
+import {updateOpportunityCustomerInfo} from "@/lib/actions/customer-lead-opportunity"
+import {calculateAge, formatRatePercent} from "@/lib/format"
 import {
   calculateAmountFromLtv,
   calculateFlatRateEquivalent,
@@ -17,54 +18,56 @@ import {
   MOTORCYCLE_INSTALLMENT_TERM,
   TRANSFER_BOOK_STATUS,
   type InterestRateType,
-} from "@/lib/loan-cal";
-import { GENDER_LABELS } from "@/lib/mock";
-import type { Gender } from "@/types/customer-lead";
+} from "@/lib/loan-cal"
+import {GENDER_LABELS} from "@/lib/mock"
+import type {Gender} from "@/types/customer-lead"
 import type {
   ProductCatalogData,
   ProductCatalogFilter,
-} from "@/types/product-catalog";
+} from "@/types/product-catalog"
 import type {
   CollateralType,
   CustomerInfo,
   LoanInfo,
   RefinanceStatus,
-} from "@/types/ratebook";
-import { useEffect, useMemo, useRef, useState } from "react";
+} from "@/types/ratebook"
+import {useEffect, useMemo, useRef, useState} from "react"
 
 type CalculatedInputs = {
-  requestedAmount: number;
-  interestRatePercent: number;
-  rateType: InterestRateType;
-  installmentTerm: number;
-  isTLC: boolean;
-  hasPpi: boolean;
-};
+  requestedAmount: number
+  interestRatePercent: number
+  rateType: InterestRateType
+  installmentTerm: number
+  isTLC: boolean
+  hasPpi: boolean
+}
 
-const MAX_REDUCING_RATE_PERCENT = 24;
-const MAX_FLAT_RATE_PERCENT = 2;
-const DEFAULT_REDUCING_RATE_PERCENT = "24";
-const DEFAULT_FLAT_RATE_PERCENT = "2.05";
+const MAX_REDUCING_RATE_PERCENT = 24
+const MAX_FLAT_RATE_PERCENT = 2
+const DEFAULT_REDUCING_RATE_PERCENT = "24"
+const DEFAULT_FLAT_RATE_PERCENT = "2.05"
 
 function sanitizeRateInput(raw: string, max: number): string | null {
-  const value = raw.replace(/[^\d.]/g, "");
-  if (!/^\d*\.?\d{0,2}$/.test(value)) return null;
-  if (Number(value) > max) return null;
-  return value;
+  const value = raw.replace(/[^\d.]/g, "")
+
+  if (!/^\d*\.?\d{0,2}$/.test(value)) return null
+
+  if (Number(value) > max) return null
+  return value
 }
 
 function parseRate(value: string): number {
-  return Number.parseFloat(value) || 0;
+  return Number.parseFloat(value) || 0
 }
 
 function formatRate(value: string): string {
-  return value === "" ? "" : formatRatePercent(parseRate(value));
+  return value === "" ? "" : formatRatePercent(parseRate(value))
 }
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
+function FieldLabel({children}: {children: React.ReactNode}) {
   return (
     <span className="mb-1 block text-[10px] text-pale-blue">{children}</span>
-  );
+  )
 }
 
 function ToggleChip({
@@ -73,10 +76,10 @@ function ToggleChip({
   disabled = false,
   onChange,
 }: {
-  label: string;
-  checked: boolean;
-  disabled?: boolean;
-  onChange: (value: boolean) => void;
+  label: string
+  checked: boolean
+  disabled?: boolean
+  onChange: (value: boolean) => void
 }) {
   return (
     <button
@@ -98,24 +101,24 @@ function ToggleChip({
       </span>
       {label}
     </button>
-  );
+  )
 }
 
 type LoanCalBarProps = {
-  productCatalog: ProductCatalogData;
-  appraisalPrice: number;
-  collateralType: CollateralType | null;
-  customer: CustomerInfo | null;
-  opportunityId: string | null;
-  refinanceStatus: RefinanceStatus | null;
+  productCatalog: ProductCatalogData
+  appraisalPrice: number
+  collateralType: CollateralType | null
+  customer: CustomerInfo | null
+  opportunityId: string | null
+  refinanceStatus: RefinanceStatus | null
   /** Lives on `RatebookForm`'s `loanInfo` so the Lead Form's วงเงินที่ต้องการ can't drift from it. */
-  requestedAmount: number;
-  onRequestedAmountChange: (amount: number) => void;
+  requestedAmount: number
+  onRequestedAmountChange: (amount: number) => void
   /** Seeds the Lead Form's ผลิตภัณฑ์เสริม / เงื่อนไขการผ่อนชำระ defaults. Must be referentially stable. */
-  onLoanTermsChange: (terms: Omit<LoanInfo, "requestedAmount">) => void;
-  onCustomerChange: (value: CustomerInfo) => void;
-  onFilterChange: (filter: ProductCatalogFilter) => void;
-};
+  onLoanTermsChange: (terms: Omit<LoanInfo, "requestedAmount">) => void
+  onCustomerChange: (value: CustomerInfo) => void
+  onFilterChange: (filter: ProductCatalogFilter) => void
+}
 
 export function LoanCalBar({
   productCatalog,
@@ -130,13 +133,13 @@ export function LoanCalBar({
   onCustomerChange,
   onFilterChange,
 }: LoanCalBarProps) {
-  const isMotorcycle = collateralType === "motorcycle";
+  const isMotorcycle = collateralType === "motorcycle"
   const installmentTermOptions = isMotorcycle
     ? [MOTORCYCLE_INSTALLMENT_TERM]
-    : INSTALLMENT_TERM_OPTIONS;
+    : INSTALLMENT_TERM_OPTIONS
   const defaultInstallmentTerm = isMotorcycle
     ? MOTORCYCLE_INSTALLMENT_TERM
-    : DEFAULT_INSTALLMENT_TERM;
+    : DEFAULT_INSTALLMENT_TERM
 
   const bookStatusOptions = useMemo(
     () =>
@@ -145,43 +148,43 @@ export function LoanCalBar({
         value: label,
       })),
     [productCatalog],
-  );
+  )
 
   const [bookStatus, setBookStatus] = useState(
     bookStatusOptions[0]?.label ?? "",
-  );
+  )
   const [requestedLtvPercent, setRequestedLtvPercent] = useState(() =>
     calculateLtvPercent(requestedAmount, appraisalPrice),
-  );
-  const [payoffAmount, setPayoffAmount] = useState(0);
-  const [cashBackAmount, setCashBackAmount] = useState(0);
-  const [isTLC, setIsTLC] = useState(bookStatus !== TRANSFER_BOOK_STATUS);
-  const [installmentTerm, setInstallmentTerm] = useState(
-    defaultInstallmentTerm,
-  );
-  const [hasPpi, setHasPpi] = useState(false);
+  )
+  const [payoffAmount, setPayoffAmount] = useState(0)
+  const [cashBackAmount, setCashBackAmount] = useState(0)
+  const [isTLC, setIsTLC] = useState(bookStatus !== TRANSFER_BOOK_STATUS)
+  const [installmentTerm, setInstallmentTerm] = useState(defaultInstallmentTerm)
+  const [hasPpi, setHasPpi] = useState(false)
   const [reducingRateInput, setReducingRateInput] = useState(
     DEFAULT_REDUCING_RATE_PERCENT,
-  );
-  const [flatRateInput, setFlatRateInput] = useState(DEFAULT_FLAT_RATE_PERCENT);
-  const [calculated, setCalculated] = useState<CalculatedInputs | null>(null);
-  const [showDetail, setShowDetail] = useState(false);
-  const [genderAgeOpen, setGenderAgeOpen] = useState(false);
+  )
+  const [flatRateInput, setFlatRateInput] = useState(DEFAULT_FLAT_RATE_PERCENT)
+  const [calculated, setCalculated] = useState<CalculatedInputs | null>(null)
+  const [showDetail, setShowDetail] = useState(false)
+  const [isCalculating, setIsCalculating] = useState(false)
+  const [allowOverMaxRate, setAllowOverMaxRate] = useState(false)
+  const [genderAgeOpen, setGenderAgeOpen] = useState(false)
   const [genderAgePosition, setGenderAgePosition] = useState<{
-    left: number;
-    bottom: number;
-  } | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const genderAgeAnchorRef = useRef<HTMLDivElement>(null);
-  const genderAgePopoverRef = useRef<HTMLDivElement>(null);
+    left: number
+    bottom: number
+  } | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const genderAgeAnchorRef = useRef<HTMLDivElement>(null)
+  const genderAgePopoverRef = useRef<HTMLDivElement>(null)
 
-  const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS;
-  const isRefinance = refinanceStatus === "still-paying";
-  const effectiveIsTLC = !isTransferBook && isTLC;
-  const rateType: InterestRateType = isTransferBook ? "flat" : "reducing";
+  const isTransferBook = bookStatus === TRANSFER_BOOK_STATUS
+  const isRefinance = refinanceStatus === "still-paying"
+  const effectiveIsTLC = !isTransferBook && isTLC
+  const rateType: InterestRateType = isTransferBook ? "flat" : "reducing"
   const interestRatePercent = parseRate(
     isTransferBook ? flatRateInput : reducingRateInput,
-  );
+  )
 
   useEffect(() => {
     onLoanTermsChange({
@@ -190,7 +193,7 @@ export function LoanCalBar({
       installmentTerm,
       interestRatePercent,
       rateType,
-    });
+    })
   }, [
     onLoanTermsChange,
     effectiveIsTLC,
@@ -198,7 +201,7 @@ export function LoanCalBar({
     installmentTerm,
     interestRatePercent,
     rateType,
-  ]);
+  ])
 
   function commitFilter(overrides: Partial<ProductCatalogFilter> = {}) {
     onFilterChange({
@@ -207,411 +210,441 @@ export function LoanCalBar({
       requestedLtvPercent,
       wantsWheelCard: effectiveIsTLC,
       ...overrides,
-    });
+    })
   }
 
-  // วงเงินที่ขอ - ยอดปิดไฟแนนซ์เดิม = เงินรับกลับบ้าน. The three amounts are separate
-  // fields: editing one recomputes a single counterpart, never the field just left.
   function syncCashBack(amount: number, payoff: number) {
-    if (isRefinance) setCashBackAmount(Math.max(0, amount - payoff));
+    if (isRefinance) setCashBackAmount(Math.max(0, amount - payoff))
   }
 
   function handleRequestedAmountChange(amount: number) {
-    onRequestedAmountChange(amount);
-    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
-    syncCashBack(amount, payoffAmount);
+    onRequestedAmountChange(amount)
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice))
+    syncCashBack(amount, payoffAmount)
   }
 
   function handleRequestedLtvChange(ltvPercent: number) {
-    const amount = calculateAmountFromLtv(ltvPercent, appraisalPrice);
-    setRequestedLtvPercent(ltvPercent);
-    onRequestedAmountChange(amount);
-    syncCashBack(amount, payoffAmount);
+    const amount = calculateAmountFromLtv(ltvPercent, appraisalPrice)
+    setRequestedLtvPercent(ltvPercent)
+    onRequestedAmountChange(amount)
+    syncCashBack(amount, payoffAmount)
   }
 
   function handlePayoffChange(payoff: number) {
-    setPayoffAmount(payoff);
+    setPayoffAmount(payoff)
     if (requestedAmount > 0 && payoff <= requestedAmount) {
-      // Case: fill requestedAmount first (e.g., 50k), then payoff (e.g., 20k)
-      // Requested remains 50k, cashBack becomes 30k.
-      syncCashBack(requestedAmount, payoff);
+      syncCashBack(requestedAmount, payoff)
     } else {
-      // Case: fill payoffAmount first OR payoff exceeds requestedAmount
-      // Reset cashback to 0 and match requestedAmount to payoff.
-      setCashBackAmount(0);
-      onRequestedAmountChange(payoff);
-      setRequestedLtvPercent(calculateLtvPercent(payoff, appraisalPrice));
+      setCashBackAmount(0)
+      onRequestedAmountChange(payoff)
+      setRequestedLtvPercent(calculateLtvPercent(payoff, appraisalPrice))
     }
   }
 
   function handleCashBackChange(cashBack: number) {
-    const amount = payoffAmount + cashBack;
-    setCashBackAmount(cashBack);
-    onRequestedAmountChange(amount);
-    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice));
+    const amount = payoffAmount + cashBack
+    setCashBackAmount(cashBack)
+    onRequestedAmountChange(amount)
+    setRequestedLtvPercent(calculateLtvPercent(amount, appraisalPrice))
   }
 
   function handleBookStatusChange(value: string) {
-    const nextIsTLC = value !== TRANSFER_BOOK_STATUS;
-    setBookStatus(value);
-    setIsTLC(nextIsTLC);
-    if (nextIsTLC) setInstallmentTerm(defaultInstallmentTerm);
-    commitFilter({ bookStatus: value, wantsWheelCard: nextIsTLC });
+    const nextIsTLC = value !== TRANSFER_BOOK_STATUS
+    setBookStatus(value)
+    setIsTLC(nextIsTLC)
+    if (nextIsTLC) setInstallmentTerm(defaultInstallmentTerm)
+    commitFilter({bookStatus: value, wantsWheelCard: nextIsTLC})
   }
 
   function handleToggleTLC(nextChecked: boolean) {
-    setIsTLC(nextChecked);
-    if (nextChecked) setInstallmentTerm(defaultInstallmentTerm);
-    commitFilter({ wantsWheelCard: nextChecked });
+    setIsTLC(nextChecked)
+    if (nextChecked) setInstallmentTerm(defaultInstallmentTerm)
+    commitFilter({wantsWheelCard: nextChecked})
   }
+
+  const ALLOW_OVER_MAX_RATE = true
+
+  const maxRate = isTransferBook
+    ? MAX_FLAT_RATE_PERCENT
+    : MAX_REDUCING_RATE_PERCENT
+  const currentRateInput = isTransferBook ? flatRateInput : reducingRateInput
+
+  const isRateError = ALLOW_OVER_MAX_RATE && Number(currentRateInput) > maxRate
 
   function handleRateChange(raw: string) {
-    const value = sanitizeRateInput(
-      raw,
-      isTransferBook ? MAX_FLAT_RATE_PERCENT : MAX_REDUCING_RATE_PERCENT,
-    );
-    if (value === null) return;
-    if (isTransferBook) setFlatRateInput(value);
-    else setReducingRateInput(value);
-  }
+    const allowedMax = ALLOW_OVER_MAX_RATE ? 100 : maxRate
+    const value = sanitizeRateInput(raw, allowedMax)
 
+    if (value === null) return
+
+    if (isTransferBook) setFlatRateInput(value)
+    else setReducingRateInput(value)
+  }
   function handleRateBlur() {
-    if (isTransferBook) setFlatRateInput(formatRate);
-    else setReducingRateInput(formatRate);
+    if (isTransferBook) setFlatRateInput(formatRate)
+    else setReducingRateInput(formatRate)
   }
 
   useEffect(() => {
-    if (!showDetail) return;
+    if (!showDetail) return
     function handleClickOutside(event: MouseEvent) {
       if (!containerRef.current?.contains(event.target as Node)) {
-        setShowDetail(false);
+        setShowDetail(false)
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDetail]);
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showDetail])
 
   useEffect(() => {
-    if (!genderAgeOpen) return;
+    if (!genderAgeOpen) return
     function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
+      const target = event.target as Node
       if (
         !genderAgeAnchorRef.current?.contains(target) &&
         !genderAgePopoverRef.current?.contains(target)
       ) {
-        setGenderAgeOpen(false);
+        setGenderAgeOpen(false)
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [genderAgeOpen]);
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [genderAgeOpen])
 
   function openGenderAgePopover() {
-    const rect = genderAgeAnchorRef.current?.getBoundingClientRect();
+    const rect = genderAgeAnchorRef.current?.getBoundingClientRect()
     if (rect) {
       setGenderAgePosition({
         left: rect.left,
         bottom: window.innerHeight - rect.top + 12,
-      });
+      })
     }
-    setGenderAgeOpen(true);
+    setGenderAgeOpen(true)
   }
 
   function handleTogglePpi(nextChecked: boolean) {
     if (!nextChecked) {
-      setHasPpi(false);
-      return;
+      setHasPpi(false)
+      return
     }
-    openGenderAgePopover();
+    openGenderAgePopover()
   }
 
   const summary = useMemo(
     () => (calculated ? calculateLoanCalSummary(calculated) : null),
     [calculated],
-  );
+  )
   const flatRatePercent = useMemo(() => {
-    if (!calculated) return 0;
-    if (calculated.rateType === "flat") return calculated.interestRatePercent;
+    if (!calculated) return 0
+    if (calculated.rateType === "flat") return calculated.interestRatePercent
     return calculateFlatRateEquivalent(
       calculated.interestRatePercent,
       calculated.installmentTerm,
-    );
-  }, [calculated]);
+    )
+  }, [calculated])
 
   function handleCalculate() {
-    setCalculated({
-      requestedAmount,
-      interestRatePercent,
-      rateType,
-      installmentTerm,
-      isTLC: effectiveIsTLC,
-      hasPpi,
-    });
-    setShowDetail(true);
+    setIsCalculating(true)
+    setTimeout(() => {
+      setIsCalculating(false)
+      setCalculated({
+        requestedAmount,
+        interestRatePercent,
+        rateType,
+        installmentTerm,
+        isTLC: effectiveIsTLC,
+        hasPpi,
+      })
+      setShowDetail(true)
+    }, 1000)
   }
 
   async function handleSaveGenderAge(value: {
-    gender: Gender;
-    birthDate: string;
+    gender: Gender
+    birthDate: string
   }) {
     const nextCustomer: CustomerInfo = {
       firstName: customer?.firstName ?? "",
       lastName: customer?.lastName ?? "",
       phone: customer?.phone ?? "",
       ...value,
-    };
-    onCustomerChange(nextCustomer);
-    setGenderAgeOpen(false);
-    setHasPpi(true);
+    }
+    onCustomerChange(nextCustomer)
+    setGenderAgeOpen(false)
+    setHasPpi(true)
     if (opportunityId) {
-      await updateOpportunityCustomerInfo(opportunityId, nextCustomer);
+      await updateOpportunityCustomerInfo(opportunityId, nextCustomer)
     }
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 md:px-20">
-      <div className="loan-cal-bar flex w-full max-w-341 items-end justify-between gap-6 rounded-xl px-4 py-2.5">
-        <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1">
-          <div className="w-fit shrink-0">
-            <FieldLabel>เล่มทะเบียน</FieldLabel>
-            <Select
-              options={bookStatusOptions}
-              value={bookStatus}
-              onChange={(e) => handleBookStatusChange(e.target.value)}
-              className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
-            />
-          </div>
-          {isRefinance ? (
-            <div className="flex shrink-0 items-end">
-              <div className="w-28 shrink-0">
-                <FieldLabel>ยอดปิดไฟแนนซ์เดิม</FieldLabel>
-                <div className="relative flex h-9 items-center gap-1 rounded-l-md border border-secondary-border bg-surface px-2">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={
-                      payoffAmount ? payoffAmount.toLocaleString("th-TH") : ""
-                    }
-                    placeholder="0"
-                    onChange={(e) =>
-                      handlePayoffChange(
-                        Number(e.target.value.replace(/\D/g, "")) || 0,
-                      )
-                    }
-                    onBlur={() => commitFilter()}
-                    className="w-full text-sm text-foreground outline-none"
-                  />
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    บาท
-                  </span>
-                  <span className="absolute top-1/2 -right-2 z-10 flex size-4 -translate-y-1/2 items-center justify-center rounded-full border border-secondary-border bg-white text-[10px] leading-none text-muted-foreground">
-                    +
-                  </span>
+    <>
+      <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 md:px-20">
+        <div className="loan-cal-bar flex w-full max-w-341 items-end justify-between gap-6 rounded-xl px-4 py-2.5">
+          <div className="flex flex-1 min-w-0 overflow-x-auto overflow-y-visible items-end gap-2 pb-1">
+            <div className="w-fit shrink-0">
+              <FieldLabel>เล่มทะเบียน</FieldLabel>
+              <Select
+                options={bookStatusOptions}
+                value={bookStatus}
+                onChange={(e) => handleBookStatusChange(e.target.value)}
+                className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
+              />
+            </div>
+            {isRefinance ? (
+              <div className="flex shrink-0 items-end">
+                <div className="w-28 shrink-0">
+                  <FieldLabel>ยอดปิดไฟแนนซ์เดิม</FieldLabel>
+                  <div className="relative flex h-9 items-center gap-1 rounded-l-md border border-secondary-border bg-surface px-2">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={
+                        payoffAmount ? payoffAmount.toLocaleString("th-TH") : ""
+                      }
+                      placeholder="0"
+                      onChange={(e) =>
+                        handlePayoffChange(
+                          Number(e.target.value.replace(/\D/g, "")) || 0,
+                        )
+                      }
+                      onBlur={() => commitFilter()}
+                      className="w-full text-sm text-foreground outline-none"
+                    />
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      บาท
+                    </span>
+                    <span className="absolute top-1/2 -right-2 z-10 flex size-4 -translate-y-1/2 items-center justify-center rounded-full border border-secondary-border bg-white text-[10px] leading-none text-muted-foreground">
+                      +
+                    </span>
+                  </div>
+                </div>
+                <div className="-ml-px w-28 shrink-0">
+                  <FieldLabel>เงินรับกลับบ้าน</FieldLabel>
+                  <div className="flex h-9 items-center gap-1 rounded-r-md border border-secondary-border bg-surface px-2">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={
+                        cashBackAmount
+                          ? cashBackAmount.toLocaleString("th-TH")
+                          : ""
+                      }
+                      placeholder="0"
+                      onChange={(e) =>
+                        handleCashBackChange(
+                          Number(e.target.value.replace(/\D/g, "")) || 0,
+                        )
+                      }
+                      onBlur={() => commitFilter()}
+                      className="w-full text-sm text-foreground outline-none"
+                    />
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      บาท
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="-ml-px w-28 shrink-0">
-                <FieldLabel>เงินรับกลับบ้าน</FieldLabel>
-                <div className="flex h-9 items-center gap-1 rounded-r-md border border-secondary-border bg-surface px-2">
+            ) : null}
+
+            <div className="w-52 shrink-0">
+              <FieldLabel>วงเงินที่ขอ</FieldLabel>
+              <div className="flex h-9 overflow-hidden rounded-md border border-secondary-border bg-surface">
+                <div className="flex flex-1 items-center gap-1 px-2">
                   <input
                     type="text"
                     inputMode="numeric"
                     value={
-                      cashBackAmount
-                        ? cashBackAmount.toLocaleString("th-TH")
+                      requestedAmount
+                        ? requestedAmount.toLocaleString("th-TH")
                         : ""
                     }
                     placeholder="0"
                     onChange={(e) =>
-                      handleCashBackChange(
+                      handleRequestedAmountChange(
                         Number(e.target.value.replace(/\D/g, "")) || 0,
                       )
                     }
                     onBlur={() => commitFilter()}
                     className="w-full text-sm text-foreground outline-none"
                   />
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    บาท
-                  </span>
+                  <span className="text-xs text-muted-foreground">บาท</span>
+                </div>
+                <div className="flex w-24 shrink-0 items-center gap-1 border-l border-divider px-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={requestedLtvPercent || ""}
+                    placeholder="0"
+                    onChange={(e) =>
+                      handleRequestedLtvChange(
+                        Number(e.target.value.replace(/\D/g, "")) || 0,
+                      )
+                    }
+                    onBlur={() => commitFilter()}
+                    className="w-full text-sm text-foreground outline-none"
+                  />
+                  <span className="text-xs text-muted-foreground">%LTV</span>
                 </div>
               </div>
             </div>
-          ) : null}
 
-          <div className="w-52 shrink-0">
-            <FieldLabel>วงเงินที่ขอ</FieldLabel>
-            <div className="flex h-9 overflow-hidden rounded-md border border-secondary-border bg-surface">
-              <div className="flex flex-1 items-center gap-1 px-2">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={
-                    requestedAmount
-                      ? requestedAmount.toLocaleString("th-TH")
-                      : ""
-                  }
-                  placeholder="0"
-                  onChange={(e) =>
-                    handleRequestedAmountChange(
-                      Number(e.target.value.replace(/\D/g, "")) || 0,
-                    )
-                  }
-                  onBlur={() => commitFilter()}
-                  className="w-full text-sm text-foreground outline-none"
-                />
-                <span className="text-xs text-muted-foreground">บาท</span>
-              </div>
-              <div className="flex w-24 shrink-0 items-center gap-1 border-l border-divider px-2">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={requestedLtvPercent || ""}
-                  placeholder="0"
-                  onChange={(e) =>
-                    handleRequestedLtvChange(
-                      Number(e.target.value.replace(/\D/g, "")) || 0,
-                    )
-                  }
-                  onBlur={() => commitFilter()}
-                  className="w-full text-sm text-foreground outline-none"
-                />
-                <span className="text-xs text-muted-foreground">%LTV</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-9 w-px shrink-0 bg-primary/60" />
-
-          <ToggleChip
-            label="บัตรติดล้อ"
-            checked={effectiveIsTLC}
-            disabled={isTransferBook}
-            onChange={handleToggleTLC}
-          />
-
-          <div className="w-fit shrink-0">
-            <FieldLabel>งวดผ่อน</FieldLabel>
-            <Select
-              options={installmentTermOptions.map((term) => ({
-                label: `${term} งวด`,
-                value: String(term),
-              }))}
-              disabled={effectiveIsTLC || isMotorcycle}
-              value={String(installmentTerm)}
-              onChange={(e) => setInstallmentTerm(Number(e.target.value))}
-              className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
-            />
-          </div>
-          <div ref={genderAgeAnchorRef} className="w-20 shrink-0">
-            {customer?.gender && customer?.birthDate ? (
-              <span className="mb-1 block shrink-0 self-center text-[10px] text-pale-blue w-full">
-                {`เพศ ${GENDER_LABELS[customer.gender]} | ${calculateAge(customer.birthDate)} ปี`}
-              </span>
-            ) : null}
+            <div className="h-9 w-px shrink-0 bg-primary/60" />
 
             <ToggleChip
-              label="PPI"
-              checked={hasPpi}
-              onChange={handleTogglePpi}
+              label="บัตรติดล้อ"
+              checked={effectiveIsTLC}
+              disabled={isTransferBook}
+              onChange={handleToggleTLC}
             />
-          </div>
 
-          {genderAgeOpen && genderAgePosition ? (
-            <div
-              ref={genderAgePopoverRef}
-              style={{
-                position: "fixed",
-                left: genderAgePosition.left,
-                bottom: genderAgePosition.bottom,
-              }}
-              className="z-1000"
-            >
-              <GenderAgePopover
-                initialGender={customer?.gender ?? null}
-                initialBirthDate={customer?.birthDate ?? null}
-                onSave={handleSaveGenderAge}
-                onCancel={() => setGenderAgeOpen(false)}
+            <div className="w-fit shrink-0">
+              <FieldLabel>งวดผ่อน</FieldLabel>
+              <Select
+                options={installmentTermOptions.map((term) => ({
+                  label: `${term} งวด`,
+                  value: String(term),
+                }))}
+                disabled={effectiveIsTLC || isMotorcycle}
+                value={String(installmentTerm)}
+                onChange={(e) => setInstallmentTerm(Number(e.target.value))}
+                className="bg-surface-muted shrink-0 py-1.5 pr-7 text-xs w-full"
               />
             </div>
-          ) : null}
-          <div className="w-30 shrink-0">
-            <FieldLabel>
-              {isTransferBook
-                ? "อัตราดอกเบี้ยคงที่"
-                : "อัตราดอกเบี้ยลดต้นลดดอก"}
-            </FieldLabel>
-            <div className="flex h-9 items-center gap-1 rounded-md border border-secondary-border bg-surface px-2">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={isTransferBook ? flatRateInput : reducingRateInput}
-                placeholder="0.00"
-                onChange={(e) => handleRateChange(e.target.value)}
-                onBlur={handleRateBlur}
-                className="w-full text-sm text-foreground outline-none"
+            <div ref={genderAgeAnchorRef} className="w-20 shrink-0">
+              {customer?.gender && customer?.birthDate ? (
+                <span className="mb-1 block shrink-0 self-center text-[10px] text-pale-blue w-full">
+                  {`เพศ ${GENDER_LABELS[customer.gender]} | ${calculateAge(customer.birthDate)} ปี`}
+                </span>
+              ) : null}
+
+              <ToggleChip
+                label="PPI"
+                checked={hasPpi}
+                onChange={handleTogglePpi}
               />
-              <span className="text-xs  text-muted-foreground shrink-0">
-                {isTransferBook ? "% ต่อเดือน" : "% ต่อปี"}
-              </span>
             </div>
-          </div>
 
-          <div className="h-9 w-px shrink-0 bg-primary/60" />
-
-          <button
-            type="button"
-            onClick={handleCalculate}
-            className="h-9 shrink-0 rounded-lg bg-success px-4 text-sm font-medium text-white hover:brightness-95"
-          >
-            คำนวณ
-          </button>
-        </div>
-
-        <div
-          ref={containerRef}
-          className="loan-cal-result-box relative flex shrink-0 flex-col justify-center gap-1 rounded-md border border-primary-to px-3 py-1.5"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-medium text-foreground">
-              ยอดผ่อนต่อเดือน
-            </span>
-            {summary !== null && summary.totalPayment > 0 ? (
-              <button
-                type="button"
-                onClick={() => setShowDetail((value) => !value)}
-                aria-label="แสดงรายละเอียดยอดจัดสินเชื่อ"
-                className="flex size-4 shrink-0 items-center justify-center rounded border border-secondary-border bg-secondary-bg"
+            {genderAgeOpen && genderAgePosition ? (
+              <div
+                ref={genderAgePopoverRef}
+                style={{
+                  position: "fixed",
+                  left: genderAgePosition.left,
+                  bottom: genderAgePosition.bottom,
+                }}
+                className="z-1000"
               >
-                <Icon
-                  name={showDetail ? "chevron-down" : "chevron-up"}
-                  className="size-3 text-foreground"
+                <GenderAgePopover
+                  initialGender={customer?.gender ?? null}
+                  initialBirthDate={customer?.birthDate ?? null}
+                  onSave={handleSaveGenderAge}
+                  onCancel={() => setGenderAgeOpen(false)}
                 />
-              </button>
+              </div>
+            ) : null}
+            <div className="w-fit shrink-0">
+              <FieldLabel>
+                {isTransferBook
+                  ? "อัตราดอกเบี้ยคงที่"
+                  : "อัตราดอกเบี้ยลดต้นลดดอก"}
+                {isRateError && (
+                  <span className="ml-1 text-red-500 whitespace-nowrap">
+                    *ไม่เกิน {maxRate}%
+                  </span>
+                )}
+              </FieldLabel>
+              <div
+                className={`flex h-9 items-center gap-1 rounded-md border bg-surface px-2 transition-colors ${
+                  isRateError ? "border-red-500" : "border-secondary-border"
+                }`}
+              >
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={currentRateInput}
+                  placeholder="0"
+                  onChange={(e) => handleRateChange(e.target.value)}
+                  onBlur={handleRateBlur}
+                  className={`w-full text-sm outline-none bg-transparent ${
+                    isRateError ? "text-red-500" : "text-foreground"
+                  }`}
+                />
+                <span
+                  className={`text-xs shrink-0 ${
+                    isRateError ? "text-red-500" : "text-muted-foreground"
+                  }`}
+                >
+                  {isTransferBook ? "% ต่อเดือน" : "% ต่อปี"}
+                </span>
+              </div>
+            </div>
+
+            <div className="h-9 w-px shrink-0 bg-primary/60" />
+
+            <button
+              type="button"
+              onClick={handleCalculate}
+              disabled={isCalculating || isRateError}
+              className="h-9 shrink-0 rounded-lg bg-success px-4 text-sm font-medium text-white hover:brightness-95 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              คำนวณ
+            </button>
+          </div>
+
+          <div
+            ref={containerRef}
+            className="loan-cal-result-box relative flex shrink-0 flex-col justify-center gap-1 rounded-md border border-primary-to px-3 py-1.5"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-medium text-foreground">
+                ยอดผ่อนต่อเดือน
+              </span>
+              {summary !== null && summary.totalPayment > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setShowDetail((value) => !value)}
+                  aria-label="แสดงรายละเอียดยอดจัดสินเชื่อ"
+                  className="flex size-4 shrink-0 items-center justify-center rounded border border-secondary-border bg-secondary-bg"
+                >
+                  <Icon
+                    name={showDetail ? "chevron-down" : "chevron-up"}
+                    className="size-3 text-foreground"
+                  />
+                </button>
+              ) : null}
+            </div>
+            <p className="text-xl font-semibold text-primary-to">
+              {summary !== null
+                ? summary.totalPayment.toLocaleString("th-TH")
+                : 0}
+              &nbsp;
+              <span className="text-xs font-normal text-price-label">บาท</span>
+            </p>
+
+            {showDetail && summary !== null && calculated !== null ? (
+              <div className="absolute bottom-0 right-0 z-1000">
+                <LoanCalDetailPopover
+                  requestedAmount={calculated.requestedAmount}
+                  interestRatePercent={calculated.interestRatePercent}
+                  rateType={calculated.rateType}
+                  flatRatePercent={flatRatePercent}
+                  installmentTerm={calculated.installmentTerm}
+                  isTLC={calculated.isTLC}
+                  hasPpi={calculated.hasPpi}
+                  onClose={() => setShowDetail(false)}
+                />
+              </div>
             ) : null}
           </div>
-          <p className="text-xl font-semibold text-primary-to">
-            {summary !== null
-              ? summary.totalPayment.toLocaleString("th-TH")
-              : 0}
-            &nbsp;
-            <span className="text-xs font-normal text-price-label">บาท</span>
-          </p>
-
-          {showDetail && summary !== null && calculated !== null ? (
-            <div className="absolute bottom-0 right-0 z-1000">
-              <LoanCalDetailPopover
-                requestedAmount={calculated.requestedAmount}
-                interestRatePercent={calculated.interestRatePercent}
-                rateType={calculated.rateType}
-                flatRatePercent={flatRatePercent}
-                installmentTerm={calculated.installmentTerm}
-                isTLC={calculated.isTLC}
-                hasPpi={calculated.hasPpi}
-                onClose={() => setShowDetail(false)}
-              />
-            </div>
-          ) : null}
         </div>
       </div>
-    </div>
-  );
+
+      <LoadingToast
+        open={isCalculating}
+        title="กำลังคำนวณ"
+        description="กรุณารอสักครู่..."
+      />
+    </>
+  )
 }

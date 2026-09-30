@@ -40,6 +40,7 @@ import {useRouter} from "next/navigation"
 import {setTimeout} from "node:timers"
 import {useState} from "react"
 import {ProgressRing} from "../atoms/ProgressRing"
+import {LeadProgressTooltip} from "../molecules/LeadProgressTooltip"
 
 const TOTAL_SECTIONS = 4
 
@@ -217,10 +218,21 @@ export function CustomerCollateralPanel({
     collateralIdentifier !== null,
     brandModelDisplay !== "",
   ]
-  const filledSectionCount = filledSections.filter(Boolean).length
+  // const filledSectionCount = filledSections.filter(Boolean).length
+
+  const progressItems = [
+    {
+      label: "ชื่อ นามสกุล",
+      filled: Boolean(customer?.firstName && customer?.lastName),
+    },
+    {label: "เบอร์มือถือ", filled: Boolean(customer?.phone)},
+    {label: "เลขทะเบียน / เลขตัวถัง", filled: collateralIdentifier !== null},
+    {label: "ยี่ห้อ / รุ่น", filled: brandModelDisplay !== ""},
+  ]
+  const filledSectionCount = progressItems.filter((item) => item.filled).length
 
   return (
-    <Card className="space-y-4 border-2">
+    <Card className="relative z-50 space-y-4 border-2">
       {customer ? (
         <div className="flex w-full items-start justify-between">
           <div className="text-left">
@@ -247,7 +259,14 @@ export function CustomerCollateralPanel({
               ) : null}
             </div>
           </div>
-          <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
+          <div className="group/progress relative">
+            <ProgressRing value={filledSectionCount} total={TOTAL_SECTIONS} />
+            <LeadProgressTooltip
+              filledCount={filledSectionCount}
+              total={TOTAL_SECTIONS}
+              items={progressItems}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex items-center justify-between">

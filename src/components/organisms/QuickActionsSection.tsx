@@ -1,11 +1,28 @@
-import { QuickActionCard } from "@/components/molecules/QuickActionCard";
-import type { QuickAction } from "@/types/dashboard";
+"use client"
+
+import {QuickActionCard} from "@/components/molecules/QuickActionCard"
+import {ErrorModal} from "@/components/organisms/ErrorModal"
+import type {QuickAction} from "@/types/dashboard"
+import {useState} from "react"
 
 type QuickActionsSectionProps = {
-  actions: QuickAction[];
-};
+  actions: QuickAction[]
+}
 
-export function QuickActionsSection({ actions }: QuickActionsSectionProps) {
+export function QuickActionsSection({actions}: QuickActionsSectionProps) {
+  const [errorActionTitle, setErrorActionTitle] = useState<string | null>(null)
+
+  const handleActionClick = (
+    e: React.MouseEvent<HTMLDivElement>,
+    title: string,
+  ) => {
+    if (title !== "Ratebook") {
+      e.preventDefault()
+      e.stopPropagation()
+      setErrorActionTitle(title)
+    }
+  }
+
   return (
     <section>
       <h2 className="text-lg font-semibold text-foreground">
@@ -13,9 +30,22 @@ export function QuickActionsSection({ actions }: QuickActionsSectionProps) {
       </h2>
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {actions.map((action) => (
-          <QuickActionCard key={action.title} {...action} />
+          <div
+            key={action.title}
+            onClickCapture={(e) => handleActionClick(e, action.title)}
+          >
+            <QuickActionCard {...action} />
+          </div>
         ))}
       </div>
+
+      <ErrorModal
+        open={!!errorActionTitle}
+        onClose={() => setErrorActionTitle(null)}
+        title="ระบบกำลังพัฒนา"
+        description={`ฟังก์ชัน "${errorActionTitle}" กำลังอยู่ในช่วงการพัฒนา`}
+        buttonText="ตกลง"
+      />
     </section>
-  );
+  )
 }

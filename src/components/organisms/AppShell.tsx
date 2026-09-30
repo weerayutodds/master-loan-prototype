@@ -47,10 +47,21 @@ export function AppShell({children}: {children: React.ReactNode}) {
   return (
     <div className="flex flex-1">
       {pageTitle ? null : <Sidebar navItems={navItems} user={currentUser} />}
-      <div className="flex flex-1 flex-col">
-        {pageTitle ? <TopHeader title={pageTitle} /> : null}
+      <div className="flex flex-1 flex-col relative">
+        {/* 👇 1. Add sticky, top-0, and z-[100] to pin it to the top of the screen */}
+        {pageTitle ? (
+          <div className="sticky top-0 z-[100] w-full">
+            <TopHeader title={pageTitle} />
+          </div>
+        ) : null}
+
+        {/* 👇 2. Add relative z-0 so the cards underneath don't bleed over the header */}
         <main
-          className={`flex flex-col flex-1 py-8 ${pageTitle ? "bg-surface px-4 md:px-20" : "bg-surface-muted px-4 md:px-8"}`}
+          className={`relative z-0 flex flex-col flex-1 py-8 ${
+            pageTitle
+              ? "bg-surface px-4 md:px-20"
+              : "bg-surface-muted px-4 md:px-8"
+          }`}
         >
           <div className="flex-1 flex justify-center w-full">
             <div className="w-full max-w-341">
