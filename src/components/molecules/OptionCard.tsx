@@ -29,7 +29,7 @@ export function OptionCard({
   const [errorOpen, setErrorOpen] = useState(false)
 
   const handleClick = () => {
-    if (label === "บรรทุก" || label === "ที่ดิน") {
+    if (label === "บรรทุก" || label === "ที่ดิน" || label === "อยากซื้อรถ") {
       setErrorOpen(true)
     } else {
       onSelect()
