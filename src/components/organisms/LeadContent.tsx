@@ -5,10 +5,8 @@ import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { LeadCarInsuranceCard } from "@/components/molecules/LeadCarInsuranceCard";
 import { LeadCollateralInfoCard } from "@/components/molecules/LeadCollateralInfoCard";
-import { LeadFollowUpTimeline } from "@/components/molecules/LeadFollowUpTimeline";
 import { LeadLoanInfoCard } from "@/components/molecules/LeadLoanInfoCard";
 import { ErrorModal } from "@/components/organisms/ErrorModal";
-import { followUpTimelineMock } from "@/lib/mock";
 import type { CustomerLeadOpportunity } from "@/types/customer-lead-opportunity";
 import type { ProductCatalogItem } from "@/types/product-catalog";
 import type {
@@ -135,11 +133,17 @@ export function LeadContent({
             onChange={onLoanInfoChange}
           />
           <LeadCarInsuranceCard value={carInsuranceInfo} onChange={onCarInsuranceInfoChange} />
-          <LeadFollowUpTimeline entries={followUpTimelineMock} />
+          <div className="rounded-xl border border-card-border bg-surface p-6 text-sm text-muted-foreground shadow-primary-s">
+            ประวัติการติดตาม — อยู่ระหว่างการพัฒนา
+          </div>
         </div>
       )}
 
-      {activeTab === "history" && <LeadFollowUpTimeline entries={followUpTimelineMock} />}
+      {activeTab === "history" && (
+        <div className="rounded-xl border border-card-border bg-surface p-6 text-sm text-muted-foreground shadow-primary-s">
+          ประวัติการติดตาม — อยู่ระหว่างการพัฒนา
+        </div>
+      )}
 
       {activeTab === "lead" && (
         <div className="rounded-xl border border-card-border bg-surface p-6 text-sm text-muted-foreground shadow-primary-s">
