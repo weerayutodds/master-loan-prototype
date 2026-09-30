@@ -7,7 +7,8 @@ import {
   carTypeOptionsByCollateralType,
   toVehicleCollateralType,
 } from "@/lib/mock";
-import { bodyTypeLabel } from "@/lib/ratebook";
+import { bodyTypeLabel, isRatebookCollateralType } from "@/lib/ratebook";
+import { getCarTypeLabel } from "@/lib/car-type";
 import type { CarInfo, CollateralType } from "@/types/ratebook";
 
 function optionLabel(options: { value: string; label: string }[], value?: string): string {
@@ -29,7 +30,9 @@ export function LeadCollateralInfoCard({ carInfo, collateralType, onEdit }: Lead
   const yearLabel = carInfo.year ? `${carInfo.year} (${Number(carInfo.year) + 543})` : "-";
   const doorsLabel = optionLabel(carDoorsOptions, carInfo.doors);
   const typeLabel = carInfo.carType
-    ? `${optionLabel(carTypeOptionsByCollateralType[vehicleCollateralType], carInfo.carType)} ${doorsLabel}`
+    ? isRatebookCollateralType(collateralType)
+      ? getCarTypeLabel(carInfo.carType) ?? "-"
+      : `${optionLabel(carTypeOptionsByCollateralType[vehicleCollateralType], carInfo.carType)} ${doorsLabel}`
     : "-";
 
   const isMotorcycle = collateralType === "motorcycle";
@@ -69,9 +72,9 @@ export function LeadCollateralInfoCard({ carInfo, collateralType, onEdit }: Lead
       </div>
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
         {fields.map((field) => (
-          <div key={field.label} className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">{field.label} :</span>
-            <span className={field.bold ? "font-semibold text-foreground" : "font-medium text-foreground"}>
+          <div key={field.label} className="flex items-start justify-between gap-3 text-sm">
+            <span className="shrink-0 text-muted-foreground">{field.label} :</span>
+            <span className={`min-w-0 text-right ${field.bold ? "font-semibold text-foreground" : "font-medium text-foreground"}`}>
               {field.value}
             </span>
           </div>

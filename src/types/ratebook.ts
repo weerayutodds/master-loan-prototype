@@ -65,6 +65,7 @@ export type CarInfo = {
   year?: string;
   condition?: string;
   doors?: string;
+  /** CARTYPE code ("1"/"2"/"3"/"8"); mock truck/land vehicles use slugs. */
   carType?: string;
   engineCc?: string;
   transmission?: string;

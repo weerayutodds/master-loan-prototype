@@ -60,10 +60,11 @@ create table customer_lead_opportunity (
   -- (Ratebook/*.xlsx, see scripts/generate-ratebook.mjs); รถบรรทุก still comes
   -- from the mock catalog. car_brand/car_model/car_sub_model/car_body_type hold
   -- the ratebook's own wording so they can be shown without a lookup, while
-  -- car_condition/car_doors/car_transmission/car_type stay slugs.
+  -- car_condition/car_doors/car_transmission stay slugs.
   --
-  -- car_type is CarInfo's body-style dropdown (sedan/pickup/...), distinct
-  -- from collateral_type above (the top-level หลักประกัน type).
+  -- car_type stores the workbook CARTYPE as text (1/2/3/8), distinct from
+  -- collateral_type (the top-level หลักประกัน type) and car_body_type.
+  -- Mock truck/land vehicles use slugs. Legacy ratebook slugs are not supported.
   car_brand text,
   car_model text,
   car_year text,

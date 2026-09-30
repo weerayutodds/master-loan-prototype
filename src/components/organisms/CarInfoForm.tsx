@@ -9,6 +9,8 @@ import {CarModelInfoModal} from "@/components/organisms/CarModelInfoModal"
 import {CarYearInfoModal} from "@/components/organisms/CarYearInfoModal"
 import {ErrorModal} from "@/components/organisms/ErrorModal" // Adjust import path if needed
 import {updateOpportunityCarInfo} from "@/lib/actions/customer-lead-opportunity"
+import {getCarTypeLabel} from "@/lib/car-type"
+import {isRatebookCollateralType} from "@/lib/ratebook"
 import {
   carTypeOptionsByCollateralType,
   toVehicleCollateralType,
@@ -80,8 +82,10 @@ export function CarInfoForm({
   const [scanErrorOpen, setScanErrorOpen] = useState(false)
 
   const vehicle = useVehicleOptions(collateralType, carInfo, loanPurpose)
-  const carTypeOptions =
-    carTypeOptionsByCollateralType[toVehicleCollateralType(collateralType)]
+  const carTypeLabel = isRatebookCollateralType(collateralType)
+    ? getCarTypeLabel(carInfo.carType)
+    : carTypeOptionsByCollateralType[toVehicleCollateralType(collateralType)]
+        .find((option) => option.value === carInfo.carType)?.label
 
   // Locked fields are answers the vehicle only has one of, so they count as filled.
   function valueOf(field: VehicleFieldKey): string {
@@ -219,11 +223,7 @@ export function CarInfoForm({
               </FormField>
               <FormField label="ประเภทรถ">
                 <ReadOnlyValue
-                  value={
-                    carTypeOptions.find(
-                      (option) => option.value === carInfo.carType,
-                    )?.label
-                  }
+                  value={carTypeLabel}
                   borderless
                 />
               </FormField>

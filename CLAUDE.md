@@ -55,6 +55,8 @@ CLAUDE.md
   from the ratebook workbooks in `Ratebook/*.xlsx`. Edit those, then run
   `npm run generate:ratebook` — never hand-edit `public/ratebook/**` or
   `src/lib/ratebook-index.ts`. รถบรรทุก/ที่ดิน still use src/lib/mock.ts.
+  `CARTYPE` is the workbook's business code (1/2/3/8), not a body-style index.
+  Labels live in `src/lib/car-type.ts`; type 1 includes four-door pickups.
 
 ## Code style
 - Keep it simple and flat. No extra abstraction layers, no state library unless asked.

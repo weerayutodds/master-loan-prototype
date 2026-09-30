@@ -23,6 +23,29 @@ The app reads a single environment variable, set in `.env` (see `.env.example`):
 
 - `DATABASE_URL` — Postgres connection string used by `src/lib/db.ts`. In production this should be your Supabase **transaction pooler** connection string (the client is configured with `prepare: false` to match).
 
+## Ratebook data
+
+Excel workbooks in `Ratebook/` are the source of truth for car and motorcycle
+options and prices. Regenerate the browser data with Node.js 24+:
+
+```bash
+npm run generate:ratebook
+```
+
+`CARTYPE` comes directly from the workbook: `1` = เก๋ง, กระบะ 4 ประตู,
+`2` = กระบะ, `3` = มอเตอร์ไซด์, `8` = รถตู้. Type `5` (รถบรรทุก) remains
+on the mock catalog. Body style and door count do not determine CARTYPE.
+
+The generator validates all sources before replacing `public/ratebook/**/*.json`
+and `src/lib/ratebook-index.ts`. Each JSON row's first number is the CARTYPE code,
+not the old body-style dictionary index. Deploy the regenerated files and decoder
+together; reload any browser tab that still has the previous dataset in memory.
+There is no format version or database schema migration.
+
+Opportunities store the code as text in `car_type` through the existing save flow.
+Legacy ratebook slugs such as `sedan` and `pickup` are not supported or migrated.
+Truck and land mock vehicles continue using their existing slugs.
+
 ## Deploy on Vercel
 
 1. Go to [vercel.com](https://vercel.com) → **Add New Project** → import this repo from GitHub.

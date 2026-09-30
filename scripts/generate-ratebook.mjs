@@ -22,6 +22,7 @@ import { readFileSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { inflateRawSync } from "node:zlib";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isRatebookCarTypeCode } from "../src/lib/car-type.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC_DIR = join(ROOT, "Ratebook");
@@ -38,12 +39,10 @@ export const CAR_SOURCES = [
 ];
 export const MOTORCYCLE_SOURCE = {
   cartype: 3,
-  carType: "motorcycle",
   file: `Cartype3(มอไซค์) ${PERIOD}.xlsx`,
 };
 
 // Tuple slots shared with src/lib/ratebook.ts -- keep both in step.
-export const CAR_TYPES = ["sedan", "pickup", "van", "motorcycle"];
 export const CONDITIONS = ["original", "gas", "modified"];
 export const TRANSMISSIONS = ["manual", "auto"];
 
@@ -200,22 +199,17 @@ export const CONDITION_BY_TYPE_SUFFIX = new Map([
   ["ซื้อขายดีลเลอร์รถแต่งซิ่ง/รถติดเครื่องเสียงพิเศษ", { condition: "modified", loanTypeId: 2 }],
 ]);
 
-/**
- * ประเภทรถ comes from the base `Type`, not from which workbook the row is in:
- * Cartype1 is the registration class รย.1, which also holds 4-door pickups
- * (TOYOTA HILUXREVO Dual Cab), and calling those รถเก๋ง would read as a bug.
- * The finer body distinction stays in ประเภทตัวถัง.
- */
-export const CAR_TYPE_BY_BASE_TYPE = new Map([
-  ["SEDAN", "sedan"],
-  ["WAGON", "sedan"],
-  ["COUPE", "sedan"],
-  ["CONVERTIBLE", "sedan"],
-  ["CABRIOLET", "sedan"],
-  ["HATCHBACK", "sedan"],
-  ["PICKUP", "pickup"],
-  ["VAN", "van"],
+// Body styles remain separate from CARTYPE: a PICKUP can belong to 1 or 2.
+const CAR_BODY_TYPES = new Set([
+  "SEDAN", "WAGON", "COUPE", "CONVERTIBLE", "CABRIOLET", "HATCHBACK", "PICKUP", "VAN",
 ]);
+
+function readCarType(value, expected, where) {
+  if (!isRatebookCarTypeCode(value) || Number(value) !== expected) {
+    throw new Error(`${where}: CARTYPE is ${value}, expected ${expected}`);
+  }
+  return Number(value);
+}
 
 export function splitCarType(value) {
   const match = /^([^(]*)(?:\((.*)\))?$/.exec(value);
@@ -265,9 +259,7 @@ function readCarRows(report) {
     for (const { excelRow, cells } of rows) {
       const where = `${source.file} row ${excelRow}`;
 
-      if (Number(cells.W) !== source.cartype) {
-        throw new Error(`${where}: CARTYPE is ${cells.W}, expected ${source.cartype}`);
-      }
+      const carType = readCarType(cells.W, source.cartype, where);
       const { base, suffix } = splitCarType(cells.E);
       const mapped = CONDITION_BY_TYPE_SUFFIX.get(suffix);
       if (!mapped) throw new Error(`${where}: unknown Type suffix "${suffix}" in "${cells.E}"`);
@@ -288,8 +280,7 @@ function readCarRows(report) {
       const gear = cells.I === "Auto" ? "auto" : cells.I === "Manual" ? "manual" : "";
       if (!gear) throw new Error(`${where}: unknown Gear "${cells.I}"`);
 
-      const carType = CAR_TYPE_BY_BASE_TYPE.get(base);
-      if (!carType) throw new Error(`${where}: unknown Type "${base}" in "${cells.E}"`);
+      if (!CAR_BODY_TYPES.has(base)) throw new Error(`${where}: unknown Type "${base}" in "${cells.E}"`);
 
       out.push({
         collateralType: "car",
@@ -341,9 +332,7 @@ function readMotorcycleRows(report) {
   let dropped = 0;
   for (const { excelRow, cells } of rows) {
     const where = `${source.file} row ${excelRow}`;
-    if (Number(cells.W) !== source.cartype) {
-      throw new Error(`${where}: CARTYPE is ${cells.W}, expected ${source.cartype}`);
-    }
+    const carType = readCarType(cells.W, source.cartype, where);
 
     const appraisalPrice = toInteger(cells.R);
     // LOANTYPE 5 (ดีลเลอร์ป้ายแดง) ships 352 rows with no Model, Type or price.
@@ -354,7 +343,7 @@ function readMotorcycleRows(report) {
 
     out.push({
       collateralType: "motorcycle",
-      carType: "motorcycle",
+      carType,
       code: cells.D,
       brand: cells.C,
       model: cells.E,
@@ -415,7 +404,7 @@ function encodeBrand(rows) {
   );
 
   const tuples = sorted.map((row) => [
-    CAR_TYPES.indexOf(row.carType),
+    row.carType,
     indexInto(models, modelIndex, row.model),
     indexInto(bodyTypes, bodyIndex, row.bodyType),
     row.condition === "" ? -1 : CONDITIONS.indexOf(row.condition),
@@ -522,16 +511,13 @@ function main() {
     );
   }
 
-  rmSync(OUT_DIR, { recursive: true, force: true });
-
   const index = {};
+  const outputFiles = [];
   for (const [collateralType, rows] of [
     ["car", carRows],
     ["motorcycle", motorcycleRows],
   ]) {
     assertResolvable(collateralType, rows);
-    mkdirSync(join(OUT_DIR, collateralType), { recursive: true });
-
     const brands = [];
     let bytes = 0;
     for (const [brand, brandRows] of groupByBrand(rows)) {
@@ -540,7 +526,7 @@ function main() {
         throw new Error(`${collateralType}: two brands share the slug "${slug}"`);
       }
       const text = stringifyBrandFile(encodeBrand(brandRows));
-      writeFileSync(join(OUT_DIR, collateralType, `${slug}.json`), text);
+      outputFiles.push({ path: join(OUT_DIR, collateralType, `${slug}.json`), text });
       bytes += text.length;
       brands.push({ value: brand, file: slug, rows: brandRows.length });
     }
@@ -551,7 +537,14 @@ function main() {
     );
   }
 
-  writeFileSync(INDEX_FILE, renderIndex(index));
+  const indexText = renderIndex(index);
+  // Validate and encode every source before replacing the current dataset.
+  rmSync(OUT_DIR, { recursive: true, force: true });
+  for (const { path, text } of outputFiles) {
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, text);
+  }
+  writeFileSync(INDEX_FILE, indexText);
   console.log(`  -> src/lib/ratebook-index.ts`);
 }
 

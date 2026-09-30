@@ -3,12 +3,13 @@ import {
   type RatebookBrand,
 } from "@/lib/ratebook-index";
 import type { CollateralType, LoanPurpose } from "@/types/ratebook";
+import { isRatebookCarTypeCode, type RatebookCarTypeCode } from "@/lib/car-type";
 
 export type RatebookCollateralType = keyof typeof ratebookBrandsByCollateralType;
 
 // Mirrors the dictionaries and tuple layout written by
 // scripts/generate-ratebook.mjs -- change both together.
-const CAR_TYPES = ["sedan", "pickup", "van", "motorcycle"];
+// tuple[0] is the workbook's CARTYPE code, not a dictionary index.
 const CONDITIONS = ["original", "gas", "modified"];
 const TRANSMISSIONS = ["manual", "auto"];
 
@@ -17,7 +18,7 @@ export type RatebookRow = {
   /** Ratebook Code (มอเตอร์ไซค์: Model AFS). Unique within a brand, and the
    *  value the รุ่นย่อย dropdown is keyed on. */
   code: string;
-  carType: string;
+  carType: RatebookCarTypeCode;
   model: string;
   /** ลักษณะแค็บ where the workbook has one, otherwise the base `Type`. */
   bodyType: string;
@@ -79,22 +80,28 @@ export function availableLoanTypeId(
 }
 
 function decodeBrandFile(file: BrandFile): RatebookRow[] {
-  return file.r.map((tuple, index) => ({
-    carType: CAR_TYPES[tuple[0]] ?? "",
-    model: file.m[tuple[1]] ?? "",
-    bodyType: file.b[tuple[2]] ?? "",
-    condition: tuple[3] < 0 ? "" : (CONDITIONS[tuple[3]] ?? ""),
-    doors: tuple[4] > 0 ? String(tuple[4]) : "",
-    year: String(tuple[5]),
-    transmission: tuple[6] < 0 ? "" : (TRANSMISSIONS[tuple[6]] ?? ""),
-    subModel: file.s[tuple[7]] ?? "",
-    description: file.d[tuple[8]] ?? "",
-    engineCc: tuple[9] > 0 ? String(tuple[9]) : "",
-    loanTypeId: tuple[10],
-    ratebookPrice: tuple[11],
-    appraisalPrice: tuple[12],
-    code: file.k[index] ?? "",
-  }));
+  return file.r.map((tuple, index) => {
+    const carType = String(tuple[0]);
+    if (!isRatebookCarTypeCode(carType)) {
+      throw new Error(`ratebook row ${index}: unsupported CARTYPE ${carType}`);
+    }
+    return {
+      carType,
+      model: file.m[tuple[1]] ?? "",
+      bodyType: file.b[tuple[2]] ?? "",
+      condition: tuple[3] < 0 ? "" : (CONDITIONS[tuple[3]] ?? ""),
+      doors: tuple[4] > 0 ? String(tuple[4]) : "",
+      year: String(tuple[5]),
+      transmission: tuple[6] < 0 ? "" : (TRANSMISSIONS[tuple[6]] ?? ""),
+      subModel: file.s[tuple[7]] ?? "",
+      description: file.d[tuple[8]] ?? "",
+      engineCc: tuple[9] > 0 ? String(tuple[9]) : "",
+      loanTypeId: tuple[10],
+      ratebookPrice: tuple[11],
+      appraisalPrice: tuple[12],
+      code: file.k[index] ?? "",
+    };
+  });
 }
 
 // One in-flight or settled request per brand file. Keyed by path, so switching
