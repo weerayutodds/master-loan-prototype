@@ -32,10 +32,12 @@ export type IconName =
   | "money-bag"
   | "check-circle-solid"
   | "refresh"
+  | "user-circle"
 
 const viewBoxes: Partial<Record<IconName, string>> = {
   "money-bag": "0 0 13 14",
   "check-circle-solid": "0 0 16 16",
+  "user-circle": "0 0 48 48",
 }
 
 type IconProps = {
@@ -295,6 +297,22 @@ const paths: Record<IconName, React.ReactNode> = {
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  ),
+  "user-circle": (
+    <>
+      {/* 1. พื้นหลังวงกลม (ใช้สี currentColor เพื่อให้เปลี่ยนสีเทาตาม className ได้) */}
+      <circle cx="24" cy="24" r="24" fill="currentColor" stroke="none" />
+
+      <g
+        fill="#FFFFFF"
+        stroke="none"
+        transform="translate(3.6, 3.6) scale(0.85)"
+      >
+        <circle cx="24" cy="12" r="8.4" />
+
+        <path d="M24 38.88c-6.155 0-11.455-3.327-14.496-8.243.072-4.814 9.65-7.477 14.496-7.477s14.412 2.663 14.496 7.477c-3.04 4.916-8.34 8.243-14.496 8.243z" />
+      </g>
+    </>
   ),
 }
 

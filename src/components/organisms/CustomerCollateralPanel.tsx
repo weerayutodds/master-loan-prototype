@@ -298,7 +298,7 @@ export function CustomerCollateralPanel({
         <span className="text-sm text-foreground">ข้อมูลหลักประกัน</span>
       </div>
 
-      {collateralType !== "land" ? (
+     {collateralType && collateralType !== "land" ? (
         <>
           <div
             className={`flex rounded-lg bg-surface-muted min-h-11 px-3 py-2.5 ${
