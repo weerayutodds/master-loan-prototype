@@ -71,7 +71,7 @@ export function ProductCatalogCard({
         </div>
 
         <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:items-center sm:gap-6">
-          <div className="sm:w-16 sm:shrink-0">
+          <div className="sm:w-20 sm:shrink-0">
             <p className="text-muted-foreground">เล่มทะเบียน</p>
             <p className="font-medium text-price-label">
               {item.bookStatusLabel}
@@ -85,7 +85,7 @@ export function ProductCatalogCard({
           </div>
           <div className="hidden w-px self-stretch bg-secondary-border sm:block" />
 
-          <div className="sm:w-16 sm:shrink-0">
+          <div className="sm:w-20 sm:shrink-0">
             <p className="text-muted-foreground">เฉพาะ NCB</p>
             <p
               className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}
