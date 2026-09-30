@@ -45,7 +45,7 @@ Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also r
 
 ### PPI label in the calculation details
 
-- Checking PPI opens `GenderAgePopover` unless Dipchip already verified the lead (`verificationMethod === "card"`) and gender + birth date are on `customer` — then the checkbox turns on with no popover. Without Dipchip, the popover opens every time PPI is checked (even if gender/DOB were saved earlier from that popover).
+- Checking PPI opens `GenderAgePopover` unless Dipchip already verified the lead (`verificationMethod === "card"`) — then the checkbox turns on with no popover (gender/DOB are taken from the card; if they were missing after remount, RatebookForm fills them from the card mock). Without Dipchip, the popover opens every time PPI is checked (even if gender/DOB were saved earlier from that popover).
 - After clicking "คำนวณ", `LoanCalDetailPopover` shows "เบี้ย PPI (ตลอดสัญญา)" directly above "ยอดจัดรวม" only when PPI is selected without บัตรติดล้อ (`!isTLC && hasPpi` — always the case on โอนเล่ม).
 - When PPI is off, or PPI is selected together with บัตรติดล้อ, this contract-total PPI row is hidden. When both are selected (`isTLC && hasPpi`), the recommended-payment section shows "ยอดผ่อนต่อเดือน + PPI ต่อเดือน" below "แนะนำผ่อนต่อเดือน", explaining that the recommended payment includes the monthly PPI premium.
 - When บัตรติดล้อ is on and PPI is off on a **new loan** (`isTLC && !hasPpi && refinanceStatus !== "still-paying"`), the detail popover hides the "งวดผ่อน" row and shows the monthly payment plus the footnote `*กรณีลูกค้าผ่อนต่อเนื่องโดยไม่มีการถอนเงินเพิ่มจะหมดภายใน {installmentTerm} งวด`. Refinance keeps the "งวดผ่อน" row and has no footnote. The TLC+PPI footnote (with "ยอดแนะนำ") is unchanged.

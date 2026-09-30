@@ -62,7 +62,9 @@ export async function updateCustomerLeadCardVerified(
     update customer_lead
     set
       verification_method = 'card',
-      id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber})
+      id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber}),
+      gender = coalesce(gender, ${mockKeyInCardCustomer.gender}),
+      birth_date = coalesce(birth_date, ${mockKeyInCardCustomer.birthDate}::date)
     where id = ${leadId}
   `;
 

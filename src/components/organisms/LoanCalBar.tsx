@@ -330,13 +330,12 @@ export function LoanCalBar({
       setHasPpi(false)
       return
     }
-    // Only Dipchip-verified gender/DOB skips the popover. A prior PPI save
-    // still re-opens it so the user can reconfirm without Dipchip.
-    if (cardAlreadyRead && customer?.gender && customer?.birthDate) {
-      setHasPpi(true);
-      return;
+    // Dipchip already verified — gender/DOB come from the card; skip the popover.
+    if (cardAlreadyRead) {
+      setHasPpi(true)
+      return
     }
-    openGenderAgePopover();
+    openGenderAgePopover()
   }
 
   const summary = useMemo(

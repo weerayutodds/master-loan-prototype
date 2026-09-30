@@ -161,6 +161,8 @@ export async function updateOpportunityCardVerified(
     set
       verification_method = 'card',
       id_card_number = coalesce(nullif(id_card_number, ''), ${idCardNumber}),
+      gender = coalesce(gender, ${mockKeyInCardCustomer.gender}),
+      birth_date = coalesce(birth_date, ${mockKeyInCardCustomer.birthDate}::date),
       updated_at = now()
     where id = ${opportunityId}
   `;

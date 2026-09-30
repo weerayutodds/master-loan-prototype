@@ -48,7 +48,7 @@ import type {
   RefinanceStatus,
 } from "@/types/ratebook"
 import {useRouter} from "next/navigation"
-import {useCallback, useState} from "react"
+import {useCallback, useEffect, useState} from "react"
 import {LoadingToast} from "../molecules/LoadingToast"
 
 type RatebookFormProps = {
@@ -253,18 +253,47 @@ export function RatebookForm({
 
   usePageTitleOverride(selectedProduct ? "สรุปรายการ Lead" : null)
 
+  // Dipchip used to persist only id + verification_method. If this page loads
+  // already card-verified but without gender/DOB, fill them from the card mock
+  // so PPI can skip the gender/age popover.
+  useEffect(() => {
+    if (verificationMethod !== "card") return
+    setCustomer((current) => {
+      if (!current) return current
+      if (current.gender && current.birthDate) return current
+      return {
+        ...current,
+        gender: current.gender ?? mockKeyInCardCustomer.gender,
+        birthDate: current.birthDate ?? mockKeyInCardCustomer.birthDate,
+      }
+    })
+  }, [verificationMethod])
+
   function applyCardRead(): string {
-    const cardIdNumber = idCardNumber || mockKeyInCardCustomer.idCardNumber
-    if (verificationMethod !== "card") {
-      const [firstName, ...rest] = mockKeyInCardCustomer.name.split(" ")
-      setCustomer((current) => ({
-        firstName,
-        lastName: rest.join(" "),
-        phone: current?.phone ?? "",
-        gender: mockKeyInCardCustomer.gender,
-        birthDate: mockKeyInCardCustomer.birthDate,
-      }))
-    }
+    const cardIdNumber =
+      idCardNumber || mockKeyInCardCustomer.idCardNumber
+    setCustomer((current) => {
+      // First card read: adopt the card's identity (prototype mock).
+      if (verificationMethod !== "card") {
+        const [firstName, ...rest] = mockKeyInCardCustomer.name.split(" ")
+        return {
+          firstName,
+          lastName: rest.join(" "),
+          phone: current?.phone ?? "",
+          gender: mockKeyInCardCustomer.gender,
+          birthDate: mockKeyInCardCustomer.birthDate,
+        }
+      }
+      // Already card-verified (e.g. after remount) but gender/DOB may be missing
+      // because card-verify used to persist only id + method — fill from the card.
+      if (!current) return current
+      if (current.gender && current.birthDate) return current
+      return {
+        ...current,
+        gender: current.gender ?? mockKeyInCardCustomer.gender,
+        birthDate: current.birthDate ?? mockKeyInCardCustomer.birthDate,
+      }
+    })
     setIdCardNumber(cardIdNumber)
     setVerificationMethod("card")
     return cardIdNumber
