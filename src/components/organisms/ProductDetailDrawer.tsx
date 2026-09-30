@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
+import { Watermark } from "@/components/atoms/Watermark";
 import type { ProductCatalogCondition, ProductCatalogItem } from "@/types/product-catalog";
 
 const INTEREST_COLUMNS = ["NCB Grade / LTV", "ต่ำกว่า 50%", "50% - 60%", "60% ขึ้นไป"];
@@ -18,6 +19,22 @@ function groupRowClassName(index: number) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="mb-2 text-sm font-semibold text-primary-to">{children}</h3>;
+}
+
+/** %LTV/ดอกเบี้ย tables for รถจักรยานยนต์ aren't finalized yet. */
+function TableWatermark({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative overflow-hidden">
+      {active ? <Watermark /> : null}
+      {children}
+    </div>
+  );
 }
 
 function ConditionGrid({ title, items }: { title: string; items: ProductCatalogCondition[] }) {
@@ -68,6 +85,7 @@ export function ProductDetailDrawer({
 
   if (!item) return null;
   const { detail } = item;
+  const isMotorcycle = detail.collateralLabel === "รถจักรยานยนต์";
 
   // Portalled to <body> so the sticky sidebar's own stacking context (it
   // sits in a sibling "relative z-50" column) can't trap this above it.
@@ -94,28 +112,30 @@ export function ProductDetailDrawer({
         <div className="flex-1 space-y-6 overflow-y-auto px-4 pt-4 pb-32">
           <section>
             <SectionTitle>%LTV สูงสุด</SectionTitle>
-            <div className={TABLE_WRAPPER}>
-              <table className="w-full table-fixed">
-                <thead className="border-b border-card-border bg-surface">
-                  <tr>
-                    <th className={HEADER_CELL}>NCB Grade</th>
-                    <th className={HEADER_CELL}>ระยะเวลาถือครอง</th>
-                    <th className={HEADER_CELL}>วงเงิน</th>
-                  </tr>
-                </thead>
-                {detail.ltvGroups.map((group, groupIndex) => (
-                  <tbody key={group.ncbGrade} className={groupRowClassName(groupIndex)}>
-                    {group.rows.map((row, rowIndex) => (
-                      <tr key={row.holdingPeriod}>
-                        <td className={BODY_CELL}>{rowIndex === 0 ? group.ncbGrade : null}</td>
-                        <td className={BODY_CELL}>{row.holdingPeriod}</td>
-                        <td className={BODY_CELL}>{row.limit}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                ))}
-              </table>
-            </div>
+            <TableWatermark active={isMotorcycle}>
+              <div className={TABLE_WRAPPER}>
+                <table className="w-full table-fixed">
+                  <thead className="border-b border-card-border bg-surface">
+                    <tr>
+                      <th className={HEADER_CELL}>NCB Grade</th>
+                      <th className={HEADER_CELL}>ระยะเวลาถือครอง</th>
+                      <th className={HEADER_CELL}>วงเงิน</th>
+                    </tr>
+                  </thead>
+                  {detail.ltvGroups.map((group, groupIndex) => (
+                    <tbody key={group.ncbGrade} className={groupRowClassName(groupIndex)}>
+                      {group.rows.map((row, rowIndex) => (
+                        <tr key={row.holdingPeriod}>
+                          <td className={BODY_CELL}>{rowIndex === 0 ? group.ncbGrade : null}</td>
+                          <td className={BODY_CELL}>{row.holdingPeriod}</td>
+                          <td className={BODY_CELL}>{row.limit}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  ))}
+                </table>
+              </div>
+            </TableWatermark>
             <p className="mt-3 text-xs text-danger">
               *นอกเหนือจากเงื่อนไขนี้ จะเป็นงานนอกอำนาจทุกกรณี (วงเงินและวันครอบครอง)
             </p>
@@ -123,31 +143,33 @@ export function ProductDetailDrawer({
 
           <section>
             <SectionTitle>ดอกเบี้ย</SectionTitle>
-            <div className={TABLE_WRAPPER}>
-              <table className="w-full table-fixed">
-                <thead className="border-b border-card-border bg-surface">
-                  <tr>
-                    {INTEREST_COLUMNS.map((column) => (
-                      <th key={column} className={HEADER_CELL}>
-                        {column}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.interestRows.map((row, index) => (
-                    <tr key={row.ncbGrade} className={groupRowClassName(index)}>
-                      <td className={BODY_CELL}>{row.ncbGrade}</td>
-                      {row.rates.map((rate, rateIndex) => (
-                        <td key={rateIndex} className={BODY_CELL}>
-                          {rate}
-                        </td>
+            <TableWatermark active={isMotorcycle}>
+              <div className={TABLE_WRAPPER}>
+                <table className="w-full table-fixed">
+                  <thead className="border-b border-card-border bg-surface">
+                    <tr>
+                      {INTEREST_COLUMNS.map((column) => (
+                        <th key={column} className={HEADER_CELL}>
+                          {column}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {detail.interestRows.map((row, index) => (
+                      <tr key={row.ncbGrade} className={groupRowClassName(index)}>
+                        <td className={BODY_CELL}>{row.ncbGrade}</td>
+                        {row.rates.map((rate, rateIndex) => (
+                          <td key={rateIndex} className={BODY_CELL}>
+                            {rate}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </TableWatermark>
           </section>
 
           <ConditionGrid

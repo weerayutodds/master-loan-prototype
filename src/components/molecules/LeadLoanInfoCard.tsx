@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/atoms/Badge";
+import { Watermark } from "@/components/atoms/Watermark";
 import { Card } from "@/components/molecules/Card";
 import { Select } from "@/components/atoms/Select";
 import { formatRatePercent } from "@/lib/format";
@@ -102,7 +103,9 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
   });
 
   return (
-    <Card>
+    <Card className="relative overflow-hidden">
+      <Watermark className="text-2xl" />
+
       <h3 className="mb-4 border-b border-divider pb-3 text-lg font-semibold text-primary-to">
         ข้อมูลสินเชื่อ
       </h3>
