@@ -915,6 +915,19 @@ export const mockKeyInCardCustomer: CardCustomerData = {
   birthDate: "1990-05-20",
 };
 
+/** Fixed values for the "ตรวจ eNCB" flow: it always returns this grade, and its OTP step is display-only. */
+export const mockEncbCheck: {
+  ncbGrade: NcbGrade;
+  otpPhone: string;
+  otpCode: string;
+  otpRef: string;
+} = {
+  ncbGrade: "A02",
+  otpPhone: "0875092348",
+  otpCode: "332176",
+  otpRef: "xxxxxxxx",
+};
+
 export const genderOptions: { value: Gender; label: string }[] = [
   { value: "male", label: "ชาย" },
   { value: "female", label: "หญิง" },

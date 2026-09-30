@@ -114,7 +114,6 @@ export function RatebookForm({
         : null,
   )
 
-  const [ncbAwaitingRefresh, setNcbAwaitingRefresh] = useState(false)
   const [ncbGrade, setNcbGrade] = useState<NcbGrade | null>(
     initialLead?.ncbGrade ?? initialOpportunity?.ncbGrade ?? null,
   )
@@ -281,14 +280,8 @@ export function RatebookForm({
     }
   }
 
-  async function handleNcbCardRead() {
-    if (verificationMethod !== "card") await handleDipchipRead()
-    setNcbAwaitingRefresh(true)
-  }
-
   async function handleNcbChecked(nextGrade: NcbGrade) {
     setNcbGrade(nextGrade)
-    setNcbAwaitingRefresh(false)
 
     const cardIdNumber = applyCardRead()
 
@@ -424,8 +417,6 @@ export function RatebookForm({
             verificationMethod={verificationMethod}
             onNcbChecked={handleNcbChecked}
             onDipchipRead={handleDipchipRead}
-            ncbAwaitingRefresh={ncbAwaitingRefresh}
-            onNcbCardRead={handleNcbCardRead}
           />
         </div>
         {selectedProduct && initialOpportunity ? (
@@ -488,8 +479,11 @@ export function RatebookForm({
                     getDefaultProductCatalogFilter(productCatalogData)
                   }
                   ncbGrade={ncbGrade}
-                  cardAlreadyRead={verificationMethod === "card"}
-                  onNcbCardRead={handleNcbCardRead}
+                  onNcbChecked={handleNcbChecked}
+                  customerName={
+                    customer ? `${customer.firstName} ${customer.lastName}` : ""
+                  }
+                  idCardNumber={idCardNumber}
                   onSelectConfirmed={handleSelectedProductConfirmed}
                 />
                 <LoanCalBar

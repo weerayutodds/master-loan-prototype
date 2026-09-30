@@ -2,25 +2,21 @@
 
 import {Icon} from "@/components/atoms/Icon"
 import {Modal} from "@/components/molecules/Modal"
-import type {NcbGrade} from "@/types/customer-lead"
 import Image from "next/image"
 import {useEffect} from "react"
 
-export const MOCK_NCB_GRADE: NcbGrade = "A02"
 const CHECK_DURATION_MS = 2000
 
 type NcbCheckModalProps = {
   open: boolean
-  onComplete: (ncbGrade: NcbGrade) => unknown
+  onComplete: () => unknown
 }
 
+/** The sidebar's "Dipchip" card read; "ตรวจ eNCB" uses `EncbCheckFlow` instead. */
 export function NcbCheckModal({open, onComplete}: NcbCheckModalProps) {
   useEffect(() => {
     if (!open) return
-    const timer = setTimeout(
-      () => onComplete(MOCK_NCB_GRADE),
-      CHECK_DURATION_MS,
-    )
+    const timer = setTimeout(() => onComplete(), CHECK_DURATION_MS)
     return () => clearTimeout(timer)
   }, [open])
 

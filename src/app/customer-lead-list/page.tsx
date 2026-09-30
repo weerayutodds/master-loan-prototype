@@ -71,6 +71,8 @@ export default async function CustomerLeadListPage({
               buttonVariant="primary"
               buttonSize="sm"
               onChecked={updateCustomerLeadNcbGrade.bind(null, focusLead.id)}
+              customerName={`${focusLead.firstName} ${focusLead.lastName}`}
+              idCardNumber={focusLead.idCardNumber}
             />
           ) : (
             <Button variant="primary" size="sm" disabled>

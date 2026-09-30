@@ -2,7 +2,7 @@
 
 import { Select } from "@/components/atoms/Select";
 import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
-import { NcbCheckModal } from "@/components/organisms/NcbCheckModal";
+import { EncbCheckFlow } from "@/components/organisms/EncbCheckFlow";
 import { ProductDetailDrawer } from "@/components/organisms/ProductDetailDrawer";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
 import { ncbGradeList } from "@/lib/mock";
@@ -20,10 +20,11 @@ type ProductCatalogProps = {
   filter: ProductCatalogFilter;
   /** Verified eNCB result; takes precedence over the local preview filter. */
   ncbGrade: NcbGrade | null;
-  /** Dipchip-verified: "ตรวจ eNCB" skips the card modal. */
-  cardAlreadyRead: boolean;
-  /** Card read done; the grade comes from the sidebar's "รีเฟรช", same as the sidebar's own "ตรวจ eNCB". */
-  onNcbCardRead: () => unknown;
+  /** Same handler as the sidebar's "ตรวจ eNCB", so either button sets the one grade. */
+  onNcbChecked: (ncbGrade: NcbGrade) => unknown;
+  /** Shown on the eNCB flow's "กรุณาเสียบบัตรประชาชนผู้กู้" step. */
+  customerName: string;
+  idCardNumber: string;
   onSelectConfirmed?: (item: ProductCatalogItem) => void;
 };
 
@@ -95,8 +96,9 @@ export function ProductCatalog({
   data,
   filter,
   ncbGrade,
-  cardAlreadyRead,
-  onNcbCardRead,
+  onNcbChecked,
+  customerName,
+  idCardNumber,
   onSelectConfirmed,
 }: ProductCatalogProps) {
   const [checkingNcb, setCheckingNcb] = useState(false);
@@ -116,11 +118,10 @@ export function ProductCatalog({
   const [detailItemId, setDetailItemId] = useState<string | null>(null);
   const detailItem = items.find((item) => item.id === detailItemId) ?? null;
 
-  // The drawer is closed so the sidebar's "รีเฟรช" is visible afterward.
+  // The drawer is closed so the re-filtered list is visible once the grade arrives.
   function handleCheckNcb() {
     setDetailItemId(null);
-    if (cardAlreadyRead) onNcbCardRead();
-    else setCheckingNcb(true);
+    setCheckingNcb(true);
   }
 
   // A grade the product doesn't accept can't be approved, so those are dropped
@@ -229,13 +230,17 @@ export function ProductCatalog({
         onCheckNcb={handleCheckNcb}
       />
 
-      <NcbCheckModal
-        open={checkingNcb}
-        onComplete={async () => {
-          await onNcbCardRead();
-          setCheckingNcb(false);
-        }}
-      />
+      {checkingNcb ? (
+        <EncbCheckFlow
+          customerName={customerName}
+          idCardNumber={idCardNumber}
+          onCancel={() => setCheckingNcb(false)}
+          onComplete={async (grade) => {
+            await onNcbChecked(grade);
+            setCheckingNcb(false);
+          }}
+        />
+      ) : null}
 
       <SelectProductConfirmModal
         open={selectedItemId !== null}
