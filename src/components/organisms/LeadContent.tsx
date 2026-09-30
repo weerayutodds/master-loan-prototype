@@ -46,6 +46,7 @@ type LeadContentProps = {
   onLoanInfoChange: (value: LoanInfo) => void;
   carInsuranceInfo: CarInsuranceInfo;
   onCarInsuranceInfoChange: (value: CarInsuranceInfo) => void;
+  onEditCollateral: () => void;
 };
 
 export function LeadContent({
@@ -57,6 +58,7 @@ export function LeadContent({
   onLoanInfoChange,
   carInsuranceInfo,
   onCarInsuranceInfoChange,
+  onEditCollateral,
 }: LeadContentProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("loan");
   // initialOpportunity.collateralType is the last-saved DB snapshot; the live
@@ -113,6 +115,7 @@ export function LeadContent({
           <LeadCollateralInfoCard
             carInfo={carInfo}
             collateralType={effectiveCollateralType}
+            onEdit={onEditCollateral}
           />
           <LeadLoanInfoCard
             product={selectedProduct}

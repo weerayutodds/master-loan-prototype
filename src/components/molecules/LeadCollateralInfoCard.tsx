@@ -17,9 +17,10 @@ function optionLabel(options: { value: string; label: string }[], value?: string
 type LeadCollateralInfoCardProps = {
   carInfo: CarInfo;
   collateralType: CollateralType | null;
+  onEdit?: () => void;
 };
 
-export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollateralInfoCardProps) {
+export function LeadCollateralInfoCard({ carInfo, collateralType, onEdit }: LeadCollateralInfoCardProps) {
   const vehicleCollateralType = toVehicleCollateralType(collateralType);
   // ยี่ห้อ/รุ่น/รุ่นย่อย are stored as the ratebook's own wording, so they are
   // shown as they are rather than looked up in a catalog this card cannot reach.
@@ -62,7 +63,7 @@ export function LeadCollateralInfoCard({ carInfo, collateralType }: LeadCollater
     <Card>
       <div className="mb-4 flex items-center justify-between border-b border-divider pb-3">
         <h3 className="text-lg font-semibold text-primary-to">ข้อมูลหลักประกัน</h3>
-        <Button variant="outline" size="xs">
+        <Button variant="outline" size="xs" onClick={onEdit}>
           แก้ไข
         </Button>
       </div>

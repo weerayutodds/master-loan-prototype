@@ -379,6 +379,17 @@ export function RatebookForm({
     setShowProductGuide(false)
   }
 
+  // Drops back to the car info step without losing anything already in state
+  // -- confirming a product (even the same one) brings LeadContent back.
+  function handleEditCollateral() {
+    setSelectedProduct(null)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({top: 0, behavior: "instant"})
+      })
+    })
+  }
+
   const tags = [
     loanPurposeOptions.find((option) => option.value === loanPurpose)
       ?.description,
@@ -429,6 +440,7 @@ export function RatebookForm({
             onLoanInfoChange={setLoanInfo}
             carInsuranceInfo={carInsuranceInfo}
             onCarInsuranceInfoChange={setCarInsuranceInfo}
+            onEditCollateral={handleEditCollateral}
           />
         ) : (
           <div className="relative z-10 space-y-6">
