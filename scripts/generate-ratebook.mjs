@@ -244,7 +244,6 @@ function readCarRows(report) {
       E: "Type",
       F: "Door",
       G: "Year",
-      H: "Model Type",
       I: "Gear",
       J: "Sub-Model",
       K: "Model Description",
@@ -288,9 +287,8 @@ function readCarRows(report) {
         code: cells.B,
         brand: cells.C,
         model: cells.D,
-        // ลักษณะแค็บ is the meaningful body distinction where it exists (กระบะ);
-        // elsewhere `Model Type` is blank and the base `Type` carries it.
-        bodyType: cells.H || base,
+        // Display the workbook's Type verbatim after removing its condition suffix.
+        bodyType: base,
         condition: mapped.condition,
         doors,
         year: Number(cells.G),

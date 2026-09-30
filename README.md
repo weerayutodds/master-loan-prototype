@@ -36,6 +36,10 @@ npm run generate:ratebook
 `2` = กระบะ, `3` = มอเตอร์ไซด์, `8` = รถตู้. Type `5` (รถบรรทุก) remains
 on the mock catalog. Body style and door count do not determine CARTYPE.
 
+For cars, body type comes from the Excel `Type` column with parentheses and their
+contents removed. It is displayed verbatim (for example, `SEDAN` or `PICKUP`),
+without translation or a fallback to `Model Type`.
+
 The generator validates all sources before replacing `public/ratebook/**/*.json`
 and `src/lib/ratebook-index.ts`. Each JSON row's first number is the CARTYPE code,
 not the old body-style dictionary index. Deploy the regenerated files and decoder

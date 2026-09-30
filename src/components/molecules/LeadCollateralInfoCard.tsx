@@ -7,7 +7,7 @@ import {
   carTypeOptionsByCollateralType,
   toVehicleCollateralType,
 } from "@/lib/mock";
-import { bodyTypeLabel, isRatebookCollateralType } from "@/lib/ratebook";
+import { isRatebookCollateralType } from "@/lib/ratebook";
 import { getCarTypeLabel } from "@/lib/car-type";
 import type { CarInfo, CollateralType } from "@/types/ratebook";
 
@@ -58,7 +58,7 @@ export function LeadCollateralInfoCard({ carInfo, collateralType, onEdit }: Lead
           value: carInfo.engineCc ? `${carInfo.engineCc} ซีซี` : "-",
         },
         { label: "ระบบเกียร์", value: optionLabel(carTransmissionOptions, carInfo.transmission) },
-        { label: "ประเภทตัวถัง", value: carInfo.bodyType ? bodyTypeLabel(carInfo.bodyType) : "-" },
+        { label: "ประเภทตัวถัง", value: carInfo.bodyType || "-" },
         { label: "รุ่นย่อย", value: carInfo.subModel ?? "-" },
       ];
 

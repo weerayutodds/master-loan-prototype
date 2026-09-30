@@ -20,7 +20,7 @@ export type RatebookRow = {
   code: string;
   carType: RatebookCarTypeCode;
   model: string;
-  /** ลักษณะแค็บ where the workbook has one, otherwise the base `Type`. */
+  /** Excel `Type` without parentheses or their contents, displayed verbatim. */
   bodyType: string;
   condition: string;
   doors: string;
@@ -212,23 +212,6 @@ export function resolveRow(
 // ---------------------------------------------------------------------------
 // labels
 // ---------------------------------------------------------------------------
-
-// The workbook writes body styles in English; cab styles are already Thai and
-// pass straight through.
-const BODY_TYPE_LABELS: Record<string, string> = {
-  SEDAN: "ซีดาน",
-  WAGON: "สเตชันแวกอน",
-  COUPE: "คูเป้",
-  CONVERTIBLE: "เปิดประทุน",
-  CABRIOLET: "คาบริโอเลต์",
-  HATCHBACK: "แฮทช์แบ็ก",
-  PICKUP: "กระบะ",
-  VAN: "ตู้",
-};
-
-export function bodyTypeLabel(value: string): string {
-  return BODY_TYPE_LABELS[value] ?? value;
-}
 
 function distinct(rows: RatebookRow[], field: RatebookField): string[] {
   return [...new Set(rows.map((row) => row[field]))].filter(

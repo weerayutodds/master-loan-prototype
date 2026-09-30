@@ -20,7 +20,6 @@ import {
 } from "@/lib/mock";
 import {
   availableLoanTypeId,
-  bodyTypeLabel,
   filterRows,
   getRatebookBrands,
   isRatebookCollateralType,
@@ -206,13 +205,11 @@ function buildRatebookOptions(
               : field === "transmission"
                 ? toKnownOptions(reachable, field, carTransmissionOptions)
                 : toOptions(reachable, field, (value) =>
-                    field === "bodyType"
-                      ? bodyTypeLabel(value)
-                      : field === "year"
-                        ? `${value} (${Number(value) + 543})`
-                        : field === "engineCc"
-                          ? `${value} ซีซี`
-                          : value,
+                    field === "year"
+                      ? `${value} (${Number(value) + 543})`
+                      : field === "engineCc"
+                        ? `${value} ซีซี`
+                        : value,
                   );
 
       const key: VehicleFieldKey = field === "code" ? "ratebookCode" : field;
