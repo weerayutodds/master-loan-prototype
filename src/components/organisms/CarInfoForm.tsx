@@ -80,6 +80,7 @@ export function CarInfoForm({
   const [yearInfoOpen, setYearInfoOpen] = useState(false)
   const [modelInfoOpen, setModelInfoOpen] = useState(false)
   const [scanErrorOpen, setScanErrorOpen] = useState(false)
+  const [showValidation, setShowValidation] = useState(false)
 
   const vehicle = useVehicleOptions(collateralType, carInfo, loanPurpose)
   const carTypeLabel = isRatebookCollateralType(collateralType)
@@ -135,6 +136,8 @@ export function CarInfoForm({
     return {
       options: [PLACEHOLDER, ...vehicle.options[field]],
       value: valueOf(field),
+      "aria-label": FIELD_LABELS[field],
+      "aria-invalid": Boolean(fieldError(field)),
       disabled: !isUnlocked(field) || vehicle.isLoading,
       onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
         update(field, event.target.value),
@@ -160,7 +163,18 @@ export function CarInfoForm({
 
   const missingFields = vehicle.sequence.filter((field) => !valueOf(field));
   const isComplete =
-    missingFields.length === 0 && carInfo.appraisalPrice != null
+    missingFields.length === 0 && carInfo.appraisalPrice != null && !vehicle.isLoading
+
+  function fieldError(field: VehicleFieldKey): string | undefined {
+    if (!showValidation) return undefined
+    if (missingFields.includes(field)) return `กรุณาเลือก${FIELD_LABELS[field]}`
+    if (field === "ratebookCode" && missingFields.length === 0) {
+      if (vehicle.isLoading) return "กำลังโหลดข้อมูลรถ กรุณาลองอีกครั้ง"
+      if (carInfo.appraisalPrice == null)
+        return "ไม่พบราคาประเมินสำหรับข้อมูลรถที่เลือก กรุณาตรวจสอบข้อมูลรถ"
+    }
+    return undefined
+  }
 
   return (
     <div className="space-y-4">
@@ -181,10 +195,11 @@ export function CarInfoForm({
 
       <div className="space-y-4 rounded-xl border-2 border-card-border bg-surface p-5 shadow-primary-s">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label={FIELD_LABELS.brand}>
+          <FormField label={FIELD_LABELS.brand} error={fieldError("brand")}>
             <Select {...selectProps("brand")} disabled={false} />
           </FormField>
           <FormField
+            error={fieldError("model")}
             label={
               <InfoLabel onClick={() => setModelInfoOpen(true)}>
                 {FIELD_LABELS.model}
@@ -198,6 +213,7 @@ export function CarInfoForm({
         {isMotorcycle ? (
           <div className="grid grid-cols-2 gap-4">
             <FormField
+              error={fieldError("year")}
               label={
                 <InfoLabel onClick={() => setYearInfoOpen(true)}>
                   {FIELD_LABELS.year}
@@ -206,7 +222,7 @@ export function CarInfoForm({
             >
               {fieldControl("year")}
             </FormField>
-            <FormField label={FIELD_LABELS.ratebookCode}>
+            <FormField label={FIELD_LABELS.ratebookCode} error={fieldError("ratebookCode")}>
               {fieldControl("ratebookCode")}
             </FormField>
           </div>
@@ -214,6 +230,7 @@ export function CarInfoForm({
           <>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <FormField
+                error={fieldError("year")}
                 label={
                   <InfoLabel onClick={() => setYearInfoOpen(true)}>
                     {FIELD_LABELS.year}
@@ -222,10 +239,10 @@ export function CarInfoForm({
               >
                 {fieldControl("year")}
               </FormField>
-              <FormField label={FIELD_LABELS.condition}>
+              <FormField label={FIELD_LABELS.condition} error={fieldError("condition")}>
                 {fieldControl("condition")}
               </FormField>
-              <FormField label={FIELD_LABELS.doors}>
+              <FormField label={FIELD_LABELS.doors} error={fieldError("doors")}>
                 {fieldControl("doors")}
               </FormField>
               <FormField label="ประเภทรถ">
@@ -237,16 +254,16 @@ export function CarInfoForm({
             </div>
 
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <FormField label={`${FIELD_LABELS.engineCc} (ไม่บังคับ)`}>
+              <FormField label={`${FIELD_LABELS.engineCc} (ไม่บังคับ)`} error={fieldError("engineCc")}>
                 {fieldControl("engineCc")}
               </FormField>
-              <FormField label={FIELD_LABELS.transmission}>
+              <FormField label={FIELD_LABELS.transmission} error={fieldError("transmission")}>
                 {fieldControl("transmission")}
               </FormField>
-              <FormField label={FIELD_LABELS.bodyType}>
+              <FormField label={FIELD_LABELS.bodyType} error={fieldError("bodyType")}>
                 {fieldControl("bodyType")}
               </FormField>
-              <FormField label={FIELD_LABELS.ratebookCode}>
+              <FormField label={FIELD_LABELS.ratebookCode} error={fieldError("ratebookCode")}>
                 {fieldControl("ratebookCode")}
               </FormField>
             </div>
@@ -256,16 +273,12 @@ export function CarInfoForm({
         <div className="border-t border-border" />
 
         <div className="flex items-center justify-end gap-3">
-          {!isComplete && missingFields.length > 0 && (
-            <p className="text-xs text-muted-foreground">
-              กรุณากรอก:{" "}
-              {missingFields.map((field) => FIELD_LABELS[field]).join(", ")}
-            </p>
-          )}
           <Button
             variant="primary"
-            disabled={!isComplete}
+            type="button"
             onClick={() => {
+              setShowValidation(true)
+              if (!isComplete) return
               if (opportunityId)
                 void updateOpportunityCarInfo(opportunityId, carInfo)
               onViewAppraisal()
