@@ -14,7 +14,10 @@ type ProductGuideProps = {
 
 export function ProductGuide({ data }: ProductGuideProps) {
   return (
-    <div className="product-guide-hero relative overflow-hidden rounded-xl p-6 shadow-primary-s">
+    <div
+      id="product-guide"
+      className="product-guide-hero relative overflow-hidden rounded-xl p-6 shadow-primary-s"
+    >
       <div className="pointer-events-none absolute -top-16 left-[9%] size-64 rounded-full bg-primary blur-[100px] mix-blend-screen" />
 
       <div className="relative flex flex-wrap items-stretch justify-center gap-4">

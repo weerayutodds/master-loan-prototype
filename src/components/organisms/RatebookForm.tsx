@@ -466,6 +466,14 @@ export function RatebookForm({
                 onViewAppraisal={() => {
                   setProductFilter(null)
                   setShowProductGuide(true)
+                  // Wait for ProductGuide to mount, then scroll it into view.
+                  requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                      document
+                        .getElementById("product-guide")
+                        ?.scrollIntoView({behavior: "smooth", block: "start"})
+                    })
+                  })
                 }}
               />
             )}
