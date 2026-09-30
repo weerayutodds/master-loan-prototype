@@ -75,15 +75,37 @@ export function CollateralDetailModal({
     register,
     handleSubmit,
     reset,
+    watch,
+    clearErrors,
     formState: {errors},
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
+    // Errors (and the auto-focus that comes with them) should only ever
+    // appear right when "บันทึก" is clicked, not from editing a field again
+    // after an earlier failed attempt.
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: {
       licensePlateNumber: "",
       licensePlateProvince: "",
       chassisNumber: "",
     },
   })
+
+  // ...but a field that's now filled in should drop its own red state right
+  // away, instead of waiting for the next "บันทึก" to notice it's fixed.
+  const plateValue = watch("licensePlateNumber")
+  const provinceValue = watch("licensePlateProvince")
+  const chassisValue = watch("chassisNumber")
+
+  useEffect(() => {
+    const hasPlate = !!plateValue?.trim()
+    const hasProvince = !!provinceValue?.trim()
+    const hasChassis = !!chassisValue?.trim()
+    if (hasPlate || hasProvince || hasChassis) clearErrors("general")
+    if (hasPlate) clearErrors("licensePlateNumber")
+    if (hasProvince) clearErrors("licensePlateProvince")
+  }, [plateValue, provinceValue, chassisValue, clearErrors])
 
   useEffect(() => {
     if (!open) return
