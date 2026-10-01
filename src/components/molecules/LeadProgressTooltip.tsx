@@ -15,7 +15,7 @@ export function LeadProgressTooltip({
   items,
 }: LeadProgressTooltipProps) {
   return (
-    <div className="invisible absolute z-20 top-1/2 left-full ml-3 w-41 -translate-y-3.5 rounded-lg bg-toast px-2 py-2 opacity-0 backdrop-blur-[2px] transition-opacity duration-150 group-hover/progress:visible group-hover/progress:opacity-100">
+    <div className="invisible absolute z-20 top-1/2 right-full mr-3 w-41 lg:right-auto lg:left-full lg:mr-0 lg:ml-3 -translate-y-3.5 rounded-lg bg-toast px-2 py-2 opacity-0 backdrop-blur-[2px] transition-opacity duration-150 group-hover/progress:visible group-hover/progress:opacity-100">
       <span className="absolute top-3 -left-1.5 h-0 w-0 border-y-[6px] border-y-transparent border-r-[6px] border-r-toast" />
 
       <p className="text-xs leading-[160%] tracking-[0.01em] text-white">

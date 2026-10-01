@@ -53,7 +53,7 @@ export function ProductCatalogCard({
       <div className="flex flex-col gap-4 overflow-x-auto rounded-t-lg bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1 rounded-lg bg-surface-muted px-3 py-2 sm:w-64 sm:shrink-0">
           <div className="flex items-center justify-between gap-1">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-0.5">
               <Icon name="money-bag" className="size-4 text-primary-to" />
               <span className="pb-0.5 text-xs text-foreground whitespace-nowrap">
                 วงเงินอนุมัติ

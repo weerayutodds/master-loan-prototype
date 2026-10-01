@@ -48,7 +48,7 @@ import type {
   RefinanceStatus,
 } from "@/types/ratebook"
 import {useRouter} from "next/navigation"
-import {useCallback, useEffect, useState} from "react"
+import {useCallback, useEffect, useRef, useState} from "react"
 import {LoadingToast} from "../molecules/LoadingToast"
 
 type RatebookFormProps = {
@@ -88,6 +88,7 @@ export function RatebookForm({
   initialOpportunity,
   initialLead = null,
 }: RatebookFormProps) {
+  const gridRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const opportunityId = initialOpportunity?.id ?? null
   const leadId = initialOpportunity?.leadId ?? initialLead?.id ?? null
@@ -437,7 +438,7 @@ export function RatebookForm({
 
   return (
     <>
-      <div className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div ref={gridRef} className="grid grid-cols-1 items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="relative z-50 lg:sticky lg:top-19">
           <CustomerCollateralPanel
             initialOpportunity={initialOpportunity}
@@ -548,6 +549,7 @@ export function RatebookForm({
                   onLoanTermsChange={handleLoanTermsChange}
                   onCustomerChange={setCustomer}
                   onFilterChange={setProductFilter}
+                  anchorRef={gridRef}
                 />
               </>
             )}
