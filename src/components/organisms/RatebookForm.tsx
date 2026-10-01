@@ -375,6 +375,7 @@ export function RatebookForm({
 
     setCarInfo({})
     setShowProductGuide(false)
+    setLoanInfo((current) => ({...current, requestedAmount: undefined}))
     commitLoanQuestionsIfComplete(
       loanPurpose,
       value,

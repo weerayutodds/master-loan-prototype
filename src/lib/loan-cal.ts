@@ -36,7 +36,7 @@ export function getMaxApprovedAmount(product: { approvedAmount: string }): numbe
 
 export function calculateLtvPercent(amount: number, appraisalPrice: number): number {
   if (appraisalPrice <= 0) return 0;
-  return Math.round((amount / appraisalPrice) * 100);
+  return Math.round((amount / appraisalPrice) * 10000) / 100;
 }
 
 export function calculateAmountFromLtv(ltvPercent: number, appraisalPrice: number): number {
