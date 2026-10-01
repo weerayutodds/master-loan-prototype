@@ -55,8 +55,8 @@ export function LoanCalDetailPopover({
   })
 
   const rateLabelPrefix = isTLC ? "แบบ" : "อัตราดอกเบี้ย "
-  // Continuous-payment footnote only for new-loan TLC without PPI.
-  const showNewLoanTlcRemark = isTLC && !hasPpi && !isRefinance
+  // TLC swaps the งวดผ่อน row for a continuous-payment footnote (the PPI variant has its own).
+  const showTlcRemark = isTLC && !hasPpi
   // Empty input shows 0; otherwise negative when the new installment is higher than the old one.
   const installmentDifference = existingInstallment
     ? existingInstallment - summary.totalPayment
@@ -112,7 +112,7 @@ export function LoanCalDetailPopover({
           />
         </>
       )}
-      {isRefinance || !isTLC ? (
+      {!isTLC ? (
         <DetailRow label="งวดผ่อน" value={`${installmentTerm} งวด`} />
       ) : null}
 
@@ -148,8 +148,14 @@ export function LoanCalDetailPopover({
             *กรณีลูกค้าผ่อนยอดแนะนำต่อเนื่องโดยไม่มีการถอนเงินเพิ่มจะหมดภายใน {installmentTerm} งวด
           </div>
         </>
-      ) : showNewLoanTlcRemark ? (
-        <div className="loan-cal-result-box px-3 py-2">
+      ) : (
+        <div
+          className={`px-3 py-2 ${
+            isRefinance
+              ? "border-t border-primary-to bg-pale-blue"
+              : "loan-cal-result-box"
+          }`}
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs text-foreground">ยอดผ่อนต่อเดือน</span>
             <p className="text-lg font-semibold text-primary-to">
@@ -157,24 +163,12 @@ export function LoanCalDetailPopover({
               <span className="text-xs font-normal text-price-label">บาท</span>
             </p>
           </div>
-          <p className="mt-1 text-[10px] text-muted-foreground">
-            *กรณีลูกค้าผ่อนต่อเนื่องโดยไม่มีการถอนเงินเพิ่มจะหมดภายใน{" "}
-            {installmentTerm} งวด
-          </p>
-        </div>
-      ) : (
-        <div
-          className={`flex items-center justify-between px-3 py-2 ${
-            isRefinance
-              ? "border-t border-primary-to bg-pale-blue"
-              : "loan-cal-result-box"
-          }`}
-        >
-          <span className="text-xs text-foreground">ยอดผ่อนต่อเดือน</span>
-          <p className="text-lg font-semibold text-primary-to">
-            {summary.totalPayment.toLocaleString("th-TH")}{" "}
-            <span className="text-xs font-normal text-price-label">บาท</span>
-          </p>
+          {showTlcRemark ? (
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              *กรณีลูกค้าผ่อนต่อเนื่องโดยไม่มีการถอนเงินเพิ่มจะหมดภายใน{" "}
+              {installmentTerm} งวด
+            </p>
+          ) : null}
         </div>
       )}
 
