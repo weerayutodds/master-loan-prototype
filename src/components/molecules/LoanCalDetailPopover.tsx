@@ -57,10 +57,18 @@ export function LoanCalDetailPopover({
   const rateLabelPrefix = isTLC ? "แบบ" : "อัตราดอกเบี้ย "
   // TLC swaps the งวดผ่อน row for a continuous-payment footnote (the PPI variant has its own).
   const showTlcRemark = isTLC && !hasPpi
-  // Empty input shows 0; otherwise negative when the new installment is higher than the old one.
-  const installmentDifference = existingInstallment
+  const hasExistingInstallment = existingInstallment > 0
+  const installmentDifference = hasExistingInstallment
     ? existingInstallment - summary.totalPayment
     : 0
+  const installmentDifferencePercent = hasExistingInstallment
+    ? (Math.abs(installmentDifference) / existingInstallment) * 100
+    : 0
+  const installmentComparisonLabel = installmentDifference > 0
+    ? "น้อยกว่าไฟแนนซ์เดิม"
+    : installmentDifference < 0
+      ? "มากกว่าไฟแนนซ์เดิม"
+      : "เท่ากับไฟแนนซ์เดิม"
 
   return (
     <div className="w-66.25 overflow-hidden rounded-lg border border-secondary-border bg-surface shadow-secondary-m">
@@ -196,12 +204,26 @@ export function LoanCalDetailPopover({
               บาท
             </span>
           </div>
-          <div className="flex items-center justify-between text-primary-foreground">
-            <span className="text-xs">ส่วนต่างจากไฟแนนซ์เดิม</span>
-            <p className="text-lg font-semibold">
-              {installmentDifference.toLocaleString("th-TH")}{" "}
-              <span className="text-xs font-normal">บาท</span>
-            </p>
+          <div className="flex flex-col gap-1 text-primary-foreground" aria-live="polite">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
+              <span className="text-xs">
+                {hasExistingInstallment ? installmentComparisonLabel : "ส่วนต่างจากไฟแนนซ์เดิม"}
+              </span>
+              <p className="text-lg font-semibold">
+                {Math.abs(installmentDifference).toLocaleString("th-TH")}{" "}
+                <span className="text-xs font-normal">บาท</span>
+              </p>
+            </div>
+            {hasExistingInstallment ? (
+              <p className="flex items-baseline justify-between gap-2 text-[10px] text-primary-foreground/80">
+                <span>เทียบกับยอดผ่อนเดิม</span>
+                <span className="shrink-0 tabular-nums">
+                  {installmentDifferencePercent.toLocaleString("th-TH", {
+                    maximumFractionDigits: 2,
+                  })}%
+                </span>
+              </p>
+            ) : null}
           </div>
         </div>
       ) : null}
