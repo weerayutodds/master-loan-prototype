@@ -81,6 +81,7 @@ export function LoanQuestionsPanel({
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4">
           {refinanceStatusOptions.map((option) => (
             <OptionCard
+              textCenter
               key={option.value}
               label={option.label}
               description={option.description}
