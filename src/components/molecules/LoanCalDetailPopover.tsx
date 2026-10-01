@@ -212,18 +212,18 @@ export function LoanCalDetailPopover({
               <p className="text-lg font-semibold">
                 {Math.abs(installmentDifference).toLocaleString("th-TH")}{" "}
                 <span className="text-xs font-normal">บาท</span>
+                {hasExistingInstallment ? (
+                  <span
+                    className="ml-2 text-xs font-normal text-primary-foreground/80 tabular-nums"
+                    aria-label="เปอร์เซ็นต์ส่วนต่างเทียบกับยอดผ่อนเดิม"
+                  >
+                    หรือ {installmentDifferencePercent.toLocaleString("th-TH", {
+                      maximumFractionDigits: 2,
+                    })}%
+                  </span>
+                ) : null}
               </p>
             </div>
-            {hasExistingInstallment ? (
-              <p className="flex items-baseline justify-between gap-2 text-[10px] text-primary-foreground/80">
-                <span>เทียบกับยอดผ่อนเดิม</span>
-                <span className="shrink-0 tabular-nums">
-                  {installmentDifferencePercent.toLocaleString("th-TH", {
-                    maximumFractionDigits: 2,
-                  })}%
-                </span>
-              </p>
-            ) : null}
           </div>
         </div>
       ) : null}
