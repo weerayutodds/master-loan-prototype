@@ -1124,7 +1124,8 @@ const topTierBrandsByCollateralType: Record<VehicleCollateralType, string[]> = {
 //   ไม่ต้องค้ำ       green   Required Guarantor = No on a program that normally needs one
 //   ต้องมีผู้ค้ำ      red     Required Guarantor = Yes
 //   ผ่อนนาน         purple  Max Tenor ≥ 72
-//   รถมือสอง        amber   Program Type = Dealer (Used)
+//
+// "(M Dealer)" programs (Program Type = Dealer New/Used) are intentionally left out.
 const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
   car: [
     {
@@ -1298,28 +1299,6 @@ const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
       bookStatusLabel: "โอนเล่ม",
       primaryActionLabel: "เลือก",
       primaryActionVariant: "filled",
-    },
-    {
-      id: "mc-dealer-used",
-      title: "โครงการรถซื้อขายมือ2 (M Dealer)",
-      tags: [
-        { label: "ดอกเบี้ยถูก", tone: "green" },
-        { label: "รถมือสอง", tone: "amber" },
-        { label: "ดอกเบี้ยคงที่", tone: "pink" },
-      ],
-      ltv: 110,
-      monthlyRate: { min: 1.06, max: 1.12 },
-      annualReduction: { min: 12.72, max: 13.44 },
-      interestType: "flat",
-      ncbGradeLabel: "ทุกเกรด",
-      ncbGradeTone: "green",
-      bookStatusLabel: "โอนเล่ม",
-      primaryActionLabel: "เลือก",
-      primaryActionVariant: "filled",
-      minAppraisalPrice: 40000,
-      // CSV Car Brand on the M Dealer rows is "Honda, Yamaha" — the one place the brand
-      // gate is actually in the data.
-      requiresTopTierBrand: true,
     },
   ],
   truck: [
