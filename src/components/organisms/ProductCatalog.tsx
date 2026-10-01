@@ -64,15 +64,25 @@ function parseRange(label: string): [number, number] {
 }
 
 /**
- * Matches when the product is at or above the request (e.g. 200,000 for 150,000),
- * or when the request falls inside the product's range (e.g. 100,000-200,000 for 150,000).
+ * %LTV filter: product matches if its LTV is at or above the request, or the
+ * request falls inside a band (e.g. "80% - 130% LTV" for 100).
  */
-function meetsRequest(label: string, requested: number): boolean {
+function meetsLtvRequest(label: string, requested: number): boolean {
   if (requested <= 0) return true;
   const [min, max] = parseRange(label);
-  const isAtOrAbove = min >= requested;
-  const isWithinRange = min <= requested && requested <= max;
-  return isAtOrAbove || isWithinRange;
+  return min >= requested || (min <= requested && requested <= max);
+}
+
+/**
+ * วงเงินอนุมัติ filter:
+ * - Single value (e.g. "905,600"): product must cover the request (approved ≥ requested).
+ * - Range (e.g. "905,600 - 1,471,600"): วงเงินที่ขอ must fall inside that band inclusive.
+ */
+function meetsApprovedAmountRequest(label: string, requested: number): boolean {
+  if (requested <= 0) return true
+  const [min, max] = parseRange(label)
+  if (min !== max) return min <= requested && requested <= max
+  return max >= requested
 }
 
 /** Highest %LTV a label like "80% - 130% LTV" offers, for sorting สูงไปต่ำ. */
@@ -87,8 +97,9 @@ function byLtvDescending(a: ProductCatalogItem, b: ProductCatalogItem): number {
 
 function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): boolean {
   if (filter.bookStatus && item.bookStatusLabel !== filter.bookStatus) return false;
-  if (!meetsRequest(item.approvedAmount, filter.requestedAmount)) return false;
-  if (!meetsRequest(item.ltvLabel, filter.requestedLtvPercent)) return false;
+  if (!meetsApprovedAmountRequest(item.approvedAmount, filter.requestedAmount))
+    return false;
+  if (!meetsLtvRequest(item.ltvLabel, filter.requestedLtvPercent)) return false;
   return true;
 }
 
