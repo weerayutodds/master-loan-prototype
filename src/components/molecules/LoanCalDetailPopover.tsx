@@ -74,7 +74,7 @@ export function LoanCalDetailPopover({
           className="flex size-6 items-center justify-center rounded border border-secondary-border bg-secondary-bg"
           aria-label="ปิดรายละเอียด"
         >
-          <Icon name="arrow-down" className="size-3 text-muted-foreground" />
+          <Icon name="chevron-down" className="size-3 text-muted-foreground" />
         </button>
       </div>
 
