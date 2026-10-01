@@ -52,20 +52,25 @@ export function ProductCatalogCard({
       </div>
 
       <div className="flex flex-col gap-4 overflow-x-auto rounded-t-lg bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-52 sm:shrink-0">
+        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-auto sm:min-w-52 sm:shrink-0">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-catalog-card-bg text-primary-to">
             <Icon name="money-bag" className="size-4" />
           </span>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
                 วงเงินอนุมัติ
               </span>
-              <Badge tone="info">{item.ltvLabel}</Badge>
+              <Badge tone="info" className="whitespace-nowrap">
+                {item.ltvLabel}
+              </Badge>
             </div>
-            <p className="text-xl font-semibold text-primary-to">
+
+            <p className="text-lg font-semibold tracking-tight text-primary-to sm:text-base md:text-lg">
               {item.approvedAmount}{" "}
-              <span className="text-xs font-normal text-unit-label">บาท</span>
+              <span className="text-xs font-normal text-unit-label whitespace-nowrap">
+                บาท
+              </span>
             </p>
           </div>
         </div>

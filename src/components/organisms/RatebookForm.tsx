@@ -274,8 +274,7 @@ export function RatebookForm({
   }, [verificationMethod])
 
   function applyCardRead(): string {
-    const cardIdNumber =
-      idCardNumber || mockKeyInCardCustomer.idCardNumber
+    const cardIdNumber = idCardNumber || mockKeyInCardCustomer.idCardNumber
     setCustomer((current) => {
       // First card read: adopt the card's identity (prototype mock).
       if (verificationMethod !== "card") {
@@ -494,6 +493,7 @@ export function RatebookForm({
 
             {showCarInfo && (
               <CarInfoForm
+                key={`${collateralType}-${loanPurpose}`}
                 opportunityId={opportunityId}
                 carInfo={carInfo}
                 collateralType={collateralType}
@@ -502,7 +502,6 @@ export function RatebookForm({
                 onViewAppraisal={() => {
                   setProductFilter(null)
                   setShowProductGuide(true)
-                  // Wait for ProductGuide to mount, then scroll it into view.
                   requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                       document
