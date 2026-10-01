@@ -1017,14 +1017,18 @@ export function getProductGuideData(
   refinanceStatus: RefinanceStatus | null = null,
 ): ProductGuideData {
   const isCar = collateralType === "car";
+  const isMotorcycle = collateralType === "motorcycle";
+  const minLtvPercent =
+    isMotorcycle && refinanceStatus === "still-paying" ? 100 : 70;
+  const maxLtvPercent = isMotorcycle ? 130 : 160;
   return {
     appraisalPrice,
     approvedRange: {
-      min: roundToNearestThousand(appraisalPrice * 0.7),
-      max: roundToNearestThousand(appraisalPrice * 1.6),
+      min: roundToNearestThousand((appraisalPrice * minLtvPercent) / 100),
+      max: roundToNearestThousand((appraisalPrice * maxLtvPercent) / 100),
     },
-    approvedLtvBadges: ["70% LTV", "160% LTV"],
-    plans: collateralType === "motorcycle"
+    approvedLtvBadges: [`${minLtvPercent}% LTV`, `${maxLtvPercent}% LTV`],
+    plans: isMotorcycle
       ? getMotorcycleGuidePlans(appraisalPrice, refinanceStatus)
       : [
       {
