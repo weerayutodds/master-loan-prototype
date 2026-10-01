@@ -970,6 +970,9 @@ function roundToNearestThousand(amount: number): number {
  * ratebook row the user picked, and รถบรรทุก still gets the old depreciation
  * estimate from vehicle-options.ts. Everything below is derived from it.
  */
+const MOTORCYCLE_EASY_APPROVAL_MAX_AMOUNT = 50000;
+const CAR_EASY_APPROVAL_MAX_AMOUNT = 500000;
+
 function getMotorcycleGuidePlans(
   appraisalPrice: number,
   refinanceStatus: RefinanceStatus | null,
@@ -998,7 +1001,10 @@ function getMotorcycleGuidePlans(
     {
       title: "อนุมัติง่าย เงื่อนไขน้อย",
       maxLtvLabel: "ไม่เกิน 70% LTV",
-      maxAmount: roundToNearestThousand(appraisalPrice * 0.7),
+      maxAmount: Math.min(
+        roundToNearestThousand(appraisalPrice * 0.7),
+        MOTORCYCLE_EASY_APPROVAL_MAX_AMOUNT,
+      ),
       bulletsHeading: "ลูกค้าต้องไม่เข้าเงื่อนไข ทั้ง 3 ข้อ พร้อมกัน",
       bullets: [
         "ไม่ใช่ A01-A04, U02",
@@ -1034,7 +1040,12 @@ export function getProductGuideData(
       {
         title: "อนุมัติง่าย LTV ต่ำ",
         maxLtvLabel: "ไม่เกิน 70% LTV",
-        maxAmount: roundToNearestThousand(appraisalPrice * 0.7),
+        maxAmount: isCar
+          ? Math.min(
+              roundToNearestThousand(appraisalPrice * 0.7),
+              CAR_EASY_APPROVAL_MAX_AMOUNT,
+            )
+          : roundToNearestThousand(appraisalPrice * 0.7),
         bullets: isCar
           ? [
               "Max 70% LTV เฉพาะ NCB เกรด A01-A03",
