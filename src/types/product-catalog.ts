@@ -1,3 +1,5 @@
+import type { ProductLoanLimits } from "@/lib/product-loan-limits";
+
 export type ProductCatalogTagTone = "green" | "red" | "purple" | "amber" | "pink";
 
 export type ProductCatalogTag = {
@@ -11,6 +13,12 @@ export type ProductCatalogItem = {
   tags: ProductCatalogTag[];
   ltvLabel: string;
   approvedAmount: string;
+  appraisalPrice: number;
+  maxLtvPercent: number;
+  loanLimits: ProductLoanLimits;
+  /** Configured CSV limits in baht; null means unspecified. */
+  minAmount: number | null;
+  maxAmount: number | null;
   ncbGradeLabel: string;
   ncbGradeTone: "blue" | "green";
   bookStatusLabel: string;

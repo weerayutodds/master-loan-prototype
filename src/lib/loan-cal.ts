@@ -1,4 +1,4 @@
-import type { ProductCatalogData, ProductCatalogFilter } from "@/types/product-catalog";
+import type { ProductCatalogData, ProductCatalogFilter, ProductCatalogItem } from "@/types/product-catalog";
 
 export const TRANSFER_BOOK_STATUS = "โอนเล่ม";
 
@@ -26,12 +26,9 @@ export function getDefaultProductCatalogFilter(
   };
 }
 
-/** Reads the top of a product's "456,000 - 741,000"-style approved-amount range. */
-export function getMaxApprovedAmount(product: { approvedAmount: string }): number {
-  const amounts = (product.approvedAmount.match(/[\d,]+/g) ?? []).map((match) =>
-    Number(match.replace(/,/g, "")),
-  );
-  return amounts[amounts.length - 1] ?? 0;
+/** Effective ceiling shared with catalog display and filtering. */
+export function getMaxApprovedAmount(product: Pick<ProductCatalogItem, "loanLimits">): number {
+  return product.loanLimits.status === "available" ? product.loanLimits.maxAmount : 0;
 }
 
 export function calculateLtvPercent(amount: number, appraisalPrice: number): number {

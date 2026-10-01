@@ -1,3 +1,4 @@
+import { productRulesByCollateralType as catalogRulesByCollateralType } from "@/lib/product-catalog-data";
 import type {
   BranchUser,
   FollowUpTask,
@@ -32,7 +33,7 @@ import type {
   ProductCatalogLtvGroup,
   ProductCatalogTag,
 } from "@/types/product-catalog";
-import { calculateAmountFromLtv } from "@/lib/loan-cal";
+import { calculateProductLoanLimits, formatProductLoanLimits } from "@/lib/product-loan-limits";
 import type { FollowUpEntry } from "@/types/lead-content";
 import type { Gender, NcbGrade } from "@/types/customer-lead";
 
@@ -1497,8 +1498,7 @@ const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
   ],
 };
 
-// Latin digits and comma grouping only: LeadLoanInfoCard regex-parses these strings
-// back into numbers (approvedAmount takes the LAST match, interestRateLabel the FIRST).
+// LeadLoanInfoCard still reads the monthly rate from its formatted label.
 function formatRange(
   spec: NumberOrRange,
   format: (value: number) => string,
@@ -1679,13 +1679,33 @@ function toCatalogItem(
   appraisalPrice: number,
   collateralType: CollateralType | null | undefined,
 ): ProductCatalogItem {
+  // Keep prototype copy/tags; borrow only the authoritative amount limits by stable ID.
+  const catalogRule = catalogRulesByCollateralType[collateralType ?? "car"].find(
+    (candidate) => candidate.id === rule.id,
+  );
+  if (!catalogRule) {
+    throw new Error(`Missing product catalog amount limits for ${rule.id}`);
+  }
+  const maxLtvPercent = typeof rule.ltv === "number" ? rule.ltv : rule.ltv.max;
+  const loanLimits = calculateProductLoanLimits({
+    appraisalPrice,
+    maxLtvPercent,
+    minAmount: catalogRule.minAmount,
+    maxAmount: catalogRule.maxAmount,
+  });
   return {
     id: rule.id,
+    appraisalPrice,
+    maxLtvPercent,
+    loanLimits,
+    minAmount: catalogRule.minAmount,
+    maxAmount: catalogRule.maxAmount,
     title: rule.title,
     tags: rule.tags,
     ltvLabel: `${formatRange(rule.ltv, (value) => `${value}%`)} LTV`,
-    approvedAmount: formatRange(rule.ltv, (value) =>
-      calculateAmountFromLtv(value, appraisalPrice).toLocaleString("en-US"),
+    approvedAmount: formatProductLoanLimits(
+      loanLimits,
+      typeof rule.ltv === "number" ? undefined : (appraisalPrice * rule.ltv.min) / 100,
     ),
     ncbGradeLabel: rule.ncbGradeLabel,
     ncbGradeTone: rule.ncbGradeTone,
@@ -1736,7 +1756,8 @@ export function getProductCatalogData(
     gradeFilterLabel: "ทุกเกรด",
     items: rules
       .filter((rule) => isRuleEligible(rule, context))
-      .map((rule) => toCatalogItem(rule, context.appraisalPrice, context.collateralType)),
+      .map((rule) => toCatalogItem(rule, context.appraisalPrice, context.collateralType))
+      .filter((item) => item.loanLimits.status === "available"),
   };
 }
 
