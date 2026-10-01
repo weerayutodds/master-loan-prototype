@@ -142,9 +142,12 @@ export function ProductDetailDrawer({
 
             <div className="flex-1 space-y-6 overflow-y-auto px-4 pt-4 pb-32">
               <section>
-                <div className="mb-4">
-                  <DevelopmentBanner />
-                </div>
+                {isMotorcycle && (
+                  <div className="mb-4">
+                    <DevelopmentBanner />
+                  </div>
+                )}
+
                 <SectionTitle>%LTV สูงสุด</SectionTitle>
                 <TableWatermark active={isMotorcycle}>
                   <div className={TABLE_WRAPPER}>
@@ -182,9 +185,11 @@ export function ProductDetailDrawer({
               </section>
 
               <section>
-                <div className="mb-4">
-                  <DevelopmentBanner />
-                </div>
+                {isMotorcycle && (
+                  <div className="mb-4">
+                    <DevelopmentBanner />
+                  </div>
+                )}
                 <SectionTitle>ดอกเบี้ย</SectionTitle>
                 <TableWatermark active={isMotorcycle}>
                   <div className={TABLE_WRAPPER}>
