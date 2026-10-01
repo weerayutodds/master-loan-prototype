@@ -209,6 +209,23 @@ export const customerTypeOptions: { value: CustomerType; label: string }[] = [
   { value: "individual", label: "บุคคลธรรมดา" },
 ];
 
+/** Approved motorcycle refinance companies supplied by the business. Shared companies keep their IDs. */
+export const motorcycleExistingFinanceOptions: { value: string; label: string }[] = [
+  { value: "summit-capital-leasing", label: "บริษัท ซัมมิท แคปปิตอล ลีสซิ่ง จำกัด" },
+  { value: "cimb-thai-auto", label: "บริษัท ซีไอเอ็มบี ไทย ออโต้ จำกัด" },
+  { value: "t-leasing", label: "บริษัท ที ลีสซิ่ง จำกัด" },
+  { value: "next-capital", label: "บริษัท เน็คซ์ แคปปิตอล จำกัด (มหาชน)" },
+  { value: "ayudhya-capital-auto-lease", label: "บริษัท อยุธยา แคปปิตอล ออโต้ ลีส จำกัด (มหาชน)" },
+  { value: "s11-group", label: "บริษัท เอส 11 กรุ๊ป จำกัด (มหาชน)" },
+  { value: "highway", label: "บริษัท ไฮเวย์ จำกัด" },
+];
+
+export function getExistingFinanceOptions(collateralType: CollateralType | null) {
+  return collateralType === "motorcycle"
+    ? motorcycleExistingFinanceOptions
+    : existingFinanceOptions;
+}
+
 export const verificationMethodOptions: {
   value: VerificationMethod;
   label: string;

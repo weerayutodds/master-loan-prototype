@@ -60,6 +60,18 @@ The Home (`/`) "Ratebook" and "eNCB" quick-action cards open the "ระบบ�
 - The row displays the total PPI premium (`summary.ppiTotal`) on the right, with thousands separators and the "บาท" unit.
 - Visibility and the displayed amount follow the last calculated inputs passed from `LoanCalBar`; changing PPI requires clicking "คำนวณ" again to update the details. This display change does not alter premium calculations.
 
+### Existing finance dropdown by collateral type
+
+- For "ยังผ่อนอยู่", `getExistingFinanceOptions(collateralType)` supplies the searchable "เลือกไฟแนนซ์เดิม" dropdown. Motorcycle collateral uses the following business-provided list in order; other collateral types retain `existingFinanceOptions`.
+  1. บริษัท ซัมมิท แคปปิตอล ลีสซิ่ง จำกัด
+  2. บริษัท ซีไอเอ็มบี ไทย ออโต้ จำกัด
+  3. บริษัท ที ลีสซิ่ง จำกัด
+  4. บริษัท เน็คซ์ แคปปิตอล จำกัด (มหาชน)
+  5. บริษัท อยุธยา แคปปิตอล ออโต้ ลีส จำกัด (มหาชน)
+  6. บริษัท เอส 11 กรุ๊ป จำกัด (มหาชน)
+  7. บริษัท ไฮเวย์ จำกัด
+- Switching collateral types retains the selected company only if its ID is in the new list; otherwise the selection clears and a new choice is required before the loan questions are complete. The same membership check applies when restoring a saved opportunity. Shared companies use the same IDs across lists. The hint remains "รับเฉพาะไฟแนนซ์ที่มีในรายการเท่านั้น".
+
 ### ยอดผ่อนไฟแนนซ์เดิม in the calculation details (refinance only)
 
 - When `refinanceStatus` is "ยังผ่อนอยู่", `LoanCalDetailPopover` ends with a blue gradient block: a "ยอดผ่อนไฟแนนซ์เดิม" input (บาท, digits only, thousands separators) and an installment-comparison line. The ยอดผ่อนต่อเดือน row above it switches to a pale-blue background with a blue top border.

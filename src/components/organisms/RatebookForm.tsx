@@ -23,7 +23,7 @@ import {
 import {getDefaultProductCatalogFilter} from "@/lib/loan-cal"
 import {
   collateralTypeOptions,
-  existingFinanceOptions,
+  getExistingFinanceOptions,
   findProductCatalogItemById,
   getProductCatalogData,
   getProductGuideData,
@@ -70,7 +70,9 @@ function toCompleteLoanQuestions(
   existingFinance: string | null,
 ): LoanQuestionAnswers | null {
   const financeAnswered =
-    refinanceStatus === "still-paying" ? Boolean(existingFinance) : true
+    refinanceStatus === "still-paying"
+      ? getExistingFinanceOptions(collateralType).some((option) => option.value === existingFinance)
+      : true
   if (!loanPurpose || !collateralType || !refinanceStatus || !financeAnswered) {
     return null
   }
@@ -138,7 +140,11 @@ export function RatebookForm({
       initialOpportunity?.refinanceStatus ?? null,
     )
   const [existingFinance, setExistingFinance] = useState<string | null>(
-    initialOpportunity?.existingFinanceCompany ?? null,
+    () => {
+      const savedFinance = initialOpportunity?.existingFinanceCompany ?? null
+      return getExistingFinanceOptions(initialOpportunity?.collateralType ?? null)
+        .some((option) => option.value === savedFinance) ? savedFinance : null
+    },
   )
   const [carInfo, setCarInfo] = useState<CarInfo>(
     initialOpportunity
@@ -372,6 +378,9 @@ export function RatebookForm({
 
   function handleCollateralTypeChange(value: CollateralType) {
     setCollateralType(value)
+    const nextExistingFinance = getExistingFinanceOptions(value)
+      .some((option) => option.value === existingFinance) ? existingFinance : null
+    setExistingFinance(nextExistingFinance)
 
     setCarInfo({})
     setShowProductGuide(false)
@@ -380,7 +389,7 @@ export function RatebookForm({
       loanPurpose,
       value,
       refinanceStatus,
-      existingFinance,
+      nextExistingFinance,
     )
   }
 
@@ -485,7 +494,7 @@ export function RatebookForm({
               onCollateralTypeChange={handleCollateralTypeChange}
               refinanceStatus={refinanceStatus}
               onRefinanceStatusChange={handleRefinanceStatusChange}
-              existingFinanceOptions={existingFinanceOptions}
+              existingFinanceOptions={getExistingFinanceOptions(collateralType)}
               existingFinance={existingFinance}
               onExistingFinanceChange={handleExistingFinanceChange}
             />
