@@ -1234,7 +1234,7 @@ const productRulesByCollateralType: Record<CollateralType, ProductRule[]> = {
       ltv: 60,
       monthlyRate: { min: 0.98, max: 1.13 },
       annualReduction: { min: 21, max: 24 },
-      ncbGradeLabel: "Non A01-A03",
+      ncbGradeLabel: "ทุกเกรด",
       ncbGradeTone: "green",
       bookStatusLabel: "ไม่โอนเล่ม",
       primaryActionLabel: "เลือก",
