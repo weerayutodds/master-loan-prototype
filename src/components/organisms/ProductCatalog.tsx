@@ -5,6 +5,7 @@ import { ProductCatalogCard } from "@/components/molecules/ProductCatalogCard";
 import { EncbCheckFlow } from "@/components/organisms/EncbCheckFlow";
 import { ProductDetailDrawer } from "@/components/organisms/ProductDetailDrawer";
 import { SelectProductConfirmModal } from "@/components/organisms/SelectProductConfirmModal";
+import { matchesProductLoanRequest } from "@/lib/product-loan-limits";
 import { ncbGradeList } from "@/lib/mock";
 import type { NcbGrade } from "@/types/customer-lead";
 import type {
@@ -64,16 +65,6 @@ function parseRange(label: string): [number, number] {
 }
 
 /**
- * %LTV filter: product matches if its LTV is at or above the request, or the
- * request falls inside a band (e.g. "80% - 130% LTV" for 100).
- */
-function meetsLtvRequest(label: string, requested: number): boolean {
-  if (requested <= 0) return true;
-  const [min, max] = parseRange(label);
-  return min >= requested || (min <= requested && requested <= max);
-}
-
-/**
  * วงเงินอนุมัติ filter:
  * - Single value (e.g. "905,600"): product must cover the request (approved ≥ requested).
  * - Range (e.g. "905,600 - 1,471,600"): วงเงินที่ขอ must fall inside that band inclusive.
@@ -85,22 +76,19 @@ function meetsApprovedAmountRequest(label: string, requested: number): boolean {
   return max >= requested
 }
 
-/** Highest %LTV a label like "80% - 130% LTV" offers, for sorting สูงไปต่ำ. */
-function maxLtvPercent(item: ProductCatalogItem): number {
-  const [, max] = parseRange(item.ltvLabel);
-  return max;
-}
-
 function byLtvDescending(a: ProductCatalogItem, b: ProductCatalogItem): number {
-  return maxLtvPercent(b) - maxLtvPercent(a);
+  return b.maxLtvPercent - a.maxLtvPercent;
 }
 
 function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): boolean {
   if (filter.bookStatus && item.bookStatusLabel !== filter.bookStatus) return false;
-  if (!meetsApprovedAmountRequest(item.approvedAmount, filter.requestedAmount))
-    return false;
-  if (!meetsLtvRequest(item.ltvLabel, filter.requestedLtvPercent)) return false;
-  return true;
+  if (!meetsApprovedAmountRequest(item.approvedAmount, filter.requestedAmount)) return false;
+  return matchesProductLoanRequest(
+    item.loanLimits,
+    item.appraisalPrice,
+    filter.requestedAmount,
+    filter.requestedLtvPercent,
+  );
 }
 
 export function ProductCatalog({

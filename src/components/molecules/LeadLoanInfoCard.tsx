@@ -6,6 +6,7 @@ import {Watermark} from "@/components/atoms/Watermark"
 import {Card} from "@/components/molecules/Card"
 import {DevelopmentBanner} from "@/components/molecules/DevelopmentBanner"
 import {formatRatePercent} from "@/lib/format"
+import {isWithinProductLoanLimits} from "@/lib/product-loan-limits"
 import {
   DEFAULT_INSTALLMENT_TERM,
   INSTALLMENT_TERM_OPTIONS,
@@ -17,8 +18,6 @@ import {
 import type {ProductCatalogItem} from "@/types/product-catalog"
 import type {LoanInfo} from "@/types/ratebook"
 import {useMemo} from "react"
-
-const MIN_REQUESTED_AMOUNT = 20000
 
 function parseMonthlyRatePercent(label: string): number {
   const match = label.match(/(\d+(\.\d+)?)/)
@@ -140,8 +139,11 @@ export function LeadLoanInfoCard({
           <span className="text-muted-foreground">วงเงินอนุมัติสูงสุด :</span>
           <div className="text-right">
             <p className="text-2xl font-semibold text-primary-to">
-              {maxApprovedAmount.toLocaleString("th-TH")}{" "}
-              <span className="text-sm font-normal text-price-label">บาท</span>
+              {product.loanLimits.status === "available" ? (
+                <>{maxApprovedAmount.toLocaleString("th-TH")}{" "}
+                  <span className="text-sm font-normal text-price-label">บาท</span>
+                </>
+              ) : "ไม่เข้าเงื่อนไขวงเงิน"}
             </p>
             <Badge tone="info">{product.ltvLabel}</Badge>
           </div>
@@ -151,7 +153,9 @@ export function LeadLoanInfoCard({
           <div>
             <p className="text-muted-foreground">วงเงินที่ต้องการ :</p>
             <p className="text-xs text-muted-foreground">
-              วงเงินเริ่มต้น {MIN_REQUESTED_AMOUNT.toLocaleString("th-TH")} บาท
+              {product.loanLimits.status === "available" && product.loanLimits.minAmount !== null
+                ? `วงเงินเริ่มต้น ${product.loanLimits.minAmount.toLocaleString("th-TH")} บาท`
+                : ""}
             </p>
           </div>
           <div className="flex h-10 w-48 items-center gap-1 rounded-lg border border-secondary-border bg-surface px-3">
@@ -171,6 +175,12 @@ export function LeadLoanInfoCard({
             <span className="text-sm text-muted-foreground">บาท</span>
           </div>
         </div>
+
+        {requestedAmount > 0 && !isWithinProductLoanLimits(product.loanLimits, requestedAmount) ? (
+          <p className="text-xs text-danger" role="status">
+            วงเงินที่ต้องการไม่อยู่ในช่วงวงเงินที่ผลิตภัณฑ์รองรับ
+          </p>
+        ) : null}
 
         <div className="border-t border-divider" />
 
