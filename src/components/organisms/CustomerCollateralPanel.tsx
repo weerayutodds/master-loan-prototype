@@ -8,6 +8,7 @@ import {LoadingToast} from "@/components/molecules/LoadingToast"
 import {Toast} from "@/components/molecules/Toast"
 import {CollateralDetailModal} from "@/components/organisms/CollateralDetailModal"
 import {CustomerInfoModal} from "@/components/organisms/CustomerInfoModal"
+import {ErrorModal} from "@/components/organisms/ErrorModal"
 import {NcbCheckControl} from "@/components/organisms/NcbCheckControl"
 import {NcbCheckModal} from "@/components/organisms/NcbCheckModal"
 import {PhoneNumberModal} from "@/components/organisms/PhoneNumberModal"
@@ -142,6 +143,7 @@ export function CustomerCollateralPanel({
   )
   const [savedToastOpen, setSavedToastOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [createApplicationErrorOpen, setCreateApplicationErrorOpen] = useState(false)
 
   async function handleSaveLead() {
     if (!customer) return
@@ -417,7 +419,11 @@ export function CustomerCollateralPanel({
           >
             บันทึก Lead
           </Button>
-          <Button variant="primary" className="flex-1">
+          <Button
+            variant="primary"
+            className="flex-1"
+            onClick={() => setCreateApplicationErrorOpen(true)}
+          >
             สร้างใบคำขอ
           </Button>
         </div>
@@ -472,6 +478,14 @@ export function CustomerCollateralPanel({
         open={isSaving}
         title="กำลังบันทึกข้อมูล"
         description="กรุณารอสักครู่..."
+      />
+
+      <ErrorModal
+        open={createApplicationErrorOpen}
+        onClose={() => setCreateApplicationErrorOpen(false)}
+        title="ระบบกำลังพัฒนา"
+        description={`ฟังก์ชัน "สร้างใบคำขอ" กำลังอยู่ในช่วงการพัฒนา`}
+        buttonText="ตกลง"
       />
     </Card>
   )

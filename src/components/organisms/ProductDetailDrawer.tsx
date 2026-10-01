@@ -263,7 +263,7 @@ export function ProductDetailDrawer({
         open={salesGuideErrorOpen}
         onClose={() => setSalesGuideErrorOpen(false)}
         title="ระบบกำลังพัฒนา"
-        description="ฟังก์ชันดูคู่มือการขายกำลังอยู่ในช่วงการพัฒนา"
+        description={`ฟังก์ชัน "ดูคู่มือการขาย" กำลังอยู่ในช่วงการพัฒนา`}
         buttonText="ตกลง"
       />
     </>
