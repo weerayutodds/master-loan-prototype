@@ -1,18 +1,29 @@
 type WatermarkProps = {
   text?: string;
   className?: string;
+  /** Band width (px number or CSS length). Defaults to the Figma 526.57px. */
+  width?: number | string;
 };
 
-/** Diagonal "อยู่ระหว่างการพัฒนา" banner. Parent needs `relative overflow-hidden`. */
-export function Watermark({ text = "อยู่ระหว่างการพัฒนา", className = "" }: WatermarkProps) {
+/** Diagonal "ข้อมูลตัวอย่าง / อยู่ระหว่างการพัฒนา" band. Parent needs `relative overflow-hidden`. */
+export function Watermark({
+  text = "อยู่ระหว่างการพัฒนา",
+  className = "",
+  width = 526.57,
+}: WatermarkProps) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden select-none">
-      <div className="flex w-[170%] -rotate-[30deg] items-center justify-center border-y-2 border-muted-foreground/50 py-2">
-        <span
-          className={`whitespace-nowrap font-extrabold tracking-[0.2em] text-muted-foreground/60 ${className || "text-lg"}`}
+      <div className="relative flex h-26.25 shrink-0 -rotate-[32.78deg] items-center justify-center border-y border-watermark-border py-3 opacity-15"
+        style={{width}}
+      >
+        <div className="absolute inset-x-0 top-3 bottom-3 border-y border-watermark-border" />
+        <p
+          className={`text-center leading-[160%] tracking-[0.01em] text-black ${className || "text-lg"}`}
         >
+          ข้อมูลตัวอย่าง
+          <br />
           {text}
-        </span>
+        </p>
       </div>
     </div>
   );

@@ -34,6 +34,7 @@ export type IconName =
   | "refresh"
   | "user-circle"
   | "camera-scan"
+  | "alert-triangle-solid"
 
 const viewBoxes: Partial<Record<IconName, string>> = {
   "money-bag": "0 0 13 14",
@@ -292,6 +293,21 @@ const paths: Record<IconName, React.ReactNode> = {
       fill="currentColor"
       stroke="none"
     />
+  ),
+  "alert-triangle-solid": (
+    <>
+      <path
+        d="M10.27 3.5a2 2 0 0 1 3.46 0l8.2 14.2A2 2 0 0 1 20.2 20.7H3.8a2 2 0 0 1-1.73-3l8.2-14.2Z"
+        fill="currentColor"
+        stroke="none"
+      />
+      <path
+        d="M12 9v4.5M12 16.75v.01"
+        stroke="white"
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+    </>
   ),
   refresh: (
     <path

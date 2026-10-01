@@ -1,10 +1,11 @@
-"use client";
+"use client"
 
-import { Badge } from "@/components/atoms/Badge";
-import { Watermark } from "@/components/atoms/Watermark";
-import { Card } from "@/components/molecules/Card";
-import { Select } from "@/components/atoms/Select";
-import { formatRatePercent } from "@/lib/format";
+import {Badge} from "@/components/atoms/Badge"
+import {Select} from "@/components/atoms/Select"
+import {Watermark} from "@/components/atoms/Watermark"
+import {Card} from "@/components/molecules/Card"
+import {DevelopmentBanner} from "@/components/molecules/DevelopmentBanner"
+import {formatRatePercent} from "@/lib/format"
 import {
   DEFAULT_INSTALLMENT_TERM,
   INSTALLMENT_TERM_OPTIONS,
@@ -12,16 +13,16 @@ import {
   calculateFlatRateEquivalent,
   calculateLoanCalSummary,
   getMaxApprovedAmount,
-} from "@/lib/loan-cal";
-import type { ProductCatalogItem } from "@/types/product-catalog";
-import type { LoanInfo } from "@/types/ratebook";
-import { useMemo } from "react";
+} from "@/lib/loan-cal"
+import type {ProductCatalogItem} from "@/types/product-catalog"
+import type {LoanInfo} from "@/types/ratebook"
+import {useMemo} from "react"
 
-const MIN_REQUESTED_AMOUNT = 20000;
+const MIN_REQUESTED_AMOUNT = 20000
 
 function parseMonthlyRatePercent(label: string): number {
-  const match = label.match(/(\d+(\.\d+)?)/);
-  return match ? Number(match[1]) : 1.43;
+  const match = label.match(/(\d+(\.\d+)?)/)
+  return match ? Number(match[1]) : 1.43
 }
 
 function RadioPair({
@@ -29,21 +30,23 @@ function RadioPair({
   value,
   onChange,
 }: {
-  options: { value: string; label: string; caption?: string }[];
-  value: string;
-  onChange: (value: string) => void;
+  options: {value: string; label: string; caption?: string}[]
+  value: string
+  onChange: (value: string) => void
 }) {
   return (
     <div className="flex gap-3">
       {options.map((option) => {
-        const selected = value === option.value;
+        const selected = value === option.value
         return (
           <button
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
             className={`flex min-w-36 items-start gap-2 rounded-lg border px-3 py-2 text-left text-sm ${
-              selected ? "border-primary bg-secondary-bg" : "border-secondary-border bg-surface"
+              selected
+                ? "border-primary bg-secondary-bg"
+                : "border-secondary-border bg-surface"
             }`}
           >
             <span
@@ -51,46 +54,59 @@ function RadioPair({
                 selected ? "border-primary-to" : "border-radio-border"
               }`}
             >
-              {selected ? <span className="size-1.5 rounded-full bg-primary-to" /> : null}
+              {selected ? (
+                <span className="size-1.5 rounded-full bg-primary-to" />
+              ) : null}
             </span>
             <span className="flex flex-col items-start">
-              <span className="font-medium text-foreground">{option.label}</span>
+              <span className="font-medium text-foreground">
+                {option.label}
+              </span>
               {option.caption && selected ? (
-                <span className="text-xs text-muted-foreground">{option.caption}</span>
+                <span className="text-xs text-muted-foreground">
+                  {option.caption}
+                </span>
               ) : null}
             </span>
           </button>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
 type LeadLoanInfoCardProps = {
-  product: ProductCatalogItem;
-  value: LoanInfo;
-  onChange: (value: LoanInfo) => void;
-};
+  product: ProductCatalogItem
+  value: LoanInfo
+  onChange: (value: LoanInfo) => void
+}
 
-export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardProps) {
-  const maxApprovedAmount = useMemo(() => getMaxApprovedAmount(product), [product]);
+export function LeadLoanInfoCard({
+  product,
+  value,
+  onChange,
+}: LeadLoanInfoCardProps) {
+  const maxApprovedAmount = useMemo(
+    () => getMaxApprovedAmount(product),
+    [product],
+  )
   const productMonthlyRatePercent = useMemo(
     () => parseMonthlyRatePercent(product.interestRateLabel),
     [product],
-  );
+  )
 
-  const requestedAmount = value.requestedAmount ?? maxApprovedAmount;
-  const wantsWheelCard = value.wantsWheelCard ?? "yes";
-  const hasPpi = value.hasPpi ?? "no";
-  const installmentTerm = value.installmentTerm ?? DEFAULT_INSTALLMENT_TERM;
-  const rateType = value.rateType ?? "reducing";
+  const requestedAmount = value.requestedAmount ?? maxApprovedAmount
+  const wantsWheelCard = value.wantsWheelCard ?? "yes"
+  const hasPpi = value.hasPpi ?? "no"
+  const installmentTerm = value.installmentTerm ?? DEFAULT_INSTALLMENT_TERM
+  const rateType = value.rateType ?? "reducing"
   const interestRatePercent =
-    value.interestRatePercent ?? productMonthlyRatePercent * 12;
+    value.interestRatePercent ?? productMonthlyRatePercent * 12
 
   function monthlyRatePercentFor(term: number): number {
-    if (value.interestRatePercent == null) return productMonthlyRatePercent;
-    if (rateType === "flat") return interestRatePercent;
-    return calculateFlatRateEquivalent(interestRatePercent, term);
+    if (value.interestRatePercent == null) return productMonthlyRatePercent
+    if (rateType === "flat") return interestRatePercent
+    return calculateFlatRateEquivalent(interestRatePercent, term)
   }
 
   const summary = calculateLoanCalSummary({
@@ -100,11 +116,15 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
     installmentTerm,
     isTLC: wantsWheelCard === "yes",
     hasPpi: hasPpi === "yes",
-  });
+  })
 
   return (
     <Card className="relative overflow-hidden">
-      <Watermark className="text-2xl" />
+      <Watermark width={737} />
+
+      <div className="mb-4">
+        <DevelopmentBanner />
+      </div>
 
       <h3 className="mb-4 border-b border-divider pb-3 text-lg font-semibold text-primary-to">
         ข้อมูลสินเชื่อ
@@ -142,7 +162,8 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
               onChange={(e) =>
                 onChange({
                   ...value,
-                  requestedAmount: Number(e.target.value.replace(/\D/g, "")) || 0,
+                  requestedAmount:
+                    Number(e.target.value.replace(/\D/g, "")) || 0,
                 })
               }
               className="w-full text-right text-sm text-foreground outline-none"
@@ -156,7 +177,9 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
         <p className="font-semibold text-foreground">ผลิตภัณฑ์เสริม</p>
 
         <div className="flex items-center justify-between gap-4 text-sm">
-          <span className="text-muted-foreground">ต้องการรับบัตรติดล้อหรือไม่?</span>
+          <span className="text-muted-foreground">
+            ต้องการรับบัตรติดล้อหรือไม่?
+          </span>
           <RadioPair
             value={wantsWheelCard}
             onChange={(next) =>
@@ -164,32 +187,36 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
                 ...value,
                 wantsWheelCard: next as "yes" | "no",
                 ...(next === "yes"
-                  ? { installmentTerm: DEFAULT_INSTALLMENT_TERM }
+                  ? {installmentTerm: DEFAULT_INSTALLMENT_TERM}
                   : {}),
               })
             }
             options={[
-              { value: "yes", label: "รับบัตร" },
-              { value: "no", label: "ไม่รับบัตร" },
+              {value: "yes", label: "รับบัตร"},
+              {value: "no", label: "ไม่รับบัตร"},
             ]}
           />
         </div>
 
         <div className="flex items-center justify-between gap-4 text-sm">
           <div>
-            <p className="text-muted-foreground">เพิ่มประกันคุ้มครองสินเชื่อ (PPI) หรือไม่?</p>
+            <p className="text-muted-foreground">
+              เพิ่มประกันคุ้มครองสินเชื่อ (PPI) หรือไม่?
+            </p>
             <p className="text-xs text-muted-foreground">เพศ ชาย อายุ 36 ปี</p>
           </div>
           <RadioPair
             value={hasPpi}
-            onChange={(next) => onChange({ ...value, hasPpi: next as "yes" | "no" })}
+            onChange={(next) =>
+              onChange({...value, hasPpi: next as "yes" | "no"})
+            }
             options={[
               {
                 value: "yes",
                 label: "เพิ่ม PPI",
                 caption: `${PPI_ANNUAL_PREMIUM.toLocaleString("th-TH")} บาทต่อปี`,
               },
-              { value: "no", label: "ไม่เพิ่ม PPI" },
+              {value: "no", label: "ไม่เพิ่ม PPI"},
             ]}
           />
         </div>
@@ -207,7 +234,7 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
               value={String(installmentTerm)}
               disabled={wantsWheelCard === "yes"}
               onChange={(e) =>
-                onChange({ ...value, installmentTerm: Number(e.target.value) })
+                onChange({...value, installmentTerm: Number(e.target.value)})
               }
             />
           </div>
@@ -223,15 +250,20 @@ export function LeadLoanInfoCard({ product, value, onChange }: LeadLoanInfoCardP
         <div className="rounded-lg bg-pale-blue/40 px-4 py-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-primary-to">ยอดจัดสินเชื่อรวม:</p>
-              <p className="text-xs text-muted-foreground">วงเงิน + เบี้ยประกัน</p>
+              <p className="font-semibold text-primary-to">
+                ยอดจัดสินเชื่อรวม:
+              </p>
+              <p className="text-xs text-muted-foreground">
+                วงเงิน + เบี้ยประกัน
+              </p>
             </div>
             <p className="text-2xl font-semibold text-primary-to">
-              {summary.financedAmount.toLocaleString("th-TH")} <span className="text-sm">บาท</span>
+              {summary.financedAmount.toLocaleString("th-TH")}{" "}
+              <span className="text-sm">บาท</span>
             </p>
           </div>
         </div>
       </div>
     </Card>
-  );
+  )
 }

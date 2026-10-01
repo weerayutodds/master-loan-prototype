@@ -39,6 +39,7 @@
   --hero-accent: #1e3fd7;
   --price-label: #616166;
   --unit-label: #828387;
+  --watermark-border: #1e1e1f;
   --radio-border: #c3c3c6;
 
   --tag-red: #f85754;
@@ -93,6 +94,7 @@
   --color-hero-accent: var(--hero-accent);
   --color-price-label: var(--price-label);
   --color-unit-label: var(--unit-label);
+  --color-watermark-border: var(--watermark-border);
   --color-radio-border: var(--radio-border);
 
   --color-tag-red: var(--tag-red);
