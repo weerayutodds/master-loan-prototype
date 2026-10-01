@@ -76,8 +76,42 @@ function meetsApprovedAmountRequest(label: string, requested: number): boolean {
   return max >= requested
 }
 
-function byLtvDescending(a: ProductCatalogItem, b: ProductCatalogItem): number {
-  return b.maxLtvPercent - a.maxLtvPercent;
+/** How many grades a label accepts: "ทุกเกรด" = all, "Non …"/"ยกเว้น …" = all minus those. */
+function acceptedNcbGradeCount(label: string): number {
+  const grades = parseNcbGrades(label);
+  if (grades.size === 0) return ncbGradeList.length;
+  const isExclusion = /Non|Not|ยกเว้น/.test(label);
+  return isExclusion
+    ? ncbGradeList.filter(({ code }) => !grades.has(code)).length
+    : grades.size;
+}
+
+const THAI_LEADING_CHARACTER = /^[\u0E00-\u0E7F]/;
+
+/** Thai titles first (ก-ฮ), then everything else (a-z). */
+function compareTitles(a: string, b: string): number {
+  const aIsThai = THAI_LEADING_CHARACTER.test(a.trim());
+  const bIsThai = THAI_LEADING_CHARACTER.test(b.trim());
+  if (aIsThai !== bIsThai) return aIsThai ? -1 : 1;
+  return a.localeCompare(b, aIsThai ? "th" : "en", { sensitivity: "base" });
+}
+
+/**
+ * 1. NCB grade — with a grade, the closest match (fewest accepted grades) first;
+ *    without one, the widest (ทุกเกรด, then most accepted grades) first.
+ * 2. Lowest min annual interest. 3. Highest max %LTV. 4. Title, Thai before English.
+ */
+function compareProducts(ncbGrade: NcbGrade | null) {
+  return (a: ProductCatalogItem, b: ProductCatalogItem): number => {
+    const gradeCountDiff =
+      acceptedNcbGradeCount(a.ncbGradeLabel) - acceptedNcbGradeCount(b.ncbGradeLabel);
+    if (gradeCountDiff !== 0) return ncbGrade ? gradeCountDiff : -gradeCountDiff;
+    if (a.minAnnualInterestPercent !== b.minAnnualInterestPercent) {
+      return a.minAnnualInterestPercent - b.minAnnualInterestPercent;
+    }
+    if (a.maxLtvPercent !== b.maxLtvPercent) return b.maxLtvPercent - a.maxLtvPercent;
+    return compareTitles(a.title, b.title);
+  };
 }
 
 function matchesFilter(item: ProductCatalogItem, filter: ProductCatalogFilter): boolean {
@@ -128,12 +162,13 @@ export function ProductCatalog({
   const gradeEligibleItems = effectiveNcbGrade
     ? items.filter((item) => acceptsNcbGrade(item.ncbGradeLabel, effectiveNcbGrade))
     : items;
+  const byPriority = compareProducts(effectiveNcbGrade);
   const matchedItems = gradeEligibleItems
     .filter((item) => matchesFilter(item, filter))
-    .sort(byLtvDescending);
+    .sort(byPriority);
   const otherItems = gradeEligibleItems
     .filter((item) => !matchesFilter(item, filter))
-    .sort(byLtvDescending);
+    .sort(byPriority);
 
   function emptyMessage() {
     if (data.items.length === 0) return "ไม่มีผลิตภัณฑ์ที่ตรงตามเงื่อนไขของหลักประกันนี้";

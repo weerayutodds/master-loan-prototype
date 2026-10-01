@@ -15,6 +15,8 @@ export type ProductCatalogItem = {
   approvedAmount: string;
   appraisalPrice: number;
   maxLtvPercent: number;
+  /** Lowest annual rate (ลดต้นลดดอก / ดอกเบี้ยคงที่ ต่อปี); used for sorting. */
+  minAnnualInterestPercent: number;
   loanLimits: ProductLoanLimits;
   /** Configured CSV limits in baht; null means unspecified. */
   minAmount: number | null;

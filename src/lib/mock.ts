@@ -1714,6 +1714,10 @@ function toCatalogItem(
     id: rule.id,
     appraisalPrice,
     maxLtvPercent,
+    minAnnualInterestPercent:
+      typeof rule.annualReduction === "number"
+        ? rule.annualReduction
+        : rule.annualReduction.min,
     loanLimits,
     minAmount: catalogRule.minAmount,
     maxAmount: catalogRule.maxAmount,
