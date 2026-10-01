@@ -16,11 +16,9 @@ export function QuickActionsSection({actions}: QuickActionsSectionProps) {
     e: React.MouseEvent<HTMLDivElement>,
     title: string,
   ) => {
-    if (title !== "Ratebook") {
-      e.preventDefault()
-      e.stopPropagation()
-      setErrorActionTitle(title)
-    }
+    e.preventDefault()
+    e.stopPropagation()
+    setErrorActionTitle(title)
   }
 
   return (
