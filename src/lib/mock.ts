@@ -23,6 +23,7 @@ import type {
   VerificationMethod,
 } from "@/types/customer-form";
 import type { ProductGuideData, ProductGuidePlan } from "@/types/product-guide";
+import { formatRatePercent } from "@/lib/format";
 import type {
   ProductCatalogData,
   ProductCatalogDetail,
@@ -973,6 +974,22 @@ function roundToNearestThousand(amount: number): number {
 const MOTORCYCLE_EASY_APPROVAL_MAX_AMOUNT = 50000;
 const CAR_EASY_APPROVAL_MAX_AMOUNT = 500000;
 
+/** 70% LTV, unless that exceeds `cap` — then the cap, with %LTV recomputed as cap ÷ ราคาประเมิน. */
+function getCappedEasyApprovalAmount(
+  appraisalPrice: number,
+  cap: number,
+): Pick<ProductGuidePlan, "maxAmount" | "maxLtvLabel"> {
+  const amount = roundToNearestThousand(appraisalPrice * 0.7);
+  if (amount <= cap || appraisalPrice <= 0) {
+    return { maxAmount: amount, maxLtvLabel: "ไม่เกิน 70% LTV" };
+  }
+  const ltvPercent = (cap / appraisalPrice) * 100;
+  return {
+    maxAmount: cap,
+    maxLtvLabel: `ไม่เกิน ${formatRatePercent(ltvPercent)}% LTV`,
+  };
+}
+
 function getMotorcycleGuidePlans(
   appraisalPrice: number,
   refinanceStatus: RefinanceStatus | null,
@@ -980,7 +997,7 @@ function getMotorcycleGuidePlans(
   const fullAmountPlan: ProductGuidePlan = {
     title: "รับเงินเต็ม อนุมัติไว",
     maxLtvLabel: "ไม่เกิน 100% LTV",
-    maxAmount: roundToNearestThousand(appraisalPrice * 1.0),
+    maxAmount: appraisalPrice,
     bullets:
       refinanceStatus === "still-paying"
         ? [
@@ -999,10 +1016,9 @@ function getMotorcycleGuidePlans(
   if (refinanceStatus === "still-paying") return [fullAmountPlan, highLimitPlan];
   return [
     {
-      title: "อนุมัติง่าย เงื่อนไขน้อย",
-      maxLtvLabel: "ไม่เกิน 70% LTV",
-      maxAmount: Math.min(
-        roundToNearestThousand(appraisalPrice * 0.7),
+      title: "Pawn Shop อนุมัติง่าย เงื่อนไขน้อย",
+      ...getCappedEasyApprovalAmount(
+        appraisalPrice,
         MOTORCYCLE_EASY_APPROVAL_MAX_AMOUNT,
       ),
       bulletsHeading: "ลูกค้าต้องไม่เข้าเงื่อนไข ทั้ง 3 ข้อ พร้อมกัน",
@@ -1038,14 +1054,16 @@ export function getProductGuideData(
       ? getMotorcycleGuidePlans(appraisalPrice, refinanceStatus)
       : [
       {
-        title: "อนุมัติง่าย LTV ต่ำ",
-        maxLtvLabel: "ไม่เกิน 70% LTV",
-        maxAmount: isCar
-          ? Math.min(
-              roundToNearestThousand(appraisalPrice * 0.7),
+        title: "Pawn Shop อนุมัติง่าย LTV ต่ำ",
+        ...(isCar
+          ? getCappedEasyApprovalAmount(
+              appraisalPrice,
               CAR_EASY_APPROVAL_MAX_AMOUNT,
             )
-          : roundToNearestThousand(appraisalPrice * 0.7),
+          : {
+              maxLtvLabel: "ไม่เกิน 70% LTV",
+              maxAmount: roundToNearestThousand(appraisalPrice * 0.7),
+            }),
         bullets: isCar
           ? [
               "Max 70% LTV เฉพาะ NCB เกรด A01-A03",
