@@ -94,3 +94,4 @@ Entry point: Home (`/`) → "Ratebook" quick-action card → `/ratebook`. Also r
 - The ข้อมูลลูกค้า/หลักประกัน sidebar header shows a `ProgressRing` (x/4) counting filled sections: ชื่อ-นามสกุล, เบอร์มือถือ, collateral identifier, and ยี่ห้อ/รุ่น. Hovering it opens `LeadProgressTooltip`.
 - `CarInfoForm` is remounted (`key={collateralType-loanPurpose}`) when หลักประกัน or loan purpose changes, so previously entered car fields are cleared.
 - The "ขนาดเครื่องยนต์" label in `CarInfoForm` no longer carries "(ไม่บังคับ)".
+- `ProductCatalogCard` follows the Figma product-card: the วงเงินอนุมัติ box (277px grey panel) has the money-bag icon + label on the left and the %LTV pill (single value or a range such as "70% - 130% LTV") on the right, with the amount right-aligned below. The card body row never wraps its columns and scrolls horizontally (`overflow-x-auto`) when the viewport is too narrow to fit them.

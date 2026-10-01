@@ -1,4 +1,3 @@
-import {Badge} from "@/components/atoms/Badge"
 import {Button} from "@/components/atoms/Button"
 import {Icon} from "@/components/atoms/Icon"
 import type {
@@ -52,31 +51,27 @@ export function ProductCatalogCard({
       </div>
 
       <div className="flex flex-col gap-4 overflow-x-auto rounded-t-lg bg-surface p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 sm:w-auto sm:min-w-52 sm:shrink-0">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-catalog-card-bg text-primary-to">
-            <Icon name="money-bag" className="size-4" />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
+        <div className="flex flex-col gap-1 rounded-lg bg-surface-muted px-3 py-2 sm:w-64 sm:shrink-0">
+          <div className="flex items-center justify-between gap-1">
+            <div className="flex items-center">
+              <Icon name="money-bag" className="size-4 text-primary-to" />
+              <span className="pb-0.5 text-xs text-foreground whitespace-nowrap">
                 วงเงินอนุมัติ
               </span>
-              <Badge tone="info" className="whitespace-nowrap">
-                {item.ltvLabel}
-              </Badge>
             </div>
-
-            <p className="text-lg font-semibold tracking-tight text-primary-to sm:text-base md:text-lg">
-              {item.approvedAmount}{" "}
-              <span className="text-xs font-normal text-unit-label whitespace-nowrap">
-                บาท
-              </span>
-            </p>
+            <span className="rounded-md bg-primary/20 px-1.5 text-xs font-medium whitespace-nowrap text-primary-to">
+              {item.ltvLabel}
+            </span>
           </div>
+
+          <p className="flex items-end justify-end gap-1 text-lg font-semibold text-primary-to">
+            {item.approvedAmount}
+            <span className="pb-0.5 text-[10px] font-normal">บาท</span>
+          </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:items-center sm:gap-3">
-          <div className="sm:w-20 sm:shrink-0">
+        <div className="grid grid-cols-3 gap-4 text-xs sm:flex sm:flex-1 sm:items-center sm:gap-3">
+          <div className="sm:shrink-0 sm:flex-1 whitespace-nowrap">
             <p className="text-muted-foreground">เล่มทะเบียน</p>
             <p className="font-medium text-price-label">
               {item.bookStatusLabel}
@@ -85,7 +80,7 @@ export function ProductCatalogCard({
 
           <div className="hidden w-px shrink-0 self-stretch bg-secondary-border sm:block" />
 
-          <div className="sm:w-42 sm:shrink-0">
+          <div className="sm:shrink-0 sm:flex-[1.5] whitespace-nowrap">
             <p className="text-muted-foreground">อัตราดอกเบี้ย</p>
             <p className="text-unit-label">{item.interestRateLabel}</p>
             <p className="text-price-label">{item.interestReductionLabel}</p>
@@ -93,7 +88,7 @@ export function ProductCatalogCard({
 
           <div className="hidden w-px shrink-0 self-stretch bg-secondary-border sm:block" />
 
-          <div className="sm:w-20 sm:shrink-0">
+          <div className="sm:shrink-0 sm:flex-1 whitespace-nowrap">
             <p className="text-muted-foreground font-light">เฉพาะ NCB</p>
             <p
               className={`font-medium ${NCB_GRADE_TONE_CLASSNAMES[item.ncbGradeTone]}`}
