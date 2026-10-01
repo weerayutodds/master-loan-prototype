@@ -431,9 +431,6 @@ export function RatebookForm({
       ?.label.replace(/ /g, "-"),
     refinanceStatusOptions.find((option) => option.value === refinanceStatus)
       ?.description,
-
-    existingFinanceOptions.find((option) => option.value === existingFinance)
-      ?.label,
   ].filter((tag): tag is string => Boolean(tag))
 
   return (
